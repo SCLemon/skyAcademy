@@ -92,10 +92,12 @@ router.beforeEach(async (to, from, next) => {
                 'x-user-token':token
             }
         })
-        if(res.data.userInfo.typeEng =='teacher') next();
+        if(res.data.userInfo && res.data.userInfo.typeEng =='teacher') next();
         else{
             alert('使用者權限不足')
+            jsCookie.remove('authToken')
             next('/academic/login')
+            location.reload()
         }
     }
     // 訪問學生資料
@@ -109,10 +111,12 @@ router.beforeEach(async (to, from, next) => {
                 'x-user-token':token
             }
         })
-        if(res.data.userInfo.typeEng =='student') next();
+        if(res.data.userInfo && res.data.userInfo.typeEng =='student') next();
         else{
             alert('使用者權限不足')
+            jsCookie.remove('authToken')
             next('/academic/login')
+            location.reload()
         }
     }
     else next();

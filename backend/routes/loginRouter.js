@@ -7,9 +7,9 @@ const userModel = require('../models/userModel');
 const {format} = require('date-fns')
 const { v4: uuidv4 } = require('uuid');
 
-// 創建新用戶
-router.post('/api/createStudent', async (req, res) => {
-    const {account, password, type} = req.body;
+
+// 檢查身份
+const authMiddleware = async (req, res, next) => {
     const token = req.headers['x-user-token']
     if (!token) {
         return res.send({
@@ -17,18 +17,26 @@ router.post('/api/createStudent', async (req, res) => {
             message: '未找到授權，請重新登入。',
         });
     }
+    const user = await userModel.findOne({ token, status:true });
+    if (!user) {
+        return res.send({
+            type: 'error',
+            message: '未找到授權，請重新登入。',
+        });
+    }
+    req.user ={
+        type: user.type
+    } 
+    next();
+};
+
+// 創建新用戶
+router.post('/api/createStudent',authMiddleware, async (req, res) => {
+    const {account, password, type} = req.body;
     try {
-        const teacher = await userModel.findOne({ token });
-        if (!teacher) {
-            return res.send({
-                type: 'error',
-                message: '未找到授權，請重新登入。',
-            });
-        }
-
-        if (teacher.type === 'teacher') {
-
+        if (req.user.type === 'teacher') {
             const newUser = new userModel({
+                idx: uuidv4(),
                 token:uuidv4(),
                 account: account,
                 password: password,
@@ -53,7 +61,7 @@ router.post('/api/createStudent', async (req, res) => {
         else {
             return res.send({
                 type: 'error',
-                message: '您沒有權限創建學生資料。',
+                message: '您沒有權限刪除學生資料。',
             });
         }
     } catch (e) {
@@ -64,6 +72,100 @@ router.post('/api/createStudent', async (req, res) => {
         });
     }
 });
+
+// 刪除用戶
+router.delete('/api/deleteStudent/:idx',authMiddleware,async(req,res)=>{
+    try {
+        if (req.user.type === 'teacher') {
+
+            const idx = req.params.idx;
+            
+            if (!idx || typeof idx !== 'string' || idx.length !== 36) {
+                return res.send({
+                    type: 'error',
+                    message: '用戶刪除失敗！'
+                });
+            }
+
+            const deletedUser = await userModel.findOneAndDelete({ idx: idx });
+
+            if (!deletedUser) {
+                return res.send({
+                    type: 'error',
+                    message: '用戶刪除失敗！',
+                });
+            }
+
+            return res.send({
+                type: 'success',
+                message: `學生 ${deletedUser.account} 已成功刪除。`,
+            });
+        } 
+        else {
+            return res.send({
+                type: 'error',
+                message: '您沒有權限創建學生資料。',
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+})
+
+// 凍結用戶
+router.put('/api/stopStudent/:idx',authMiddleware,async(req,res)=>{
+    try {
+        if (req.user.type === 'teacher') {
+
+            const idx = req.params.idx;
+            
+            if (!idx || typeof idx !== 'string' || idx.length !== 36) {
+                return res.send({
+                    type: 'error',
+                    message: '用戶權限變更失敗！'
+                });
+            }
+            const user = await userModel.findOne({ idx: idx });
+
+            if (!user) {
+                return res.send({
+                    type: 'error',
+                    message: '用戶權限變更失敗！',
+                });
+            }
+
+            const updatedUser = await userModel.findOneAndUpdate({ idx: idx },{ $set: { status: !user.status } },{ new: true });
+
+            if (!updatedUser) {
+                return res.send({
+                    type: 'error',
+                    message: '用戶權限變更失敗！',
+                });
+            }
+
+            return res.send({
+                type: 'success',
+                message: `學生 ${updatedUser.account} 權限變更成功。`,
+            });
+        } 
+        else {
+            return res.send({
+                type: 'error',
+                message: '您沒有權限修改學生資料。',
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+})
 
 // 登入驗證
 router.post('/login/verify', async (req, res) => {
@@ -147,29 +249,17 @@ router.post('/login/token', async (req, res) => {
 });
 
 // 獲取學生資料
-router.get('/api/getStudent', async (req, res) => {
-    const token = req.headers['x-user-token']
-    if (!token) {
-        return res.send({
-            type: 'error',
-            message: '未找到授權，請重新登入。',
-        });
-    }
-    try {
-        const teacher = await userModel.findOne({ token });
-        if (!teacher) {
-            return res.send({
-                type: 'error',
-                message: '未找到授權，請重新登入。',
-            });
-        }
+router.get('/api/getStudent',authMiddleware, async (req, res) => {
 
-        if (teacher.type === 'teacher') {
+    try {
+
+        if (req.user.type === 'teacher') {
 
             let students = await userModel.find({ type: 'student' });
 
             students = students.map(obj=>{
                 return {
+                    idx:obj.idx,
                     createTime:obj.createTime,
                     account:obj.account,
                     lastOnline:obj.lastOnline,
@@ -198,5 +288,26 @@ router.get('/api/getStudent', async (req, res) => {
         });
     }
 });
+
+
+
+// 新增欄位
+const updateIdxIncrementally = async () => {
+    try {
+        const users = await userModel.find();
+        let index = uuidv4(); 
+
+        for (let user of users) {
+            await userModel.updateOne({ _id: user._id }, { $set: { idx: index } });
+            index = uuidv4()
+        }
+
+        console.log('所有文件的欄位已更新');
+    } catch (error) {
+        console.error('更新失敗:', error);
+    }
+};
+
+// updateIdx();
 
 module.exports = router;

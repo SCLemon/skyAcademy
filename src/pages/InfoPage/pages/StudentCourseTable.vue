@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="tableTitle">課程總覽</div>
-        <el-table :data="tableData" border height="calc(100vh - 360px)" style="width: 100%" class="tableData">
+        <el-table :data="tableData" border height="calc(100vh - 360px)" style="width: 100%" class="tableData" empty-text="暫無數據">
             <el-table-column prop="date" label="開課時間"></el-table-column>
             <el-table-column prop="course_id" label="課程代碼"></el-table-column>
             <el-table-column prop="course_name" label="課程名稱"></el-table-column>

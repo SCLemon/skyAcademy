@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
+    idx:{
+        type: String,
+        required:true,
+        unique: true,
+        trim: true,
+    },
     token: {
         type: String,
         required:true,
