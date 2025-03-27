@@ -29,6 +29,7 @@ export default {
   }
   .view{
     width: calc(100vw - 250px);
+    min-width: 1190px;
     height: 100vh;
   }
 </style>
