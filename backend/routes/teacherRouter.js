@@ -3,7 +3,8 @@ const router = express.Router();
 
 const multer = require('multer');
 const userModel = require('../models/userModel');
-
+const fs = require('fs');
+const path = require('path');
 const {format} = require('date-fns')
 const { v4: uuidv4 } = require('uuid');
 
@@ -209,7 +210,50 @@ router.get('/api/getStudent',authMiddleware, async (req, res) => {
     }
 });
 
+// 獲取使用容量
+function getFolderSize(folderPath) {
+    let totalSize = 0;
 
+    // 讀取資料夾內容
+    const files = fs.readdirSync(folderPath);
+  
+    files.forEach((file) => {
+      const filePath = path.join(folderPath, file);
+      const stat = fs.statSync(filePath);
+      if (stat.isDirectory()) totalSize += getFolderSize(filePath);
+      else totalSize += stat.size;
+    });
+  
+    return totalSize/(1024*1024);
+}
+router.get('/api/getUsageMemory',authMiddleware, async (req, res) => {
+   
+    try {
+        if (req.user.type === 'teacher') {
+            const token = req.headers['x-user-token']
+            const folderPath = path.resolve(__dirname, `../../database/${token}`);
+            if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath, { recursive: true });
+            const size = getFolderSize(folderPath);
+            return res.send({
+                type:'success',
+                size:size,
+                message:'儲存空間用量資訊獲取成功！'
+            })
+        } 
+        else {
+            return res.send({
+                type: 'error',
+                message: '您沒有權限查看儲存空間用量。',
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+});
 // 額外新增欄位
 const updateIdxIncrementally = async () => {
     try {

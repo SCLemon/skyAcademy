@@ -11,7 +11,7 @@
         </router-link>
         <router-link :to="''" class="sum">
             <div class="sum_title">空間用量 (MB)</div>
-            <div class="sum_num">1024</div>
+            <div class="sum_num">{{ usage_memory }}</div>
         </router-link>
     </div>
     <div class="table">
@@ -21,20 +21,33 @@
 </template>
 
 <script>
+import axios from 'axios'
+import jsCookie from 'js-cookie'
 export default {
     name:'TeacherInfo',
     mounted(){
         this.$bus.$on('setStudentNum',this.setStudentNum)
+        this.getUsageMemory()
     },
     data(){
       return{
         student_num:0,
+        usage_memory:0
       }
     },
     methods:{
         setStudentNum(num){
             this.student_num = num
         },
+        async getUsageMemory(){
+            const res = await axios.get('/api/getUsageMemory',{
+                headers:{
+                    'x-user-token':jsCookie.get('authToken')
+                }
+            })
+            if(res.data.type == 'success') this.usage_memory = parseFloat(res.data.size).toFixed(3)
+            else this.$bus.$emit('handleAlert','儲存空間資訊通知',res.data.message,res.data.type)
+        }
     }
 }
 </script>
