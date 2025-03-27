@@ -6,8 +6,8 @@
             <div class="sum_num">{{ student_num }}</div>
         </router-link>
         <router-link :to="{ path:'teacherCourseTable' }" class="sum">
-            <div class="sum_title">有效課程</div>
-            <div class="sum_num">1</div>
+            <div class="sum_title">課程總數</div>
+            <div class="sum_num">{{ course_num }}</div>
         </router-link>
         <router-link :to="''" class="sum">
             <div class="sum_title">空間用量 (MB)</div>
@@ -25,19 +25,44 @@ import axios from 'axios'
 import jsCookie from 'js-cookie'
 export default {
     name:'TeacherInfo',
-    mounted(){
+    async mounted(){
         this.$bus.$on('setStudentNum',this.setStudentNum)
-        this.getUsageMemory()
+        this.$bus.$on('setCourseNum',this.setCourseNum)
+        this.initialize()
     },
     data(){
       return{
         student_num:0,
+        course_num:0,
         usage_memory:0
       }
     },
     methods:{
+        // 初始化
+        initialize(){
+            this.getUsageMemory()
+            this.getStudent()
+            this.getCourse()
+        },
         setStudentNum(num){
             this.student_num = num
+        },
+        setCourseNum(num){
+            this.course_num = num
+        },
+        async getCourse(){
+            try{
+                const res = await axios.get('/api/getCourse',{headers:{'x-user-token':jsCookie.get('authToken')}})
+                if(res.data.courses) this.course_num = res.data.courses.length
+            }
+            catch(e){}
+        },
+        async getStudent(){
+            try{
+                const res = await axios.get('/api/getStudent',{headers:{'x-user-token':jsCookie.get('authToken')}})
+                if(res.data.students) this.student_num = res.data.students.length
+            }
+            catch(e){}
         },
         async getUsageMemory(){
             const res = await axios.get('/api/getUsageMemory',{
@@ -45,7 +70,7 @@ export default {
                     'x-user-token':jsCookie.get('authToken')
                 }
             })
-            if(res.data.type == 'success') this.usage_memory = parseFloat(res.data.size).toFixed(3)
+            if(res.data.type == 'success') this.usage_memory = parseFloat(res.data.size).toFixed(2)
             else this.$bus.$emit('handleAlert','儲存空間資訊通知',res.data.message,res.data.type)
         }
     }

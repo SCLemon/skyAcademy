@@ -14,12 +14,12 @@
                     <div :class="scope.row.status?'valid':'invalid'">{{ scope.row.status?'有效':'凍結' }}</div>
                 </template>
             </el-table-column>
-            <el-table-column label="管理操作">
+            <el-table-column label="管理操作" width="250">
                 <template v-slot="scope">
                     <div class="btn">
-                        <div class="btn_link success" @click="editUser(scope.row.idx)">編輯</div>
-                        <div class="btn_link warning" @click="stopUser(scope.row.account,scope.row.idx)">{{scope.row.status?'凍結':'解凍'}}</div>
-                        <div class="btn_link error" @click="deleteUser(scope.row.account,scope.row.idx)">刪除</div>
+                        <el-button class="btn_link" @click="editUser(scope.row.idx)">查看</el-button>
+                        <el-button class="btn_link" type="warning" @click="stopUser(scope.row.account,scope.row.idx)">{{scope.row.status?'凍結':'解凍'}}</el-button>
+                        <el-button class="btn_link" type="danger" @click="deleteUser(scope.row.account,scope.row.idx)">刪除</el-button>
                     </div>
                 </template>
             </el-table-column>
@@ -168,22 +168,15 @@ export default {
     .invalid{
         color: rgb(170, 170, 170);
     }
-    .success:hover{
-        color: blue !important;
-    }
-    .warning:hover{
-        color: orange !important;
-    }
-    .error:hover{
-        color:red !important;
-    }
     .btn{
         display: flex;
         justify-content: space-evenly;
         align-items: center;
     }
+    .btn_link{
+        font-size: 14px;
+    }
     .btn_link:hover{
         cursor: pointer;
-        color: blue;
     }
 </style>

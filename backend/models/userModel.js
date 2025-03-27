@@ -13,6 +13,11 @@ const userSchema = new mongoose.Schema({
         unique: true,
         trim: true,
     },
+    group:{
+        type: String,
+        required:true,
+        trim: true,
+    },
     account:{
         type:String,
         required:true,

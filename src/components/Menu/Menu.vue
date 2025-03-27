@@ -3,12 +3,16 @@
     <div :class="{user:true,list_selected: $route.path.includes('/login') || $route.path.includes('/studentInfo') || $route.path.includes('/teacherInfo')}"
          @click="isLogin?goTo(`/academic/${userInfo.typeEng}Info`):goTo('/academic/login')">
         <img class="img" src="img/user.png" alt="">
-        <div class="username">{{ isLogin?`${userInfo.account} (${userInfo.type})`:'登入/註冊' }}</div>
+        <div :class="`username ${isLogin?'username_login':''}`">
+            {{ isLogin?`${userInfo.account}`:'登入/註冊' }}
+            <div>(職稱：{{userInfo.type}})</div>
+        </div>
     </div>
-    <div @click="goTo('/academic/post')" :class="{list:true,list_selected: $route.path.includes('/post')}">課程公告</div>
-    <div @click="goTo('/academic/learn')" :class="{list:true,list_selected: $route.path.includes('/learn')}">教學影音</div>
+    <div @click="goTo('/academic/post')" :class="{list:true,list_selected: $route.path.includes('/post')}">平台公告</div>
+    <div @click="goTo('/academic/learn')" :class="{list:true,list_selected: $route.path.includes('/learn')}">課程列表</div>
     <div @click="goTo('/academic/practice')" :class="{list:true,list_selected: $route.path.includes('/practice')}">課後練習</div>
     <div v-if="isLogin" :class="{list:true}" @click="logout()">登出系統</div>
+    <div class="footer"><img class="footer_img" src="img/horizontal_logo_white.png" alt=""> </div>
   </div>
 </template>
 
@@ -58,6 +62,7 @@ export default {
         width: 250px;
         height: 100vh;
         background: black;
+        position: relative;
     }
     .user{
         width: 100%;
@@ -79,8 +84,10 @@ export default {
         height: 60px;
         line-height: 60px;
         text-align: center;
-        white-space: nowrap;
         overflow-y: scroll;
+    }
+    .username_login{
+        line-height: 30px;
     }
     .list{
         width:100%;
@@ -93,5 +100,16 @@ export default {
         cursor: pointer;
         background: white;
         color: black;
+    }
+
+    .footer{
+        width:100%;
+        height: 60px;
+    }
+    .footer>img{
+        width: 100%;
+        margin: 0 auto;
+        position: absolute;
+        bottom: 15px;
     }
 </style>

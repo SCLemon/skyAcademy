@@ -3,6 +3,7 @@ const router = express.Router();
 
 const multer = require('multer');
 const userModel = require('../models/userModel');
+const courseModel = require('../models/courseModel');
 const fs = require('fs');
 const path = require('path');
 const {format} = require('date-fns')
@@ -26,7 +27,8 @@ const authMiddleware = async (req, res, next) => {
         });
     }
     req.user ={
-        type: user.type
+        type: user.type,
+        group: user.group
     } 
     next();
 };
@@ -41,6 +43,7 @@ router.post('/api/createStudent',authMiddleware, async (req, res) => {
                 token:uuidv4(),
                 account: account,
                 password: password,
+                group: req.user.group,
                 createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),
                 type:type
             });
@@ -53,6 +56,7 @@ router.post('/api/createStudent',authMiddleware, async (req, res) => {
                 });
             }
             catch(e){
+                console.log(e)
                 return res.send({
                     type:'error',
                     message:'用戶創建失敗。'
@@ -62,7 +66,7 @@ router.post('/api/createStudent',authMiddleware, async (req, res) => {
         else {
             return res.send({
                 type: 'error',
-                message: '您沒有權限刪除學生資料。',
+                message: '您沒有權限創建學生資料。',
             });
         }
     } catch (e) {
@@ -130,7 +134,7 @@ router.put('/api/stopStudent/:idx',authMiddleware,async(req,res)=>{
                     message: '用戶權限變更失敗！'
                 });
             }
-            const user = await userModel.findOne({ idx: idx });
+            const user = await userModel.findOne({ idx: idx, group:req.user.group });
 
             if (!user) {
                 return res.send({
@@ -139,7 +143,7 @@ router.put('/api/stopStudent/:idx',authMiddleware,async(req,res)=>{
                 });
             }
 
-            const updatedUser = await userModel.findOneAndUpdate({ idx: idx },{ $set: { status: !user.status } },{ new: true });
+            const updatedUser = await userModel.findOneAndUpdate({ idx: idx , group:req.user.group},{ $set: { status: !user.status } },{ new: true });
 
             if (!updatedUser) {
                 return res.send({
@@ -176,7 +180,7 @@ router.get('/api/getStudent',authMiddleware, async (req, res) => {
 
         if (req.user.type === 'teacher') {
 
-            let students = await userModel.find({ type: 'student' });
+            let students = await userModel.find({ type: 'student', group: req.user.group });
 
             students = students.map(obj=>{
                 return {
@@ -213,10 +217,7 @@ router.get('/api/getStudent',authMiddleware, async (req, res) => {
 // 獲取使用容量
 function getFolderSize(folderPath) {
     let totalSize = 0;
-
-    // 讀取資料夾內容
     const files = fs.readdirSync(folderPath);
-  
     files.forEach((file) => {
       const filePath = path.join(folderPath, file);
       const stat = fs.statSync(filePath);
@@ -224,16 +225,16 @@ function getFolderSize(folderPath) {
       else totalSize += stat.size;
     });
   
-    return totalSize/(1024*1024);
+    return totalSize;
 }
 router.get('/api/getUsageMemory',authMiddleware, async (req, res) => {
    
     try {
         if (req.user.type === 'teacher') {
             const token = req.headers['x-user-token']
-            const folderPath = path.resolve(__dirname, `../../database/${token}`);
+            const folderPath = path.resolve(__dirname, `../../database/${req.user.group}`);
             if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath, { recursive: true });
-            const size = getFolderSize(folderPath);
+            const size = getFolderSize(folderPath) / (1024*1024);
             return res.send({
                 type:'success',
                 size:size,
@@ -254,15 +255,215 @@ router.get('/api/getUsageMemory',authMiddleware, async (req, res) => {
         });
     }
 });
+
+// 以下為課程區域操作
+
+function createCourseFolder(folderPath){
+    if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath, { recursive: true });
+}
+function deleteCourseFolder(folderPath){
+    if (fs.existsSync(folderPath)) fs.rmSync(folderPath, { recursive: true, force: true }); // 遞迴刪除
+}
+
+// 創建課程
+router.post('/api/createCourse',authMiddleware, async (req, res) => {
+    const {courseId,courseName,lecturer} = req.body;
+    try {
+        if (req.user.type === 'teacher') {
+            const idx = uuidv4();
+            const newCourse = new courseModel({
+                idx:idx,
+                courseId,
+                courseName,
+                lecturer,
+                group: req.user.group,
+                createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),
+            });
+        
+            try{
+                await newCourse.save()
+
+                // 創建課程專屬資料夾
+                const folderPath = path.resolve(__dirname, `../../database/${req.user.group}/${idx}`);
+                createCourseFolder(folderPath)
+
+                return res.send({
+                    type:'success',
+                    message:'課程創建成功。'
+                });
+            }
+            catch(e){
+                console.log(e)
+                return res.send({
+                    type:'error',
+                    message:'課程創建失敗。'
+                });
+            }
+        } 
+        else {
+            return res.send({
+                type: 'error',
+                message: '您沒有權限創建課程資料。',
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+});
+
+// 獲取課程資料
+router.get('/api/getCourse',authMiddleware, async (req, res) => {
+
+    try {
+
+        if (req.user.type === 'teacher') {
+
+            let courses = await courseModel.find({ group: req.user.group });
+
+            courses = courses.map(obj=>{
+                return {
+                    idx:obj.idx,
+                    createTime:obj.createTime,
+                    courseId:obj.courseId,
+                    courseName:obj.courseName,
+                    lecturer:obj.lecturer,
+                    status:obj.status
+                }
+            })
+
+            return res.send({
+                type: 'success',
+                courses:courses,
+                message: '資料查詢成功。',
+            });
+        } 
+        else {
+            return res.send({
+                type: 'error',
+                message: '您沒有權限查看課程資料。',
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+});
+
+// 刪除課程
+router.delete('/api/deleteCourse/:idx',authMiddleware,async(req,res)=>{
+    try {
+        if (req.user.type === 'teacher') {
+
+            const idx = req.params.idx;
+            
+            if (!idx || typeof idx !== 'string' || idx.length !== 36) {
+                return res.send({
+                    type: 'error',
+                    message: '課程刪除失敗！'
+                });
+            }
+
+            const deletedCourse = await courseModel.findOneAndDelete({ idx: idx, group:req.user.group });
+
+            if (!deletedCourse) {
+                return res.send({
+                    type: 'error',
+                    message: '課程刪除失敗！',
+                });
+            }
+            
+            // 刪除課程專屬資料夾
+            const folderPath = path.resolve(__dirname, `../../database/${req.user.group}/${idx}`);
+            deleteCourseFolder(folderPath)
+            
+            return res.send({
+                type: 'success',
+                message: `課程 ${deletedCourse.courseId} 已成功刪除。`,
+            });
+        } 
+        else {
+            return res.send({
+                type: 'error',
+                message: '您沒有權限刪除課程資料。',
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+})
+
+// 隱藏課程
+router.put('/api/stopCourse/:idx',authMiddleware,async(req,res)=>{
+    try {
+        if (req.user.type === 'teacher') {
+
+            const idx = req.params.idx;
+            
+            if (!idx || typeof idx !== 'string' || idx.length !== 36) {
+                return res.send({
+                    type: 'error',
+                    message: '用戶權限變更失敗！'
+                });
+            }
+            const course = await courseModel.findOne({ idx: idx, group:req.user.group });
+
+            if (!course) {
+                return res.send({
+                    type: 'error',
+                    message: '課程權限變更失敗！',
+                });
+            }
+
+            const updatedCourse = await courseModel.findOneAndUpdate({ idx: idx, group:req.user.group },{ $set: { status: !course.status } },{ new: true });
+
+            if (!updatedCourse) {
+                return res.send({
+                    type: 'error',
+                    message: '用戶權限變更失敗！',
+                });
+            }
+
+            return res.send({
+                type: 'success',
+                message: `課程 ${updatedCourse.courseId} 權限變更成功。`,
+            });
+        } 
+        else {
+            return res.send({
+                type: 'error',
+                message: '您沒有權限修改課程資料。',
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+})
+
+
+
+// 下方為 admin 操作區
 // 額外新增欄位
-const updateIdxIncrementally = async () => {
+const update = async () => {
     try {
         const users = await userModel.find();
-        let index = uuidv4(); 
 
         for (let user of users) {
-            await userModel.updateOne({ _id: user._id }, { $set: { idx: index } });
-            index = uuidv4()
+            await userModel.updateOne({ _id: user._id, type: 'teacher' }, { $set: { group: '0001' } });
         }
 
         console.log('所有文件的欄位已更新');
@@ -271,6 +472,31 @@ const updateIdxIncrementally = async () => {
     }
 };
 
-// updateIdx();
+// 新增教師
+async function createUserByAdmin(){
+    const account = 'sclemon2';
+    const password = '34864015';
+    const type = 'teacher';
+    const group = '0002'
+    const newUser = new userModel({
+        idx: uuidv4(),
+        token:uuidv4(),
+        account: account,
+        password: password,
+        group: group,
+        createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),
+        type:type
+    });
+    await newUser.save();
+    console.log('資料創建完畢')
+}
 
 module.exports = router;
+
+
+const canvas = document.getElementsByClassName('c-canvas-section__adsorptionLine')[0];
+const dataUrl = canvas.toDataURL('image/png'); // 將畫布轉換為 PNG 圖像
+    const a = document.createElement('a'); // 創建下載連結
+    a.href = dataUrl; // 設定連結為 canvas 的圖像數據
+    a.download = 'canvas_image.png'; // 設定下載文件名
+    a.click(); // 模擬點擊下載

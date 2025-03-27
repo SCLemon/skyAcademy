@@ -1,88 +1,187 @@
-<template>
-  <div>
-    <div class="tableTitle">課程總覽</div>
-        <el-table :data="tableData" border height="calc(100vh - 360px)" style="width: 100%" class="tableData" empty-text="暫無數據">
-            <el-table-column prop="date" label="開課時間"></el-table-column>
-            <el-table-column prop="course_id" label="課程代碼"></el-table-column>
-            <el-table-column prop="course_name" label="課程名稱"></el-table-column>
-            <el-table-column prop="teacher" label="授課教師"></el-table-column>
-            <el-table-column prop="status" label="狀態">
-                <template v-slot="scope">
-                    <div :class="scope.row.status?'valid':'invalid'">{{ scope.row.status?'有效':'失效' }}</div>
-                </template>
-            </el-table-column>
-            <el-table-column label="管理操作">
-                <template v-slot="scope">
-                    <div class="btn">
-                        <div class="btn_link" @click="editCourse(scope.row.course_id)">編輯</div>
-                        <div class="btn_link" @click="stopCourse(scope.row.course_id)">停止</div>
-                        <div class="btn_link" @click="removeCourse(scope.row.course_id)">刪除</div>
-                    </div>
-                </template>
-            </el-table-column>
-        </el-table>
-  </div>
-</template>
-
-<script>
-export default {
-    name:'StudentCourseTable',
-    data(){
-        return{
-            valid:true,
-            tableData: []
+    <template>
+        <div>
+        <div class="tableTitle">
+            <div class="tableTitle_left">課程總覽</div>
+            <el-button class="tableTitle_right" @click="dialogFormVisible = true">新增課程</el-button>
+        </div>
+            <el-table :data="tableData" border height="calc(100vh - 360px)" style="width: 100%" class="tableData" empty-text="暫無數據">
+                <el-table-column prop="createTime" label="創建時間"></el-table-column>
+                <el-table-column prop="courseId" label="課程代碼"></el-table-column>
+                <el-table-column prop="lecturer" label="授課教師"></el-table-column>
+                <el-table-column prop="status" label="狀態">
+                    <template v-slot="scope">
+                        <div :class="scope.row.status?'valid':'invalid'">{{ scope.row.status?'公開':'不公開' }}</div>
+                    </template>
+                </el-table-column>
+                <el-table-column label="管理操作" width="250">
+                    <template v-slot="scope">
+                        <div class="btn">
+                            <el-button class="btn_link" @click="editCourse(scope.row.idx)">查看</el-button>
+                            <el-button class="btn_link" type="warning" @click="stopCourse(scope.row.account,scope.row.idx)">{{scope.row.status?'隱藏':'公開'}}</el-button>
+                            <el-button class="btn_link" type="danger" @click="deleteCourse(scope.row.courseId,scope.row.idx)">刪除</el-button>
+                        </div>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-dialog title="創建課程" :visible.sync="dialogFormVisible">
+                <el-form :model="form">
+                    <el-form-item label="課程名稱">
+                        <el-input v-model="form.courseName" autocomplete="off" clearable></el-input>
+                    </el-form-item>
+                    <el-form-item label="課程代碼">
+                        <el-input v-model="form.courseId" autocomplete="off" clearable></el-input>
+                    </el-form-item>
+                    <el-form-item label="授課教師">
+                        <el-input v-model="form.lecturer" autocomplete="off" clearable></el-input>
+                    </el-form-item>
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="dialogFormVisible = false">取消</el-button>
+                    <el-button type="primary" @click="create()">創建</el-button>
+                </div>
+            </el-dialog>
+        </div>
+    </template>
+    
+    <script>
+    import axios from 'axios'
+    import jsCookie from 'js-cookie'
+    export default {
+        name:'ClientTable',
+        data(){
+            return{
+                tableData: [],
+                dialogFormVisible:false,
+                form:{
+                    courseName:'',
+                    courseId:'',
+                    lecturer:''
+                },
+            }
+        },
+        mounted(){
+            this.getData()
+        },
+        methods:{
+            async getData(){
+                const res = await axios.get('/api/getCourse',{
+                    headers:{
+                        'x-user-token':jsCookie.get('authToken')
+                    }
+                })
+                if(res.data.courses) {
+                    this.tableData = res.data.courses
+                    this.$bus.$emit('setCourseNum',this.tableData.length)
+                }
+                else this.$bus.$emit('handleAlert','課程資料查詢通知',res.data.message,res.data.type)
+            },
+            async create(){
+                const res = await axios.post('/api/createCourse',this.form,{
+                    headers:{
+                        'x-user-token':jsCookie.get('authToken')
+                    }
+                })
+                if(res.data.type == 'success'){
+                    this.getData();
+                    this.dialogFormVisible = false;
+                    this.form = {
+                        courseName:'',
+                        courseId:'',
+                        lecturer:''
+                    },
+                    this.$bus.$emit('handleAlert','課程資料創建通知',res.data.message,res.data.type)
+                }
+                else this.$bus.$emit('handleAlert','課程資料創建通知',res.data.message,res.data.type)
+            },
+            async deleteCourse(courseId, idx){
+                try{
+                    await this.$confirm(`確認是否刪除課程 (${courseId})?`, '提示', {
+                        confirmButtonText: '刪除',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    })
+                    const res = await axios.delete(`/api/deleteCourse/${idx}`,{
+                        headers:{
+                            'x-user-token':jsCookie.get('authToken')
+                        }
+                    })
+                    if(res.data.type == 'success'){
+                        this.getData();
+                        this.$bus.$emit('handleAlert','課程資料刪除通知',res.data.message,res.data.type)
+                    }
+                    else this.$bus.$emit('handleAlert','課程資料刪除通知',res.data.message,res.data.type)
+                }
+                catch(e){}
+            },
+            async stopCourse(account, idx){
+                try{
+                    await this.$confirm(`確認是否變更用戶 (${account}) 權限?`, '提示', {
+                        confirmButtonText: '刪除',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    })
+                    const res = await axios.put(`/api/stopCourse/${idx}`,{},{
+                        headers:{
+                            'x-user-token':jsCookie.get('authToken')
+                        }
+                    })
+                    if(res.data.type == 'success'){
+                        this.getData();
+                        this.$bus.$emit('handleAlert','課程權限變更通知',res.data.message,res.data.type)
+                    }
+                    else this.$bus.$emit('handleAlert','課程權限變更通知',res.data.message,res.data.type)
+                }
+                catch(e){}
+            },
+            async editCourse(account,idx){
+    
+            }
         }
-    },
-    mounted(){
-        this.getData()
-    },
-    methods:{
-        getData(){
-            let dummy = [{
-                date: '2025-03-26',
-                course_id: 'SC31001',
-                course_name: '高中物理全',
-                teacher:'SCLemon',
-                status: true,
-            }]
-            this.tableData = dummy
-        },
-        editCourse(course_id){
-            this.$bus.$emit('handleAlert','edit',course_id,'success')
-        },
-        stopCourse(course_id){
-            this.$bus.$emit('handleAlert','stop',course_id,'success')
-        },
-        removeCourse(course_id){
-            this.$bus.$emit('handleAlert','remove',course_id,'success')
+    }
+    </script>
+    
+    <style scoped>
+        .table{
+            width: 95%;
+            margin: 0 auto;
+            margin-top: 20px;
         }
-    }
-}
-</script>
-
-<style scoped>
-    .table{
-        width: 95%;
-        margin: 0 auto;
-        margin-top: 20px;
-    }
-    .tableTitle{
-        font-size: 24px;
-        line-height: 85px;
-    }
-    .valid{
-        color: lightgreen;
-    }
-    .invalid{
-        color: rgb(170, 170, 170);
-    }
-    .btn{
-        display: flex;
-        justify-content: space-evenly;
-        align-items: center;
-    }
-    .btn_link:hover{
-        cursor: pointer;
-        color: blue;
-    }
-</style>
+        .tableTitle{
+            line-height: 85px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+        }
+        .tableTitle_left{
+            float: left;
+            font-size: 24px;
+        }
+        .tableTitle_right{
+            height: 40px;
+            text-align: center;
+            /* 放置最右邊 */
+            margin-left: auto;
+            font-size: 14px;
+        }
+        .tableTitle_right:hover{
+            cursor: pointer;
+            color: blue;
+        }
+        .valid{
+            color: lightgreen;
+        }
+        .invalid{
+            color: rgb(170, 170, 170);
+        }
+        .btn{
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+        }
+        .btn_link{
+            font-size: 14px;
+        }
+        .btn_link:hover{
+            cursor: pointer;
+        }
+    </style>
