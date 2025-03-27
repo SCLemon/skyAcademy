@@ -36,15 +36,6 @@ export default {
     mounted(){
         this.getData()
     },
-    watch:{
-        '$route.query': {
-        handler() {
-            if(this.$route.query.valid) this.valid = this.$route.query.valid;
-            this.getData()
-        },
-        immediate: true, 
-        }
-    },
     methods:{
         getData(){
             let dummy = [{
@@ -54,7 +45,7 @@ export default {
                 teacher:'SCLemon',
                 status: true,
             }]
-            this.tableData = dummy.filter(obj=> obj.status.toString() == this.valid.toString())
+            this.tableData = dummy
         },
         editCourse(course_id){
             this.$bus.$emit('handleAlert','edit',course_id,'success')

@@ -5,13 +5,13 @@
             <div class="sum_title">學生總數</div>
             <div class="sum_num">{{ student_num }}</div>
         </router-link>
-        <router-link :to="{ path:'teacherCourseTable', query:{valid:true}}" class="sum">
+        <router-link :to="{ path:'teacherCourseTable' }" class="sum">
             <div class="sum_title">有效課程</div>
             <div class="sum_num">1</div>
         </router-link>
-        <router-link :to="{ path:'teacherCourseTable', query:{valid:false}}" class="sum">
-            <div class="sum_title">失效課程</div>
-            <div class="sum_num">0</div>
+        <router-link :to="''" class="sum">
+            <div class="sum_title">空間用量 (MB)</div>
+            <div class="sum_num">1024</div>
         </router-link>
     </div>
     <div class="table">

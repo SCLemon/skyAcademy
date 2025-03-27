@@ -2,8 +2,7 @@
   <div>
     <div class="tableTitle">
         <div class="tableTitle_left">學生總覽</div>
-        <div class="tableTitle_right" @click="dialogFormVisible = true">新增學生</div>
-        
+        <el-button class="tableTitle_right" @click="dialogFormVisible = true">新增學生</el-button>
     </div>
         <el-table :data="tableData" border height="calc(100vh - 360px)" style="width: 100%" class="tableData" empty-text="暫無數據">
             <el-table-column prop="createTime" label="創建時間"></el-table-column>
@@ -18,7 +17,7 @@
             <el-table-column label="管理操作">
                 <template v-slot="scope">
                     <div class="btn">
-                        <div class="btn_link success" @click="EditUser(scope.row.idx)">編輯</div>
+                        <div class="btn_link success" @click="editUser(scope.row.idx)">編輯</div>
                         <div class="btn_link warning" @click="stopUser(scope.row.account,scope.row.idx)">{{scope.row.status?'凍結':'解凍'}}</div>
                         <div class="btn_link error" @click="deleteUser(scope.row.account,scope.row.idx)">刪除</div>
                     </div>
@@ -128,6 +127,9 @@ export default {
                 else this.$bus.$emit('handleAlert','用戶權限變更通知',res.data.message,res.data.type)
             }
             catch(e){}
+        },
+        async editUser(account,idx){
+
         }
     }
 }
@@ -142,14 +144,18 @@ export default {
     .tableTitle{
         line-height: 85px;
         text-align: center;
+        display: flex;
+        align-items: center;
     }
     .tableTitle_left{
         float: left;
         font-size: 24px;
     }
     .tableTitle_right{
-        float: right;
-        margin-right: 10px;
+        height: 40px;
+        text-align: center;
+        /* 放置最右邊 */
+        margin-left: auto;
         font-size: 14px;
     }
     .tableTitle_right:hover{

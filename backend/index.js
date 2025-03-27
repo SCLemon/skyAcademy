@@ -32,6 +32,8 @@ process.on('SIGINT', function() {
 const loginRouter = require('./routes/loginRouter');
 app.use(loginRouter);
 
+const teacherRouter = require('./routes/teacherRouter');
+app.use(teacherRouter);
 
 app.listen(3007,()=>{
     console.log('server is running on port 3007')
