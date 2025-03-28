@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="header">
-            <div class="logo"><img class="logo_img" src="img/horizontal_logo_white.png" alt=""></div>
+            <div class="logo"><img class="logo_img" src="img/horizontal_logo_white.png" alt="" @click="goTo('/')"></div>
             <div class="contact">Contact Us</div>
         </div>
         <div class="top">
@@ -44,11 +44,11 @@ export default {
                 if(el) el.style = 'border-right:0'
             }
             catch(e){}
-        }, 5750);
+        }, 6500);
     },
     methods: {
         goTo(path){
-            this.$router.push(path)
+            this.$router.push(path).catch((e)=>{})
         }
     },
     beforeDestroy(){
@@ -75,6 +75,9 @@ export default {
     }
     .logo_img{
         width:100%;
+    }
+    .logo_img{
+        cursor: pointer;
     }
     .contact{
         width: 100px;
@@ -132,17 +135,21 @@ export default {
         white-space: nowrap;
         overflow: hidden;
         border-right: 2px solid white;
+        color: black;
         padding-right: 2px;
+        width: 0;
         animation: typing 4s steps(77) 1s 1 normal forwards, blink 0.75s step-end infinite;
     }
 
     @keyframes typing {
         0% {
             width: 0;
+            color: white;
             border-right: 2px solid white;
         }
         100% {
             width: 100%;
+            color: white;
         }
     }
     @keyframes blink {
@@ -185,7 +192,7 @@ export default {
         border-radius: 40px;
         border: 1px solid black;
         color: black;
-        background: rgb(230,230,230);
+        background: rgb(230,230,230);  
     }
     .btn-1:hover{
         background: white;

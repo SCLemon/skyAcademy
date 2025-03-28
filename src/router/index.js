@@ -82,45 +82,42 @@ const router = new VueRouter({
 })
 router.beforeEach(async (to, from, next) => {
     const token = jsCookie.get('authToken')
-    // 訪問教師資料
-    if(to.fullPath.includes('teacherInfo')){
-        if (!token) {
-            alert('使用者權限不足')
-            return next('/academic/login')
+    
+    // 通用驗證
+    const allowedPaths = ['/', '/academic/login'];
+    if(!allowedPaths.includes(to.path) && !token) return next('/academic/login')
+    
+    const res = await axios.post('/login/token',{},{
+        headers:{
+            'x-user-token':token
         }
-        const res = await axios.post('/login/token',{},{
-            headers:{
-                'x-user-token':token
-            }
-        })
-        if(res.data.userInfo && res.data.userInfo.typeEng =='teacher') next();
+    })
+    
+    if (!allowedPaths.includes(to.path) && !(res.data.userInfo)) return next('/academic/login')
+
+    // 訪問教師資料
+    else if(to.fullPath.includes('teacherInfo')){
+
+        if(res.data.userInfo && res.data.userInfo.typeEng =='teacher') return next();
         else{
-            alert('使用者權限不足')
             jsCookie.remove('authToken')
             next('/academic/login')
             location.reload()
+            return
         }
     }
     // 訪問學生資料
     else if(to.fullPath.includes('studentInfo')){
-        if (!token) {
-            alert('使用者權限不足')
-            return next('/academic/login')
-        }
-        const res = await axios.post('/login/token',{},{
-            headers:{
-                'x-user-token':token
-            }
-        })
+
         if(res.data.userInfo && res.data.userInfo.typeEng =='student') next();
         else{
-            alert('使用者權限不足')
             jsCookie.remove('authToken')
             next('/academic/login')
             location.reload()
+            return
         }
     }
-    else next();
+    return next();
 });
 
 export default router

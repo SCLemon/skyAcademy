@@ -8,11 +8,11 @@
             <div>(職稱：{{userInfo.type}})</div>
         </div>
     </div>
-    <div @click="goTo('/academic/post')" :class="{list:true,list_selected: $route.path.includes('/post')}">平台公告</div>
-    <div @click="goTo('/academic/learn')" :class="{list:true,list_selected: $route.path.includes('/learn')}">課程列表</div>
-    <div @click="goTo('/academic/practice')" :class="{list:true,list_selected: $route.path.includes('/practice')}">課後練習</div>
+    <div @click="goTo('/academic/post')" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/post')}"><i class="fa-solid fa-lock lock" v-if="!isLogin"></i>平台公告</div>
+    <div @click="isLogin?goTo('/academic/learn'):''" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/learn')}"><i class="fa-solid fa-lock lock" v-if="!isLogin"></i>課程列表</div>
+    <div @click="isLogin?goTo('/academic/practice'):''" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/practice')}"><i class="fa-solid fa-lock lock" v-if="!isLogin"></i>課後練習</div>
     <div v-if="isLogin" :class="{list:true}" @click="logout()">登出系統</div>
-    <div class="footer"><img class="footer_img" src="img/horizontal_logo_white.png" alt=""> </div>
+    <div class="footer"><img class="footer_img" src="img/horizontal_logo_white.png" alt="" @click="goTo('/')"> </div>
   </div>
 </template>
 
@@ -78,7 +78,6 @@ export default {
         background: white;
         border-radius: 90px;
     }
-
     .username{
         width: 120px;
         height: 60px;
@@ -96,12 +95,17 @@ export default {
         text-align: center;
         color: white;
     }
+    .lock{
+        margin-right: 20px;
+    }
     .user:hover,.list:hover,.list_selected{
         cursor: pointer;
         background: white;
         color: black;
     }
-
+    .list_lock{
+        cursor: not-allowed !important;
+    }
     .footer{
         width:100%;
         height: 60px;
@@ -111,5 +115,8 @@ export default {
         margin: 0 auto;
         position: absolute;
         bottom: 15px;
+    }
+    .footer_img:hover{
+        cursor: pointer;
     }
 </style>
