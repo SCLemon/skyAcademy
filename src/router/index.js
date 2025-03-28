@@ -12,11 +12,16 @@ import TeacherInfo from '@/pages/InfoPage/TeacherInfo.vue'
 import StudentCourseTable from '@/pages/InfoPage/pages/StudentCourseTable.vue'
 import TeacherCourseTable from '@/pages/InfoPage/pages/TeacherCourseTable.vue'
 import ClientTable from '@/pages/InfoPage/pages/ClientTable.vue'
+import Index from '@/pages/Index/Index.vue'
 import axios from 'axios'
 Vue.use(VueRouter)
 const router = new VueRouter({
     routes:[
         {
+            path:'/',
+            component:Index,
+        },
+        {   
             path:'/academic',
             component:Academic,
             children:[
@@ -72,10 +77,6 @@ const router = new VueRouter({
                     redirect:'post'
                 },
             ]
-        },
-        {
-            path:'/',
-            redirect:'/academic'
         },
     ]
 })

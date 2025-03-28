@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-
 const multer = require('multer');
 const userModel = require('../models/userModel');
 const courseModel = require('../models/courseModel');
@@ -258,13 +257,6 @@ router.get('/api/getUsageMemory',authMiddleware, async (req, res) => {
 
 // 以下為課程區域操作
 
-function createCourseFolder(folderPath){
-    if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath, { recursive: true });
-}
-function deleteCourseFolder(folderPath){
-    if (fs.existsSync(folderPath)) fs.rmSync(folderPath, { recursive: true, force: true }); // 遞迴刪除
-}
-
 // 創建課程
 router.post('/api/createCourse',authMiddleware, async (req, res) => {
     const {courseId,courseName,lecturer} = req.body;
@@ -285,7 +277,7 @@ router.post('/api/createCourse',authMiddleware, async (req, res) => {
 
                 // 創建課程專屬資料夾
                 const folderPath = path.resolve(__dirname, `../../database/${req.user.group}/${idx}`);
-                createCourseFolder(folderPath)
+                if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath, { recursive: true });
 
                 return res.send({
                     type:'success',
@@ -358,6 +350,7 @@ router.get('/api/getCourse',authMiddleware, async (req, res) => {
 
 // 刪除課程
 router.delete('/api/deleteCourse/:idx',authMiddleware,async(req,res)=>{
+
     try {
         if (req.user.type === 'teacher') {
 
@@ -381,8 +374,8 @@ router.delete('/api/deleteCourse/:idx',authMiddleware,async(req,res)=>{
             
             // 刪除課程專屬資料夾
             const folderPath = path.resolve(__dirname, `../../database/${req.user.group}/${idx}`);
-            deleteCourseFolder(folderPath)
-            
+            if (fs.existsSync(folderPath)) fs.rmSync(folderPath, { recursive: true, force: true });
+
             return res.send({
                 type: 'success',
                 message: `課程 ${deletedCourse.courseId} 已成功刪除。`,
@@ -492,11 +485,3 @@ async function createUserByAdmin(){
 }
 
 module.exports = router;
-
-
-const canvas = document.getElementsByClassName('c-canvas-section__adsorptionLine')[0];
-const dataUrl = canvas.toDataURL('image/png'); // 將畫布轉換為 PNG 圖像
-    const a = document.createElement('a'); // 創建下載連結
-    a.href = dataUrl; // 設定連結為 canvas 的圖像數據
-    a.download = 'canvas_image.png'; // 設定下載文件名
-    a.click(); // 模擬點擊下載

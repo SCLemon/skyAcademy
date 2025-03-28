@@ -35,7 +35,7 @@ export default {
     },
     methods:{
         goTo(path){
-            this.$router.replace(path).catch((e)=>{})
+            this.$router.push(path).catch((e)=>{})
         },
         setUserInfo(userInfo){
             if(userInfo) this.isLogin = true;
