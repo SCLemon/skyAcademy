@@ -70,8 +70,11 @@ router.post('/login/token', async (req, res) => {
     const token = req.headers['x-user-token']
     try {
         const user = await userModel.findOne({ token });
-        if (!user || !user.status) {
-            return res.send({type:'error', message:'無效使用者', showAlert:true});
+        if (!user) {
+            return res.send({type:'error', message:'無效使用者，請重新登入', showAlert:true});
+        }
+        else if(!user.status){
+            return res.send({type:'error', message:'此帳號已被凍結，請洽客服人員', showAlert:true});
         }
         userData = {
             account:user.account,

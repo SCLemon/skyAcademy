@@ -38,7 +38,8 @@ export default {
       if(res.data.type == 'success') this.$bus.$emit('setUserInfo',res.data.userInfo)
       else {
         jsCookie.remove('authToken');
-        this.$bus.$emit('handleAlert',res.data.message,res.data.type)
+        console.log('here')
+        this.$bus.$emit('handleAlert','使用者權限異常通知',res.data.message,res.data.type)
       }
     }
   }
