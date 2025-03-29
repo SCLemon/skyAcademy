@@ -35,6 +35,9 @@ app.use(loginRouter);
 const teacherRouter = require('./routes/teacherRouter');
 app.use(teacherRouter);
 
+const studentRouter = require('./routes/studentRouter');
+app.use(studentRouter);
+
 app.listen(3007,()=>{
     console.log('server is running on port 3007')
 })

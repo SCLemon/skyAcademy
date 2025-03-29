@@ -1,51 +1,57 @@
 <template>
-  <div>
-    <div class="tableTitle">課程總覽</div>
+    <div>
+    <div class="tableTitle">
+        <div class="tableTitle_left">課程總覽</div>
+    </div>
         <el-table :data="tableData" border height="calc(100vh - 360px)" style="width: 100%" class="tableData" empty-text="暫無數據">
-            <el-table-column prop="date" label="開課時間"></el-table-column>
-            <el-table-column prop="course_id" label="課程代碼"></el-table-column>
-            <el-table-column prop="course_name" label="課程名稱"></el-table-column>
-            <el-table-column prop="teacher" label="授課教師"></el-table-column>
+            <el-table-column prop="createTime" label="開課時間"></el-table-column>
+            <el-table-column prop="courseId" label="課程代碼"></el-table-column>
+            <el-table-column prop="courseName" label="課程名稱"></el-table-column>
+            <el-table-column prop="lecturer" label="授課教師"></el-table-column>
             <el-table-column prop="status" label="狀態">
                 <template v-slot="scope">
-                    <div :class="scope.row.status?'valid':'invalid'">{{ scope.row.status?'有效':'失效' }}</div>
+                    <div :class="scope.row.status?'valid':'invalid'">{{ scope.row.status?'公開':'不公開' }}</div>
                 </template>
             </el-table-column>
-            <el-table-column label="管理操作">
+            <el-table-column label="課程通道" width="250">
                 <template v-slot="scope">
-                    <div class="btn">
-                        <div class="btn_link" @click="goToCourse(scope.row.course_id)">進入課程</div>
-                    </div>
+                    <div class="btn" @click="scope.row.status?goToCourse(scope.row.idx):''">{{ scope.row.status?'進入課程':'目前無法進入課程' }}</div>
                 </template>
             </el-table-column>
         </el-table>
-  </div>
+    </div>
 </template>
 
 <script>
+import axios from 'axios'
+import jsCookie from 'js-cookie'
 export default {
     name:'StudentCourseTable',
     data(){
         return{
-            tableData: [{
-                date: '2025-03-26',
-                course_id: 'SC31001',
-                course_name: '高中物理全',
-                teacher:'SCLemon',
-                status: true,
-            }]
+            tableData: [],
         }
     },
     mounted(){
-
+        this.getCourseList()
     },
     methods:{
-        getData(){
-            
+        goToCourse(idx){
+            this.$router.push(path)
         },
-        goToCourse(course_id){
-            this.$bus.$emit('handleAlert','test',course_id,'success')
-        }
+        async getCourseList(){
+            const res = await axios.get('/api/getStudentCourse',{
+                headers:{
+                    'x-user-token':jsCookie.get('authToken')
+                }
+            })
+            if(res.data.courses) {
+                this.tableData = res.data.courses
+                this.$bus.$emit('setCourseNum',this.tableData.length)
+            }
+            else this.$bus.$emit('handleAlert','課程資料查詢通知',res.data.message,res.data.type)
+        },
+
     }
 }
 </script>
@@ -57,8 +63,25 @@ export default {
         margin-top: 20px;
     }
     .tableTitle{
-        font-size: 24px;
         line-height: 85px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+    }
+    .tableTitle_left{
+        float: left;
+        font-size: 24px;
+    }
+    .tableTitle_right{
+        height: 40px;
+        text-align: center;
+        /* 放置最右邊 */
+        margin-left: auto;
+        font-size: 14px;
+    }
+    .tableTitle_right:hover{
+        cursor: pointer;
+        color: blue;
     }
     .valid{
         color: lightgreen;
@@ -71,8 +94,7 @@ export default {
         justify-content: space-evenly;
         align-items: center;
     }
-    .btn_link:hover{
+    .btn:hover{
         cursor: pointer;
-        color: blue;
     }
 </style>

@@ -55,10 +55,7 @@ const router = new VueRouter({
                 {
                     path:'teacherInfo',
                     component:TeacherInfo,
-                    children:[{
-                        path:'studentCourseTable',
-                        component:StudentCourseTable
-                    },
+                    children:[
                     {
                         path:'clientTable',
                         component:ClientTable
