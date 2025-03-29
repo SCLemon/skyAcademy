@@ -90,7 +90,12 @@ router.beforeEach(async (to, from, next) => {
         }
     })
     
-    if (!allowedPaths.includes(to.path) && !(res.data.userInfo)) return next('/academic/login')
+    if (!allowedPaths.includes(to.path) && !(res.data.userInfo)){
+        jsCookie.remove('authToken')
+        next('/academic/login')
+        location.reload()
+        return;
+    }
 
     // 訪問教師資料
     else if(to.fullPath.includes('teacherInfo')){
