@@ -463,30 +463,34 @@ router.put('/api/stopCourse/:idx',authMiddleware,async(req,res)=>{
 
 // 指派課程
 router.post('/api/setStudentToCourse',authMiddleware,async(req,res)=>{
-    let {idx, studentList} = req.body;
+    let {idx, courseId, lecturer, studentList} = req.body;
 
     try {
         if (req.user.type === 'teacher') {
             const setCourse = await courseModel.findOneAndUpdate({idx:idx, group:req.user.group},{
-                $set: { studentList: studentList }
+                $set: { 
+                    courseId:courseId,
+                    lecturer:lecturer,
+                    studentList: studentList 
+                }
             })
 
             if (!setCourse) {
                 return res.send({
                     type: 'error',
-                    message: '課程指派失敗！',
+                    message: '課程修改失敗！',
                 });
             }
 
             return res.send({
                 type: 'success',
-                message: `課程 ${setCourse.courseId} 已成功指派學生。`,
+                message: `課程 ${setCourse.courseId} 修改成功。`,
             });
         } 
         else {
             return res.send({
                 type: 'error',
-                message: '您沒有權限指派學生課程。',
+                message: '您沒有權限修改課程。',
             });
         }
     } catch (e) {

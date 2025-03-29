@@ -16,8 +16,8 @@
                 <el-table-column label="管理操作" width="250">
                     <template v-slot="scope">
                         <div class="btn">
-                            <el-button class="btn_link" @click="openStudentList(scope.row.courseId, scope.row.idx)">查看</el-button>
-                            <el-button class="btn_link" type="warning" @click="stopCourse(scope.row.account,scope.row.idx)">{{scope.row.status?'隱藏':'公開'}}</el-button>
+                            <el-button class="btn_link" @click="openStudentList(scope.row)">編輯</el-button>
+                            <el-button class="btn_link" type="warning" @click="stopCourse(scope.row.courseId,scope.row.idx)">{{scope.row.status?'隱藏':'公開'}}</el-button>
                             <el-button class="btn_link" type="danger" @click="deleteCourse(scope.row.courseId,scope.row.idx)">刪除</el-button>
                         </div>
                     </template>
@@ -41,6 +41,14 @@
                 </div>
             </el-dialog>
             <el-dialog :title="`${setStudentList.courseId} - 修課名單`" :visible.sync="dialogFormVisible2">
+                <el-form :model="setStudentList">
+                    <el-form-item label="課程代碼">
+                        <el-input v-model="setStudentList.courseId" autocomplete="off" clearable></el-input>
+                    </el-form-item>
+                    <el-form-item label="授課教師">
+                        <el-input v-model="setStudentList.lecturer" autocomplete="off" clearable></el-input>
+                    </el-form-item>
+                </el-form>
                 <el-transfer class="transfer" v-model="setStudentList.studentList" :props="{key: 'idx', label: 'name'}" :filterable="true" :filter-method="customFilter"
                 filter-placeholder="請輸入學生姓名" :data="students" :titles="['學生列表', '已選學生']"></el-transfer>
                 <div slot="footer" class="dialog-footer">
@@ -72,6 +80,8 @@
                 setStudentList:{
                     idx:'',
                     courseId:'',
+                    lecturer:'',
+                    newCourseId:'',
                     studentList:[] // 呈現在右列 (存 idx)
                 }
             }
@@ -144,9 +154,9 @@
                 }
                 catch(e){}
             },
-            async stopCourse(account, idx){
+            async stopCourse(courseId, idx){
                 try{
-                    await this.$confirm(`確認是否變更用戶 (${account}) 權限?`, '提示', {
+                    await this.$confirm(`確認是否變更課程 (${courseId}) 權限?`, '提示', {
                         confirmButtonText: '刪除',
                         cancelButtonText: '取消',
                         type: 'warning'
@@ -166,16 +176,17 @@
             },
 
             // 指派課程
-            async openStudentList(courseId, idx){
-                this.setStudentList.idx = idx;
-                this.setStudentList.courseId = courseId;
+            async openStudentList(target){
+                this.setStudentList.idx = target.idx;
+                this.setStudentList.courseId = target.courseId;
+                this.setStudentList.lecturer = target.lecturer;
 
                 // 刷新數據
                 await this.getStudentList();
                 await this.getCourseList();
 
                 // 設置學生資料
-                const course = this.tableData.filter((course)=> course.idx == idx)[0];
+                const course = this.tableData.filter((course)=> course.idx == target.idx)[0];
                 this.setStudentList.studentList = course.studentList;
                 
                 // 開啟視窗
@@ -183,7 +194,7 @@
             },
             async pushStudentList(){
                 try{
-                    await this.$confirm(`確認是否指派課程 (${this.setStudentList.courseId})?`, '提示', {
+                    await this.$confirm(`確認是否修改課程 (${this.setStudentList.courseId})?`, '提示', {
                         confirmButtonText: '確認',
                         cancelButtonText: '取消',
                         type: 'warning'
@@ -200,11 +211,12 @@
                         this.setStudentList = {
                             idx:'',
                             courseId:'',
+                            lecturer:'',
                             studentList:[]
                         },
-                        this.$bus.$emit('handleAlert','課程指派通知',res.data.message,res.data.type)
+                        this.$bus.$emit('handleAlert','課程修改通知',res.data.message,res.data.type)
                     }
-                    else this.$bus.$emit('handleAlert','課程指派通知',res.data.message,res.data.type)
+                    else this.$bus.$emit('handleAlert','課程修改通知',res.data.message,res.data.type)
                 }
                 catch(e){}
             },
@@ -266,7 +278,7 @@
         }
         ::v-deep .el-dialog{
             width: 720px;
- 
+            margin-top: 5vh !important;
         }
         ::v-deep .el-transfer-panel__empty{
             display: none;
