@@ -97,6 +97,7 @@ export default {
         align-items: center;
         margin-left: auto;
         margin-right: 10px;
+        transition: all 0.25s;
     }
     .contact_item:hover{
         cursor: pointer;
@@ -201,12 +202,14 @@ export default {
         border: 1px solid black;
         color: black;
         background: rgb(230,230,230);  
+        transition: all 0.25s;
     }
     .btn-1:hover{
         background: white;
     }
     .btn-2{
         color: rgb(230,230,230);
+        transition: all 0.25s;
     }
     .btn-2:hover{
         color:white;
