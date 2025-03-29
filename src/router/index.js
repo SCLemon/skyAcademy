@@ -84,7 +84,7 @@ router.beforeEach(async (to, from, next) => {
     const allowedPaths = ['/', '/academic/login'];
     if(!allowedPaths.includes(to.path) && !token) return next('/academic/login')
     
-    const res = await axios.post('/login/token',{},{
+    const res = await axios.post('/login/token',{save:false},{
         headers:{
             'x-user-token':token
         }

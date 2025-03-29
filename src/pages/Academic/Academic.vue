@@ -30,7 +30,7 @@ export default {
 
       if(!token) return
 
-      const res = await axios.post('/login/token',{},{
+      const res = await axios.post('/login/token',{save:true},{
         headers:{
           'x-user-token':token
         }

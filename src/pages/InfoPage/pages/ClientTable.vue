@@ -7,7 +7,7 @@
         <el-table :data="tableData" border height="calc(100vh - 360px)" style="width: 100%" class="tableData" empty-text="暫無數據">
             <el-table-column prop="createTime" label="創建時間"></el-table-column>
             <el-table-column prop="name" label="學生姓名"></el-table-column>
-            <el-table-column prop="lastOnline" label="上次登入時間"></el-table-column>
+            <el-table-column prop="lastOnline" label="上次訪問時間"></el-table-column>
             <el-table-column prop="loginIP" label="登入 IP"></el-table-column>
             <el-table-column prop="status" label="狀態">
                 <template v-slot="scope">

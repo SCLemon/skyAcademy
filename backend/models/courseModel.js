@@ -33,6 +33,7 @@ const courseSchema = new mongoose.Schema({
     meta: { 
         type: [{
             idx:String,
+            type:String, // Video or Text
             title:String,
             videoSrc:String,
             abstract:String,

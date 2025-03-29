@@ -42,7 +42,7 @@ router.post('/login/verify', async (req, res) => {
         await user.save();
 
         res.cookie('authToken',user.token,{
-            maxAge:86400 * 1000 * 7, // 7 天
+            maxAge:86400 * 1000 * 3, // 3 天
         })
         userData = {
             account:user.account,
@@ -68,6 +68,7 @@ router.post('/login/verify', async (req, res) => {
 // token 驗證
 router.post('/login/token', async (req, res) => {
     const token = req.headers['x-user-token']
+    const save = req.body.save;
     try {
         const user = await userModel.findOne({ token });
         if (!user) {
@@ -82,6 +83,12 @@ router.post('/login/token', async (req, res) => {
             name: user.name,
             type: user.type == 'teacher'?'教師':'學生'
         }
+
+        const loginIP = req.ip;
+        const loginTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss')
+        user.lastOnline = loginTime;
+        user.loginIP = loginIP;
+        if(save) await user.save();
 
         return res.send({
             type:'success',
