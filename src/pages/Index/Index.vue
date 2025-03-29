@@ -2,7 +2,13 @@
     <div>
         <div class="header">
             <div class="logo"><img class="logo_img" src="img/horizontal_logo_white.png" alt="" @click="goTo('/')"></div>
-            <div class="contact">Contact Us</div>
+            <div class="contact">
+                <div class="contact_item">關於</div>
+                <div class="contact_item">使用文件</div>
+                <div class="contact_item">價目表</div>
+                <div class="contact_item">開發團隊</div>
+                <div class="contact_item">聯絡我們</div>
+            </div>
         </div>
         <div class="top">
             <div class="content">
@@ -10,8 +16,8 @@
                     <div class="title">Sky Academy</div>
                     <div class="subTitle"><div class="subText" ref="subText">{{ subTitle }}</div></div>
                     <div class="box">
-                        <div class="btn btn-1" @click="goTo('/academic')">Get Started <i class="fa-solid fa-arrow-right start-arrow"></i></div>
-                        <div class="btn btn-2">Learn More <i class="fa-solid fa-chevron-right"></i></div>
+                        <div class="btn btn-1" @click="goTo('/academic')">快速開始 <i class="fa-solid fa-arrow-right start-arrow"></i></div>
+                        <div class="btn btn-2">詳細資料 <i class="fa-solid fa-chevron-right"></i></div>
                     </div>
                 </div>
                 <div class="carousel">
@@ -59,7 +65,8 @@ export default {
   
 <style scoped>
     .header{
-        width: 100%;
+        width: 100vw;
+        min-width: 1440px;
         height: 90px;
         display: flex;
         position: fixed;
@@ -80,17 +87,18 @@ export default {
         cursor: pointer;
     }
     .contact{
-        width: 100px;
+        width: 450px;
         height: 40px;
         line-height: 40px;
-        border-radius: 40px;
-        text-align: center;
         font-size: 14px;
         color: rgb(230,230,230);
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
         margin-left: auto;
-        margin-right: 15px;
+        margin-right: 10px;
     }
-    .contact:hover{
+    .contact_item:hover{
         cursor: pointer;
         color: white;
     }
