@@ -42,7 +42,7 @@
             </el-dialog>
             <el-dialog :title="`${setStudentList.courseId} - 修課名單`" :visible.sync="dialogFormVisible2">
                 <el-transfer class="transfer" v-model="setStudentList.studentList" :props="{key: 'idx', label: 'name'}" :filterable="true" :filter-method="customFilter"
-                filter-placeholder="請輸入學生姓名" :data="students" :titles="['學生列表', '已選學生']" :format="{noChecked: '沒有可選學生',noData: '暫無學生資料'}"></el-transfer>
+                filter-placeholder="請輸入學生姓名" :data="students" :titles="['學生列表', '已選學生']"></el-transfer>
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="dialogFormVisible2 = false">取消</el-button>
                     <el-button type="primary" @click="pushStudentList()">保存</el-button>
