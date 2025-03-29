@@ -16,7 +16,7 @@
                 <el-table-column label="管理操作" width="250">
                     <template v-slot="scope">
                         <div class="btn">
-                            <el-button class="btn_link" @click="editCourse(scope.row.idx)">查看</el-button>
+                            <el-button class="btn_link" @click="openStudentList(scope.row.courseId, scope.row.idx)">查看</el-button>
                             <el-button class="btn_link" type="warning" @click="stopCourse(scope.row.account,scope.row.idx)">{{scope.row.status?'隱藏':'公開'}}</el-button>
                             <el-button class="btn_link" type="danger" @click="deleteCourse(scope.row.courseId,scope.row.idx)">刪除</el-button>
                         </div>
@@ -40,6 +40,14 @@
                     <el-button type="primary" @click="create()">創建</el-button>
                 </div>
             </el-dialog>
+            <el-dialog :title="`${setStudentList.courseId} - 修課名單`" :visible.sync="dialogFormVisible2">
+                <el-transfer class="transfer" v-model="setStudentList.studentList" :props="{key: 'idx', label: 'name'}" :filterable="true"
+                filter-placeholder="請輸入學生姓名" :data="students" :titles="['學生列表', '已選學生']" :format="{noChecked: '沒有可選學生',noData: '暫無學生資料'}"></el-transfer>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="dialogFormVisible2 = false">取消</el-button>
+                    <el-button type="primary" @click="pushStudentList()">保存</el-button>
+                </div>
+            </el-dialog>
         </div>
     </template>
     
@@ -51,19 +59,40 @@
         data(){
             return{
                 tableData: [],
-                dialogFormVisible:false,
+                // 創建學生
+                dialogFormVisible:false, 
                 form:{
                     courseName:'',
                     courseId:'',
                     lecturer:''
                 },
+                // 指派課程
+                dialogFormVisible2:false, 
+                students:[],// 呈現在左列
+                setStudentList:{
+                    idx:'',
+                    courseId:'',
+                    studentList:[] // 呈現在右列 (存 idx)
+                }
             }
         },
         mounted(){
-            this.getData()
+            this.getCourseList()
         },
         methods:{
-            async getData(){
+            async getStudentList(){
+                const res = await axios.get('/api/getStudent',{
+                    headers:{
+                        'x-user-token':jsCookie.get('authToken')
+                    }
+                })
+                if(res.data.students) {
+                    this.students = res.data.students
+                    this.$bus.$emit('setStudentNum',this.students.length)
+                }
+                else this.$bus.$emit('handleAlert','用戶資料查詢通知',res.data.message,res.data.type)
+            },
+            async getCourseList(){
                 const res = await axios.get('/api/getCourse',{
                     headers:{
                         'x-user-token':jsCookie.get('authToken')
@@ -75,6 +104,8 @@
                 }
                 else this.$bus.$emit('handleAlert','課程資料查詢通知',res.data.message,res.data.type)
             },
+
+            // 創建課程
             async create(){
                 const res = await axios.post('/api/createCourse',this.form,{
                     headers:{
@@ -82,7 +113,7 @@
                     }
                 })
                 if(res.data.type == 'success'){
-                    this.getData();
+                    this.getCourseList();
                     this.dialogFormVisible = false;
                     this.form = {
                         courseName:'',
@@ -106,7 +137,7 @@
                         }
                     })
                     if(res.data.type == 'success'){
-                        this.getData();
+                        this.getCourseList();
                         this.$bus.$emit('handleAlert','課程資料刪除通知',res.data.message,res.data.type)
                     }
                     else this.$bus.$emit('handleAlert','課程資料刪除通知',res.data.message,res.data.type)
@@ -126,15 +157,56 @@
                         }
                     })
                     if(res.data.type == 'success'){
-                        this.getData();
+                        this.getCourseList();
                         this.$bus.$emit('handleAlert','課程權限變更通知',res.data.message,res.data.type)
                     }
                     else this.$bus.$emit('handleAlert','課程權限變更通知',res.data.message,res.data.type)
                 }
                 catch(e){}
             },
-            async editCourse(account,idx){
-    
+
+            // 指派課程
+            async openStudentList(courseId, idx){
+                this.setStudentList.idx = idx;
+                this.setStudentList.courseId = courseId;
+
+                // 刷新數據
+                await this.getStudentList();
+                await this.getCourseList();
+
+                // 設置學生資料
+                const course = this.tableData.filter((course)=> course.idx == idx)[0];
+                this.setStudentList.studentList = course.studentList;
+                
+                // 開啟視窗
+                this.dialogFormVisible2 = true;
+            },
+            async pushStudentList(){
+                try{
+                    await this.$confirm(`確認是否指派課程 (${this.setStudentList.courseId})?`, '提示', {
+                        confirmButtonText: '確認',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    })
+                    const res = await axios.post('/api/setStudentToCourse',this.setStudentList,{
+                        headers:{
+                            'x-user-token':jsCookie.get('authToken')
+                        }
+                    })
+                    if(res.data.type == 'success'){
+                        this.getCourseList();
+                        this.getStudentList();
+                        this.dialogFormVisible2 = false;
+                        this.setStudentList = {
+                            idx:'',
+                            courseId:'',
+                            studentList:[]
+                        },
+                        this.$bus.$emit('handleAlert','課程指派通知',res.data.message,res.data.type)
+                    }
+                    else this.$bus.$emit('handleAlert','課程指派通知',res.data.message,res.data.type)
+                }
+                catch(e){}
             }
         }
     }
@@ -183,5 +255,16 @@
         }
         .btn_link:hover{
             cursor: pointer;
+        }
+        .transfer{
+            width:90%;
+            margin: 0 auto;
+        }
+        ::v-deep .el-dialog{
+            width: 720px;
+ 
+        }
+        ::v-deep .el-transfer-panel__empty{
+            display: none;
         }
     </style>

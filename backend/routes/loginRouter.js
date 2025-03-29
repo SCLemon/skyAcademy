@@ -47,7 +47,8 @@ router.post('/login/verify', async (req, res) => {
         userData = {
             account:user.account,
             typeEng:user.type,
-            type: user.type == 'teacher'?'教師':'學生'
+            type: user.type == 'teacher'?'教師':'學生',
+            name: user.name
         }
         return res.send({
             type:'success',
@@ -75,6 +76,7 @@ router.post('/login/token', async (req, res) => {
         userData = {
             account:user.account,
             typeEng:user.type,
+            name: user.name,
             type: user.type == 'teacher'?'教師':'學生'
         }
 

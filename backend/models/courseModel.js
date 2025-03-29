@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const courseSchema = new mongoose.Schema({
+    createTime:String,
     idx:{
         type: String,
         required:true,
@@ -43,7 +44,10 @@ const courseSchema = new mongoose.Schema({
         }],
         default: []
     },
-    createTime:String,
+    studentList:{
+        type:[String],
+        default:[]
+    }
 });
 
 const courseModel = mongoose.model('Course', courseSchema);

@@ -34,14 +34,18 @@ const authMiddleware = async (req, res, next) => {
 
 // 創建新用戶
 router.post('/api/createStudent',authMiddleware, async (req, res) => {
-    const {account, password, type} = req.body;
+    const {account, password, name, type} = req.body;
+    
     try {
+
         if (req.user.type === 'teacher') {
+            
             const newUser = new userModel({
                 idx: uuidv4(),
                 token:uuidv4(),
                 account: account,
                 password: password,
+                name: name,
                 group: req.user.group,
                 createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),
                 type:type
@@ -188,6 +192,7 @@ router.get('/api/getStudent',authMiddleware, async (req, res) => {
                     account:obj.account,
                     lastOnline:obj.lastOnline,
                     loginIP:obj.loginIP,
+                    name:obj.name,
                     status:obj.status
                 }
             })
@@ -316,6 +321,14 @@ router.get('/api/getCourse',authMiddleware, async (req, res) => {
 
             let courses = await courseModel.find({ group: req.user.group });
 
+            if(courses.length == 0) {
+                return res.send({
+                    type: 'success',
+                    courses:[],
+                    message: '資料查詢成功。',
+                });
+            }
+            
             courses = courses.map(obj=>{
                 return {
                     idx:obj.idx,
@@ -323,7 +336,8 @@ router.get('/api/getCourse',authMiddleware, async (req, res) => {
                     courseId:obj.courseId,
                     courseName:obj.courseName,
                     lecturer:obj.lecturer,
-                    status:obj.status
+                    status:obj.status,
+                    studentList:obj.studentList
                 }
             })
 
@@ -447,7 +461,79 @@ router.put('/api/stopCourse/:idx',authMiddleware,async(req,res)=>{
     }
 })
 
+// 指派課程
+router.post('/api/setStudentToCourse',authMiddleware,async(req,res)=>{
+    let {idx, studentList} = req.body;
 
+    try {
+        if (req.user.type === 'teacher') {
+            const setCourse = await courseModel.findOneAndUpdate({idx:idx, group:req.user.group},{
+                $set: { studentList: studentList }
+            })
+
+            if (!setCourse) {
+                return res.send({
+                    type: 'error',
+                    message: '課程指派失敗！',
+                });
+            }
+
+            return res.send({
+                type: 'success',
+                message: `課程 ${setCourse.courseId} 已成功指派學生。`,
+            });
+        } 
+        else {
+            return res.send({
+                type: 'error',
+                message: '您沒有權限指派學生課程。',
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+})
+
+// 獲取特定課程的修課名單
+router.get('/api/getCourseStudentList/:idx',authMiddleware, async (req, res) => {
+    const idx = req.params.idx;
+    try {
+
+        if (req.user.type === 'teacher') {
+
+            let target = await courseModel.findOne({ idx:idx, group: req.user.group });
+
+            if (!target) {
+                return res.send({
+                    type: 'error',
+                    message: '修課資料查詢失敗。',
+                });
+            }
+
+            return res.send({
+                type: 'success',
+                studentList:target.studentList,
+                message: '修課資料查詢成功。',
+            });
+        } 
+        else {
+            return res.send({
+                type: 'error',
+                message: '您沒有權限查看修課名單。',
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+});
 
 // 下方為 admin 操作區
 // 額外新增欄位
@@ -467,15 +553,17 @@ const update = async () => {
 
 // 新增教師
 async function createUserByAdmin(){
-    const account = 'sclemon2';
+    const account = 'blc0000421';
     const password = '34864015';
     const type = 'teacher';
-    const group = '0002'
+    const group = '0001'
+    const name = 'SCLemon'
     const newUser = new userModel({
         idx: uuidv4(),
         token:uuidv4(),
         account: account,
         password: password,
+        name: name,
         group: group,
         createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),
         type:type
@@ -483,5 +571,6 @@ async function createUserByAdmin(){
     await newUser.save();
     console.log('資料創建完畢')
 }
+
 
 module.exports = router;

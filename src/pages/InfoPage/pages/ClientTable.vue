@@ -6,7 +6,7 @@
     </div>
         <el-table :data="tableData" border height="calc(100vh - 360px)" style="width: 100%" class="tableData" empty-text="暫無數據">
             <el-table-column prop="createTime" label="創建時間"></el-table-column>
-            <el-table-column prop="account" label="使用者 ID"></el-table-column>
+            <el-table-column prop="name" label="學生姓名"></el-table-column>
             <el-table-column prop="lastOnline" label="上次登入時間"></el-table-column>
             <el-table-column prop="loginIP" label="登入 IP"></el-table-column>
             <el-table-column prop="status" label="狀態">
@@ -26,10 +26,13 @@
         </el-table>
         <el-dialog title="創建學生" :visible.sync="dialogFormVisible">
             <el-form :model="form">
-                <el-form-item label="使用者名稱">
+                <el-form-item label="學生學號">
                     <el-input v-model="form.account" autocomplete="off" clearable></el-input>
                 </el-form-item>
-                <el-form-item label="使用者密碼">
+                <el-form-item label="學生名稱">
+                    <el-input v-model="form.name" autocomplete="off" clearable></el-input>
+                </el-form-item>
+                <el-form-item label="學生密碼">
                     <el-input v-model="form.password" autocomplete="off" show-password clearable></el-input>
                 </el-form-item>
             </el-form>
@@ -53,6 +56,7 @@ export default {
             form:{
                 account:'',
                 password:'',
+                name:'',
                 type:'student'
             },
         }
@@ -84,6 +88,7 @@ export default {
                 this.dialogFormVisible = false;
                 this.form.account = '';
                 this.form.password = '';
+                this.form.name = '';
                 this.$bus.$emit('handleAlert','用戶資料創建通知',res.data.message,res.data.type)
             }
             else this.$bus.$emit('handleAlert','用戶資料創建通知',res.data.message,res.data.type)

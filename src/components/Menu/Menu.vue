@@ -4,7 +4,7 @@
          @click="isLogin?goTo(`/academic/${userInfo.typeEng}Info`):goTo('/academic/login')">
         <img class="img" src="img/user.png" alt="">
         <div :class="`username ${isLogin?'username_login':''}`">
-            {{ isLogin?`${userInfo.account}`:'登入/註冊' }}
+            {{ isLogin?`${userInfo.name}`:'登入/註冊' }}
             <div>(職稱：{{userInfo.type}})</div>
         </div>
     </div>
@@ -25,6 +25,7 @@ export default {
             isLogin:false,
             userInfo:{
                 account:'',
+                name:'',
                 typeEng:'',
                 type:''
             }

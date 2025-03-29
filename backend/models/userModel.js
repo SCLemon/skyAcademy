@@ -1,12 +1,21 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
+    createTime:String,
+    // 可傳到前端系統判定
     idx:{
         type: String,
         required:true,
         unique: true,
         trim: true,
     },
+    // 姓名
+    name:{
+        type: String,
+        required:true,
+        trim: true,
+    },
+    // 不可傳到前端系統判定
     token: {
         type: String,
         required:true,
@@ -37,14 +46,6 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
-    courseList: { 
-        type: [{ 
-            course_id: String,
-            status: Boolean
-        }],
-        default: []
-    },
-    createTime:String,
     lastOnline:{
         type:String,
         default:''
