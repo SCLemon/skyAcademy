@@ -66,7 +66,7 @@ export default {
     },
     methods:{
         async getData(){
-            const res = await axios.get('/api/getStudent',{
+            const res = await axios.get('/api/infoPage/getStudent',{
                 headers:{
                     'x-user-token':jsCookie.get('authToken')
                 }
@@ -78,7 +78,7 @@ export default {
             else this.$bus.$emit('handleAlert','用戶資料查詢通知',res.data.message,res.data.type)
         },
         async create(){
-            const res = await axios.post('/api/createStudent',this.form,{
+            const res = await axios.post('/api/infoPage/createStudent',this.form,{
                 headers:{
                     'x-user-token':jsCookie.get('authToken')
                 }
@@ -100,7 +100,7 @@ export default {
                     cancelButtonText: '取消',
                     type: 'warning'
                 })
-                const res = await axios.delete(`/api/deleteStudent/${idx}`,{
+                const res = await axios.delete(`/api/infoPage/deleteStudent/${idx}`,{
                     headers:{
                         'x-user-token':jsCookie.get('authToken')
                     }
@@ -120,7 +120,7 @@ export default {
                     cancelButtonText: '取消',
                     type: 'warning'
                 })
-                const res = await axios.put(`/api/stopStudent/${idx}`,{},{
+                const res = await axios.put(`/api/infoPage/stopStudent/${idx}`,{},{
                     headers:{
                         'x-user-token':jsCookie.get('authToken')
                     }

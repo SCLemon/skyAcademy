@@ -28,15 +28,23 @@ process.on('SIGINT', function() {
     process.exit(0);
 });
 
+const adminRouter = require('./routes/adminRouter');
+app.use(adminRouter);
 
 const loginRouter = require('./routes/loginRouter');
 app.use(loginRouter);
 
-const teacherRouter = require('./routes/teacherRouter');
-app.use(teacherRouter);
+const teacher_create_courseRouter = require('./routes/teacher_create_courseRouter');
+app.use(teacher_create_courseRouter);
+
+const teacher_create_studentRouter = require('./routes/teacher_create_studentRouter');
+app.use(teacher_create_studentRouter);
 
 const studentRouter = require('./routes/studentRouter');
 app.use(studentRouter);
+
+const learnRouter = require('./routes/learnRouter');
+app.use(learnRouter);
 
 app.listen(3007,()=>{
     console.log('server is running on port 3007')

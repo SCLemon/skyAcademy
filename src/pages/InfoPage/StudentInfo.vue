@@ -42,7 +42,7 @@
             },
             async getCourse(){
                 try{
-                    const res = await axios.get('/api/getStudentCourse',{headers:{'x-user-token':jsCookie.get('authToken')}})
+                    const res = await axios.get('/api/infoPage/getStudentCourse',{headers:{'x-user-token':jsCookie.get('authToken')}})
                     if(res.data.courses){
                         this.course_num = res.data.courses.length
                         this.available_num = res.data.courses.filter(course => course.status === true).length;

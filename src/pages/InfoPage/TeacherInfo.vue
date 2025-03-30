@@ -52,14 +52,14 @@ export default {
         },
         async getCourse(){
             try{
-                const res = await axios.get('/api/getCourse',{headers:{'x-user-token':jsCookie.get('authToken')}})
+                const res = await axios.get('/api/infoPage/getCourse',{headers:{'x-user-token':jsCookie.get('authToken')}})
                 if(res.data.courses) this.course_num = res.data.courses.length
             }
             catch(e){}
         },
         async getStudent(){
             try{
-                const res = await axios.get('/api/getStudent',{headers:{'x-user-token':jsCookie.get('authToken')}})
+                const res = await axios.get('/api/infoPage/getStudent',{headers:{'x-user-token':jsCookie.get('authToken')}})
                 if(res.data.students) this.student_num = res.data.students.length
             }
             catch(e){}

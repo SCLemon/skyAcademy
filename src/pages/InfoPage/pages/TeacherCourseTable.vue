@@ -91,7 +91,7 @@
         },
         methods:{
             async getStudentList(){
-                const res = await axios.get('/api/getStudent',{
+                const res = await axios.get('/api/infoPage/getStudent',{
                     headers:{
                         'x-user-token':jsCookie.get('authToken')
                     }
@@ -103,7 +103,7 @@
                 else this.$bus.$emit('handleAlert','用戶資料查詢通知',res.data.message,res.data.type)
             },
             async getCourseList(){
-                const res = await axios.get('/api/getCourse',{
+                const res = await axios.get('/api/infoPage/getCourse',{
                     headers:{
                         'x-user-token':jsCookie.get('authToken')
                     }
@@ -117,7 +117,7 @@
 
             // 創建課程
             async create(){
-                const res = await axios.post('/api/createCourse',this.form,{
+                const res = await axios.post('/api/infoPage/createCourse',this.form,{
                     headers:{
                         'x-user-token':jsCookie.get('authToken')
                     }
@@ -141,7 +141,7 @@
                         cancelButtonText: '取消',
                         type: 'warning'
                     })
-                    const res = await axios.delete(`/api/deleteCourse/${idx}`,{
+                    const res = await axios.delete(`/api/infoPage/deleteCourse/${idx}`,{
                         headers:{
                             'x-user-token':jsCookie.get('authToken')
                         }
@@ -161,7 +161,7 @@
                         cancelButtonText: '取消',
                         type: 'warning'
                     })
-                    const res = await axios.put(`/api/stopCourse/${idx}`,{},{
+                    const res = await axios.put(`/api/infoPage/stopCourse/${idx}`,{},{
                         headers:{
                             'x-user-token':jsCookie.get('authToken')
                         }
@@ -199,7 +199,7 @@
                         cancelButtonText: '取消',
                         type: 'warning'
                     })
-                    const res = await axios.post('/api/setStudentToCourse',this.setStudentList,{
+                    const res = await axios.post('/api/infoPage/setStudentToCourse',this.setStudentList,{
                         headers:{
                             'x-user-token':jsCookie.get('authToken')
                         }

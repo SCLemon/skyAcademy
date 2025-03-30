@@ -40,7 +40,7 @@ export default {
             this.$router.push(path)
         },
         async getCourseList(){
-            const res = await axios.get('/api/getStudentCourse',{
+            const res = await axios.get('/api/infoPage/getStudentCourse',{
                 headers:{
                     'x-user-token':jsCookie.get('authToken')
                 }
