@@ -35,6 +35,18 @@
                         <el-input v-model="form.lecturer" autocomplete="off" clearable></el-input>
                     </el-form-item>
                 </el-form>
+                <div class="class_banner_title">課程封面上傳（限制三張且上傳後暫不提供修改，至少 350 pixel x 175 pixel）</div>
+                <el-upload  action="#" :on-change="handleUpload" list-type="picture-card" :auto-upload="false" :file-list="fileList" :limit="3" :multiple="true">
+                    <i slot="default" class="el-icon-plus"></i>
+                    <div slot="file" slot-scope="{file}">
+                        <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
+                        <span class="el-upload-list__item-actions">
+                            <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)"><i class="el-icon-zoom-in"></i></span>
+                            <span class="el-upload-list__item-delete" @click="handleRemove(file)"><i class="el-icon-delete"></i></span>
+                        </span>
+                    </div>
+                </el-upload>
+                <el-dialog :visible.sync="dialogVisible"><img width="100%" :src="dialogImageUrl" alt=""></el-dialog>
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="dialogFormVisible = false">取消</el-button>
                     <el-button type="primary" @click="create()">創建</el-button>
@@ -67,13 +79,18 @@
         data(){
             return{
                 tableData: [],
-                // 創建學生
+                // 創建課程
                 dialogFormVisible:false, 
                 form:{
                     courseName:'',
                     courseId:'',
                     lecturer:''
                 },
+                // 創建課程的圖片上傳
+                fileList: [],
+                dialogImageUrl: '',
+                dialogVisible: false,
+
                 // 指派課程
                 dialogFormVisible2:false, 
                 students:[],// 呈現在左列
@@ -83,7 +100,7 @@
                     lecturer:'',
                     newCourseId:'',
                     studentList:[] // 呈現在右列 (存 idx)
-                }
+                },
             }
         },
         mounted(){
@@ -117,9 +134,22 @@
 
             // 創建課程
             async create(){
-                const res = await axios.post('/api/infoPage/createCourse',this.form,{
+
+                const formData = new FormData();
+                
+                formData.append('courseName', this.form.courseName);
+                formData.append('courseId', this.form.courseId);
+                formData.append('lecturer', this.form.lecturer);
+
+                if (this.fileList && this.fileList.length > 0) {
+                    this.fileList.forEach((file, index) => {
+                        console.log(file);
+                        formData.append('attachments', file.raw);
+                    });
+                }
+                const res = await axios.post('/api/infoPage/createCourse',formData,{
                     headers:{
-                        'x-user-token':jsCookie.get('authToken')
+                        'x-user-token':jsCookie.get('authToken'),
                     }
                 })
                 if(res.data.type == 'success'){
@@ -174,6 +204,19 @@
                 }
                 catch(e){}
             },
+            // 創建課程的 banner 上傳
+            handleUpload(file){
+                if (this.fileList.length >= 5) return this.$bus.$emit('handleAlert','圖片上傳通知','僅允許上傳五張圖片','error')
+                this.fileList.push(file)
+            },
+            handleRemove(file) {
+                const index = this.fileList.indexOf(file);
+                if (index !== -1) this.fileList.splice(index, 1);
+            },
+            handlePictureCardPreview(file) {
+                this.dialogImageUrl = file.url;
+                this.dialogVisible = true;
+            },
 
             // 指派課程
             async openStudentList(target){
@@ -223,7 +266,7 @@
             customFilter(query, item) {
                 return item.name.toLowerCase().includes(query.toLowerCase()) ||
                 item.account.toLowerCase().includes(query.toLowerCase())
-            }
+            },
         }
     }
     </script>
@@ -275,6 +318,9 @@
         .transfer{
             width:90%;
             margin: 0 auto;
+        }
+        .class_banner_title{
+            margin-bottom: 20px;
         }
         ::v-deep .el-dialog{
             width: 720px;

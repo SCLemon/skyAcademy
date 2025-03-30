@@ -7,6 +7,7 @@ const groupModel = require('../models/groupModel')
 const fs = require('fs');
 const {format} = require('date-fns')
 const { v4: uuidv4 } = require('uuid');
+const multer = require('multer')
 
 
 // 檢查身份
@@ -33,9 +34,11 @@ const authMiddleware = async (req, res, next) => {
 };
 
 // 創建課程
-router.post('/api/infoPage/createCourse',authMiddleware, async (req, res) => {
+const upload = multer();
+router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', maxCount: 3 }]),authMiddleware, async (req, res) => {
+    
     const {courseId,courseName,lecturer} = req.body;
-
+    
     const groupInfo = await groupModel.findOne({group: req.user.group});
     if(!groupInfo){
         return res.send({
@@ -47,27 +50,45 @@ router.post('/api/infoPage/createCourse',authMiddleware, async (req, res) => {
     const databaseUrl = groupInfo.databaseUrl;
     try {
         if (req.user.type === 'teacher') {
+            // 創建課程專屬 idx
             const idx = uuidv4();
-            const newCourse = new courseModel({
-                idx:idx,
-                courseId,
-                courseName,
-                lecturer,
-                group: req.user.group,
-                createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),
-            });
         
             try{
-                await newCourse.save()
 
                 // 創建課程專屬資料夾
                 const folderPath = `${databaseUrl}/${idx}`
-                if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath, { recursive: true });
+                const bannerFolderPath = `${folderPath}/banner`
+                if (!fs.existsSync(folderPath)){
+                    fs.mkdirSync(folderPath, { recursive: true });
+                }
+                if(!fs.existsSync(bannerFolderPath)){
+                    fs.mkdirSync(bannerFolderPath, { recursive: true });
+                }
+
+                // Banner 寫入資料夾中
+                let attachments = req.files['attachments']?req.files['attachments']:[]
+                attachments.forEach((file) => {
+                    const filePath = `${bannerFolderPath}/${file.originalname}`
+                    fs.writeFileSync(filePath, file.buffer);
+                });
+
+                const newCourse = new courseModel({
+                    idx:idx,
+                    bannerFolderPath:bannerFolderPath,
+                    courseId,
+                    courseName,
+                    lecturer,
+                    group: req.user.group,
+                    createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),
+                });
+
+                await newCourse.save()
 
                 return res.send({
                     type:'success',
                     message:'課程創建成功。'
                 });
+
             }
             catch(e){
                 console.log(e)
@@ -178,7 +199,9 @@ router.delete('/api/infoPage/deleteCourse/:idx',authMiddleware,async(req,res)=>{
             
             // 刪除課程專屬資料夾
             const folderPath = `${databaseUrl}/${idx}`
-            if (fs.existsSync(folderPath)) fs.rmSync(folderPath, { recursive: true, force: true });
+            if (fs.existsSync(folderPath)){
+                fs.rmSync(folderPath, { recursive: true, force: true });
+            }
 
             return res.send({
                 type: 'success',

@@ -8,6 +8,11 @@ const courseSchema = new mongoose.Schema({
         unique: true,
         trim: true,
     },
+    bannerFolderPath:{
+        type: String,
+        trim: true,
+        default:''
+    },
     courseId:{
         type: String,
         required:true,
