@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const userModel = require('../models/userModel');
 const courseModel = require('../models/courseModel');
+const groupModel = require('../models/groupModel')
 const fs = require('fs');
 const path = require('path');
 const {format} = require('date-fns')
@@ -35,6 +36,16 @@ const authMiddleware = async (req, res, next) => {
 // 創建課程
 router.post('/api/infoPage/createCourse',authMiddleware, async (req, res) => {
     const {courseId,courseName,lecturer} = req.body;
+
+    const groupInfo = await groupModel.findOne({group: req.user.group});
+    if(!groupInfo){
+        return res.send({
+            type:'error',
+            message:'課程創建失敗（群組不存在）。'
+        });
+    }
+    
+    const databaseUrl = groupInfo.databaseUrl;
     try {
         if (req.user.type === 'teacher') {
             const idx = uuidv4();
@@ -51,7 +62,7 @@ router.post('/api/infoPage/createCourse',authMiddleware, async (req, res) => {
                 await newCourse.save()
 
                 // 創建課程專屬資料夾
-                const folderPath = path.resolve(__dirname, `../../database/${req.user.group}/${idx}`);
+                const folderPath = `${databaseUrl}/${idx}`
                 if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath, { recursive: true });
 
                 return res.send({
@@ -147,6 +158,16 @@ router.delete('/api/infoPage/deleteCourse/:idx',authMiddleware,async(req,res)=>{
                 });
             }
 
+            const groupInfo = await groupModel.findOne({group: req.user.group});
+            if(!groupInfo){
+                return res.send({
+                    type:'error',
+                    message:'課程刪除失敗（群組不存在）。'
+                });
+            }
+            
+            const databaseUrl = groupInfo.databaseUrl;
+
             const deletedCourse = await courseModel.findOneAndDelete({ idx: idx, group:req.user.group });
 
             if (!deletedCourse) {
@@ -157,7 +178,7 @@ router.delete('/api/infoPage/deleteCourse/:idx',authMiddleware,async(req,res)=>{
             }
             
             // 刪除課程專屬資料夾
-            const folderPath = path.resolve(__dirname, `../../database/${req.user.group}/${idx}`);
+            const folderPath = `${databaseUrl}/${idx}`
             if (fs.existsSync(folderPath)) fs.rmSync(folderPath, { recursive: true, force: true });
 
             return res.send({
