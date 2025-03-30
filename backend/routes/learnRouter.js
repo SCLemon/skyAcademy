@@ -37,19 +37,26 @@ router.get('/api/learn/getCourse', authMiddleware, async (req, res) => {
 
         if (req.user.type === 'teacher') {
             courses = await courseModel.find({ group: req.user.group, status: true });
-        } else if (req.user.type === 'student') {
+        } 
+        else if (req.user.type === 'student') {
             courses = await courseModel.find({
                 group: req.user.group,
                 studentList: req.user.idx,
                 status: true,
             });
         }
+        else {
+            return res.send({
+                type: 'error',
+                message: '課程資料查詢失敗。',
+            })
+        }
 
         if (courses.length === 0) {
             return res.send({
                 type: 'success',
                 courses: [],
-                message: '資料查詢成功。',
+                message: '課程資料查詢成功。',
             });
         }
 
@@ -66,7 +73,8 @@ router.get('/api/learn/getCourse', authMiddleware, async (req, res) => {
                         };
                     });
                 }
-
+                // 若無 banner
+                if(bannerImg.length == 0) bannerImg.push({name:'default_course_banner',url:'img/default_course_banner.jpg'})
                 return {
                     idx: course.idx,
                     createTime: course.createTime,
@@ -82,7 +90,7 @@ router.get('/api/learn/getCourse', authMiddleware, async (req, res) => {
         return res.send({
             type: 'success',
             courses: courses,
-            message: '資料查詢成功。',
+            message: '課程資料查詢成功。',
         });
     } catch (e) {
         console.log(e);

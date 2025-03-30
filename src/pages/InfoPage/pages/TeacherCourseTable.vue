@@ -35,8 +35,8 @@
                         <el-input v-model="form.lecturer" autocomplete="off" clearable></el-input>
                     </el-form-item>
                 </el-form>
-                <div class="class_banner_title">課程封面上傳（限制三張且上傳後暫不提供修改，至少 350 pixel x 175 pixel）</div>
-                <el-upload  action="#" :on-change="handleUpload" list-type="picture-card" :auto-upload="false" :file-list="fileList" :limit="3" :multiple="true">
+                <div class="class_banner_title">課程封面上傳（限制兩張，上傳後暫不提供修改，至少 350 pixel x 175 pixel）</div>
+                <el-upload  action="#" :on-change="handleUpload" list-type="picture-card" :auto-upload="false" :file-list="fileList" :limit="2" :multiple="true">
                     <i slot="default" class="el-icon-plus"></i>
                     <div slot="file" slot-scope="{file}">
                         <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
@@ -113,7 +113,7 @@
                         'x-user-token':jsCookie.get('authToken')
                     }
                 })
-                if(res.data.students) {
+                if(res.data.type == 'success') {
                     this.students = res.data.students
                     this.$bus.$emit('setStudentNum',this.students.length)
                 }
@@ -125,7 +125,7 @@
                         'x-user-token':jsCookie.get('authToken')
                     }
                 })
-                if(res.data.courses) {
+                if(res.data.type == 'success') {
                     this.tableData = res.data.courses
                     this.$bus.$emit('setCourseNum',this.tableData.length)
                 }
@@ -209,7 +209,6 @@
             },
             // 創建課程的 banner 上傳
             handleUpload(file){
-                if (this.fileList.length >= 5) return this.$bus.$emit('handleAlert','圖片上傳通知','僅允許上傳五張圖片','error')
                 this.fileList.push(file)
             },
             handleRemove(file) {
@@ -331,5 +330,10 @@
         }
         ::v-deep .el-transfer-panel__empty{
             display: none;
+        }
+        ::v-deep .el-upload--picture-card, ::v-deep .el-upload-list__item {
+            width: 330px !important;
+            height: 165px !important;
+            line-height: 170px !important; /* 讓圖標垂直置中 */
         }
     </style>

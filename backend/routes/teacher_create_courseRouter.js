@@ -8,7 +8,7 @@ const fs = require('fs');
 const {format} = require('date-fns')
 const { v4: uuidv4 } = require('uuid');
 const multer = require('multer')
-
+const path = require('path')
 
 // 檢查身份
 const authMiddleware = async (req, res, next) => {
@@ -33,9 +33,53 @@ const authMiddleware = async (req, res, next) => {
     next();
 };
 
+// 檢查是否超過空間用量
+function getFolderSize(folderPath) {
+    let totalSize = 0;
+    const files = fs.readdirSync(folderPath);
+    files.forEach((file) => {
+      const filePath = path.join(folderPath, file);
+      const stat = fs.statSync(filePath);
+      if (stat.isDirectory()) totalSize += getFolderSize(filePath);
+      else totalSize += stat.size;
+    });
+  
+    return totalSize;
+}
+const checkUsageMemory = async(req,res,next)=>{
+    try{
+        const group = await groupModel.findOne({group: req.user.group})
+        if (!group) {
+            return res.send({
+                type: 'error',
+                message: '課程群組不存在。',
+            });
+        }
+        const limitMemory = group.limit.memory;
+        const databaseUrl = group.databaseUrl;
+        const size = getFolderSize(databaseUrl) / (1024*1024);
+
+        if (size >= limitMemory) {
+            return res.send({
+                type: 'error',
+                message: `檔案大小已達限制，已使用 ${size.toFixed(2)} MB，超過限制 ${limitMemory} MB。`,
+            });
+        }
+        next()
+    }
+    catch(e){
+        console.error(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+}
+
+
 // 創建課程
 const upload = multer();
-router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', maxCount: 3 }]),authMiddleware, async (req, res) => {
+router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', maxCount: 2}]),authMiddleware,checkUsageMemory, async (req, res) => {
     
     const {courseId,courseName,lecturer} = req.body;
     
@@ -58,20 +102,8 @@ router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', m
                 // 創建課程專屬資料夾
                 const folderPath = `${databaseUrl}/${idx}`
                 const bannerFolderPath = `${folderPath}/banner`
-                if (!fs.existsSync(folderPath)){
-                    fs.mkdirSync(folderPath, { recursive: true });
-                }
-                if(!fs.existsSync(bannerFolderPath)){
-                    fs.mkdirSync(bannerFolderPath, { recursive: true });
-                }
 
-                // Banner 寫入資料夾中
-                let attachments = req.files['attachments']?req.files['attachments']:[]
-                attachments.forEach((file) => {
-                    const filePath = `${bannerFolderPath}/${file.originalname}`
-                    fs.writeFileSync(filePath, file.buffer);
-                });
-
+                // 先寫入資料庫
                 const newCourse = new courseModel({
                     idx:idx,
                     bannerFolderPath:bannerFolderPath,
@@ -81,8 +113,21 @@ router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', m
                     group: req.user.group,
                     createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),
                 });
-
                 await newCourse.save()
+
+                // 再創建和將 Banner 寫入資料夾中
+                if (!fs.existsSync(folderPath)){
+                    fs.mkdirSync(folderPath, { recursive: true });
+                }
+                if(!fs.existsSync(bannerFolderPath)){
+                    fs.mkdirSync(bannerFolderPath, { recursive: true });
+                }
+
+                let attachments = req.files['attachments']?req.files['attachments']:[]
+                attachments.forEach((file) => {
+                    const filePath = `${bannerFolderPath}/${file.originalname}`
+                    fs.writeFileSync(filePath, file.buffer);
+                });
 
                 return res.send({
                     type:'success',

@@ -10,10 +10,18 @@ app.set('trust proxy', 'loopback, 192.168.0.1');
 
 const rateLimit = require('express-rate-limit');
 
+// 不受限速
+const whitelistRoutes = [
+    '/api/learn/getCourseBanner',
+];
+
 const limiter = rateLimit({
     windowMs: 60 * 1000, // 1 分鐘
-    max: 500,
+    max: 100,
     message: 'Too many requests from this IP, please try again after a minute.',
+    skip: (req, res) => {
+        return whitelistRoutes.some(route => req.path.startsWith(route));
+    }
 });
 
 app.use(limiter);

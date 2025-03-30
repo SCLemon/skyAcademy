@@ -7,7 +7,7 @@
         <div class="banner">
           <el-carousel class="carousel" width="100%" height="175px" :autoplay="false">
             <el-carousel-item v-for="(item,id) in courses.bannerImg" :key="id">
-              <img :src="item.url" alt="" class="bannerImg">
+              <img :src="item.url" alt="" class="bannerImg" loading="lazy">
             </el-carousel-item>
           </el-carousel>
         </div>
@@ -44,7 +44,11 @@ export default {
           'x-user-token':token
         }
       })
-      this.courseList = res.data.courses;
+      const data = res.data;
+      if(data.type == 'success'){
+        this.courseList = data.courses;
+      }
+      else this.$bus.$emit('handleAlert','課程資料查詢通知',res.data.message,res.data.type)
     }
   }
 }
@@ -124,5 +128,8 @@ export default {
     font-size: 14px;
     bottom: 10px;
     color: gray;
+  }
+  ::v-deep .el-carousel__indicator{
+    display: none;
   }
 </style>
