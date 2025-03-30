@@ -28,6 +28,7 @@ export default {
     async mounted(){
         this.$bus.$on('setStudentNum',this.setStudentNum)
         this.$bus.$on('setCourseNum',this.setCourseNum)
+        this.$bus.$on('getUsageMemory',this.getUsageMemory)
         this.initialize()
     },
     data(){

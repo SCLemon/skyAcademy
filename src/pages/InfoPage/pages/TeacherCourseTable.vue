@@ -143,7 +143,6 @@
 
                 if (this.fileList && this.fileList.length > 0) {
                     this.fileList.forEach((file, index) => {
-                        console.log(file);
                         formData.append('attachments', file.raw);
                     });
                 }
@@ -160,6 +159,8 @@
                         courseId:'',
                         lecturer:''
                     },
+                    // 獲取使用容量
+                    this.$bus.$emit('getUsageMemory')
                     this.$bus.$emit('handleAlert','課程資料創建通知',res.data.message,res.data.type)
                 }
                 else this.$bus.$emit('handleAlert','課程資料創建通知',res.data.message,res.data.type)
@@ -178,6 +179,8 @@
                     })
                     if(res.data.type == 'success'){
                         this.getCourseList();
+                        // 獲取使用容量
+                        this.$bus.$emit('getUsageMemory')
                         this.$bus.$emit('handleAlert','課程資料刪除通知',res.data.message,res.data.type)
                     }
                     else this.$bus.$emit('handleAlert','課程資料刪除通知',res.data.message,res.data.type)
