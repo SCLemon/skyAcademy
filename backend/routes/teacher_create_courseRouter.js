@@ -1,11 +1,10 @@
-// 針對 teacherInfo
+// 針對創建課程
 const express = require('express');
 const router = express.Router();
 const userModel = require('../models/userModel');
 const courseModel = require('../models/courseModel');
 const groupModel = require('../models/groupModel')
 const fs = require('fs');
-const path = require('path');
 const {format} = require('date-fns')
 const { v4: uuidv4 } = require('uuid');
 

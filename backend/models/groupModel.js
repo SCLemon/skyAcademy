@@ -10,11 +10,9 @@ const groupSchema = new mongoose.Schema({
     limit:{
         type:{
             memory:Number, // 單位 MB
-            studentNum:Number, 
         },
         default:{
             memory: 1024,
-            studentNum:10,
         }
     },
     databaseUrl:{ // 資料儲存位置

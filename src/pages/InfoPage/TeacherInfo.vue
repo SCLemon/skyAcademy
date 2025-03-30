@@ -10,7 +10,7 @@
             <div class="sum_num">{{ course_num }}</div>
         </router-link>
         <router-link :to="''" class="sum">
-            <div class="sum_title">空間用量 (MB)</div>
+            <div class="sum_title">空間用量 (上限 {{ limit.memory }} MB)</div>
             <div class="sum_num">{{ usage_memory }}</div>
         </router-link>
     </div>
@@ -34,7 +34,10 @@ export default {
       return{
         student_num:0,
         course_num:0,
-        usage_memory:0
+        usage_memory:0,
+        limit:{
+            memory:0,
+        }
       }
     },
     methods:{
@@ -70,7 +73,10 @@ export default {
                     'x-user-token':jsCookie.get('authToken')
                 }
             })
-            if(res.data.type == 'success') this.usage_memory = parseFloat(res.data.size).toFixed(2)
+            if(res.data.type == 'success'){
+                this.usage_memory = parseFloat(res.data.size).toFixed(2)
+                this.limit = res.data.limit;
+            }
             else this.$bus.$emit('handleAlert','儲存空間資訊通知',res.data.message,res.data.type)
         }
     }

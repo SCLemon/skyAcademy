@@ -2,8 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const userModel = require('../models/userModel');
-const fs = require('fs');
-const path = require('path');
+const groupModel = require('../models/groupModel')
 const {format} = require('date-fns')
 const { v4: uuidv4 } = require('uuid');
 
@@ -34,11 +33,9 @@ const authMiddleware = async (req, res, next) => {
 // 創建新用戶
 router.post('/api/infoPage/createStudent',authMiddleware, async (req, res) => {
     const {account, password, name, type} = req.body;
-    
-    try {
 
+    try {
         if (req.user.type === 'teacher') {
-            
             const newUser = new userModel({
                 idx: uuidv4(),
                 token:uuidv4(),
