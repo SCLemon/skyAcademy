@@ -79,6 +79,7 @@ export default {
       // 貼文創建
       dialogTableVisible:false,
       sendEnabled: false,
+      inputKeyUpfunction:{},
       // 圖片牆
       dialogImageUrl: '',
       dialogVisible: false,
@@ -87,10 +88,11 @@ export default {
       posts:[],
       showPermission:false,
       timer:-1, // 自動汲取貼文
+      
     }
   },
   async mounted(){
-    window.addEventListener('keyup',()=>{
+    this.inputKeyUpfunction = window.addEventListener('keyup',()=>{
       if(this.dialogTableVisible && this.$refs.input){
         if(this.$refs.input.innerHTML.trim()==''){
           this.$refs.input.innerHTML = ''
@@ -123,7 +125,6 @@ export default {
         })
         if(res.data.type == 'success'){
           this.showPermission = (res.data.userInfo.typeEng == 'teacher')
-          console.log(this.showPermission)
         }
       }
       catch(e){
@@ -210,7 +211,7 @@ export default {
     }
   },
   beforeDestroy(){
-    window.removeEventListener('keyup');
+    window.removeEventListener('keyup',this.inputKeyUpfunction);
     
   }
 }
