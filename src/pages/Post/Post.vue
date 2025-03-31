@@ -38,7 +38,7 @@
             </div>
             <div class="post_text" v-if="obj.content.trim()!=''" v-html="obj.content"></div>
             <div class="post_img" v-if="obj.postImg.length">
-              <el-carousel height="300px">
+              <el-carousel height="300px" :autoplay="false">
                 <el-carousel-item v-for="(item,id) in obj.postImg" :key="id">
                   <div class="carousel_img"><img :src="item.url" alt=""></div>
                 </el-carousel-item>
@@ -190,7 +190,7 @@ export default {
     },
     openDialog(){
       if(this.showPermission) this.dialogTableVisible = true;
-      else this.$bus.$emit('handleAlert','創建貼文權限通知','目前課程並未開放學生進行貼文','warning')
+      else this.$bus.$emit('handleAlert','創建貼文權限通知','目前平台並未開放學生進行貼文','warning')
     },
 
     // 圖片處理
