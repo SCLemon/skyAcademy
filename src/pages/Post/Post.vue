@@ -426,4 +426,10 @@ export default {
   ::v-deep .el-carousel__indicator{
     display: none;
   }
+  ::v-deep .el-upload-list__item img {
+    width: 100%;   
+    height: 100%;  
+    object-fit: cover; 
+  }
+
 </style>
