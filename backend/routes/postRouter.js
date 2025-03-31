@@ -1,0 +1,313 @@
+// 針對課程貼文
+const express = require('express');
+const router = express.Router();
+const userModel = require('../models/userModel');
+const groupModel = require('../models/groupModel')
+const postModel = require('../models/postModel')
+const fs = require('fs');
+const {format} = require('date-fns')
+const { v4: uuidv4 } = require('uuid');
+const multer = require('multer')
+const path = require('path')
+
+// 檢查身份
+const authMiddleware = async (req, res, next) => {
+    const token = req.headers['x-user-token']
+    if (!token) {
+        return res.send({
+            type: 'error',
+            message: '未找到授權，請重新登入。',
+        });
+    }
+    const user = await userModel.findOne({ token, status:true });
+    if (!user) {
+        return res.send({
+            type: 'error',
+            message: '未找到授權，請重新登入。',
+        });
+    }
+    req.user ={
+        idx: user.idx,
+        type: user.type,
+        name: user.name,
+        group: user.group
+    } 
+    next();
+};
+
+// 檢查是否超過空間用量
+function getFolderSize(folderPath) {
+    let totalSize = 0;
+    const files = fs.readdirSync(folderPath);
+    files.forEach((file) => {
+      const filePath = path.join(folderPath, file);
+      const stat = fs.statSync(filePath);
+      if (stat.isDirectory()) totalSize += getFolderSize(filePath);
+      else totalSize += stat.size;
+    });
+  
+    return totalSize;
+}
+const checkUsageMemory = async(req,res,next)=>{
+    try{
+        const group = await groupModel.findOne({group: req.user.group})
+        if (!group) {
+            return res.send({
+                type: 'error',
+                message: '課程群組不存在。',
+            });
+        }
+        const limitMemory = group.limit.memory;
+        const databaseUrl = group.databaseUrl;
+        const size = getFolderSize(databaseUrl) / (1024*1024);
+
+        if (size >= limitMemory) {
+            return res.send({
+                type: 'error',
+                message: `空間用量已超過限制 ${limitMemory} MB，如需調額請洽客服人員。`,
+            });
+        }
+        next()
+    }
+    catch(e){
+        console.error(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+}
+
+
+
+// 創建貼文
+const upload = multer();
+router.post('/api/post/create',upload.fields([{ name: 'attachments'}]),authMiddleware,checkUsageMemory, async (req, res) => {
+    
+    const {content} = req.body;
+    let attachments = req.files['attachments']?req.files['attachments']:[]
+
+    if(content.trim().length == 0 && attachments.length == 0){
+        return res.send({
+            type:'error',
+            message:'貼文內容不可為空。'
+        });
+    }
+    const groupInfo = await groupModel.findOne({group: req.user.group});
+    if(!groupInfo){
+        return res.send({
+            type:'error',
+            message:'貼文創建失敗（群組不存在）。'
+        });
+    }
+    
+    const databaseUrl = groupInfo.databaseUrl;
+    try {
+        if (req.user.type === 'teacher') {
+            // 創建貼文專屬 idx
+            const idx = uuidv4();
+        
+            try{
+
+                // 創建貼文專屬資料夾
+                const folderPath = `${databaseUrl}/post/${idx}`
+
+                // 先寫入資料庫
+                const newPost = new postModel({
+                    idx:idx,
+                    creator:{
+                        idx:req.user.idx,
+                        name: req.user.name
+                    },
+                    group: req.user.group,
+                    content: content,
+                    databaseUrl:folderPath,
+                    createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),
+                });
+                await newPost.save()
+
+                // 再創建並寫入資料夾中
+                if (!fs.existsSync(folderPath)){
+                    fs.mkdirSync(folderPath, { recursive: true });
+                }
+
+                attachments.forEach((file) => {
+                    const filePath = `${folderPath}/${file.originalname}`
+                    fs.writeFileSync(filePath, file.buffer);
+                });
+
+                return res.send({
+                    type:'success',
+                    message:'貼文創建成功。'
+                });
+
+            }
+            catch(e){
+                console.log(e)
+                return res.send({
+                    type:'error',
+                    message:'貼文創建失敗。'
+                });
+            }
+        } 
+        else {
+            return res.send({
+                type: 'error',
+                message: '您沒有權限創建貼文。',
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+});
+
+// 刪除貼文
+router.delete('/api/post/deletePost/:idx',authMiddleware,async(req,res)=>{
+
+    try {
+        if (req.user.type === 'teacher') {
+
+            const idx = req.params.idx;
+            
+            if (!idx || typeof idx !== 'string' || idx.length !== 36) {
+                return res.send({
+                    type: 'error',
+                    message: '貼文刪除失敗！'
+                });
+            }
+
+            const groupInfo = await groupModel.findOne({group: req.user.group});
+            if(!groupInfo){
+                return res.send({
+                    type:'error',
+                    message:'貼文刪除失敗（群組不存在）。'
+                });
+            }
+            
+            const databaseUrl = groupInfo.databaseUrl;
+
+            const deletedPost = await postModel.findOneAndDelete({ idx: idx, group:req.user.group });
+
+            if (!deletedPost) {
+                return res.send({
+                    type: 'error',
+                    message: '貼文刪除失敗！',
+                });
+            }
+            
+            // 刪除貼文專屬資料夾
+            const folderPath = `${databaseUrl}/post/${idx}`
+            if (fs.existsSync(folderPath)){
+                fs.rmSync(folderPath, { recursive: true, force: true });
+            }
+
+            return res.send({
+                type: 'success',
+                message: `貼文已成功刪除。`,
+            });
+        } 
+        else {
+            return res.send({
+                type: 'error',
+                message: '您沒有權限刪除貼文資料。',
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+})
+
+// 獲取貼文資料
+router.get('/api/post/getPost', authMiddleware, async (req, res) => {
+    try {
+        let posts = [];
+
+        if (req.user.type === 'teacher') {
+            posts = await postModel.find({ group: req.user.group });
+        } 
+        else if (req.user.type === 'student') {
+            posts = await postModel.find({ group: req.user.group, status: true });
+        }
+        else {
+            return res.send({
+                type: 'error',
+                message: '貼文資料查詢失敗。',
+            })
+        }
+
+        if (posts.length === 0) {
+            return res.send({
+                type: 'success',
+                posts: [],
+                message: '貼文資料查詢成功。',
+            });
+        }
+
+        posts = await Promise.all(
+            posts.map(async (post) => {
+                let postImg = [];
+                const databaseUrl = post.databaseUrl;
+
+                if (fs.existsSync(databaseUrl)) {
+                    postImg = fs.readdirSync(databaseUrl).map((file) => {
+                        return {
+                            name: file,
+                            url: `/api/post/image/${post.idx}/${file}`, // 使用相對URL返回圖片
+                        };
+                    });
+                }
+                
+                return {
+                    idx: post.idx,
+                    createTime: post.createTime,
+                    creator: post.creator,
+                    content: post.content,
+                    status: post.status,
+                    meta: post.meta,
+                    postImg: postImg,
+                };
+            })
+        );
+
+        return res.send({
+            type: 'success',
+            posts:posts,
+            message: '課程資料查詢成功。',
+        });
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+});
+
+// 返回圖片
+router.get('/api/post/image/:idx/:imageName',async (req, res) => {
+    const { idx, imageName } = req.params;
+    
+    const post = await postModel.findOne({ idx: idx });
+    const databaseUrl = post.databaseUrl;
+    const filePath = path.join(databaseUrl, imageName);
+
+    if (fs.existsSync(filePath)) {
+
+        const fileStream = fs.createReadStream(filePath);
+        fileStream.pipe(res);
+    } else {
+        res.status(404).send('File not found');
+    }
+});
+
+
+
+module.exports = router;

@@ -36,7 +36,7 @@ router.get('/api/learn/getCourse', authMiddleware, async (req, res) => {
         let courses = [];
 
         if (req.user.type === 'teacher') {
-            courses = await courseModel.find({ group: req.user.group, status: true });
+            courses = await courseModel.find({ group: req.user.group});
         } 
         else if (req.user.type === 'student') {
             courses = await courseModel.find({

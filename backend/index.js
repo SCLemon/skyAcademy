@@ -51,6 +51,9 @@ app.use(teacher_create_studentRouter);
 const studentRouter = require('./routes/studentRouter');
 app.use(studentRouter);
 
+const postRouter = require('./routes/postRouter');
+app.use(postRouter);
+
 const learnRouter = require('./routes/learnRouter');
 app.use(learnRouter);
 

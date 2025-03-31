@@ -36,7 +36,7 @@
                     </el-form-item>
                 </el-form>
                 <div class="class_banner_title">課程封面上傳（限制兩張，上傳後暫不提供修改，至少 350 pixel x 175 pixel）</div>
-                <el-upload  action="#" :on-change="handleUpload" list-type="picture-card" :auto-upload="false" :file-list="fileList" :limit="2" :multiple="true">
+                <el-upload  action="#" :on-change="handleUpload" list-type="picture-card" :auto-upload="false" :file-list="fileList" :limit="2" :multiple="true" accept="image/*">
                     <i slot="default" class="el-icon-plus"></i>
                     <div slot="file" slot-scope="{file}">
                         <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">

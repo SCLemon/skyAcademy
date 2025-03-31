@@ -1,9 +1,13 @@
 <template>
   <div class="body">
-    <Menu></Menu>
-    <transition name="slide-fade">
-      <router-view></router-view>
-    </transition>
+    <div class="menu">
+      <Menu></Menu>
+    </div>
+    <div class="view">
+      <transition name="slide-fade">
+        <router-view></router-view>
+      </transition>
+    </div>
   </div>
 </template>
 
@@ -48,6 +52,11 @@ export default {
 <style scoped>
   .body{
     display: flex;
+  }
+  .menu{
+    width: 250px;
+    min-width: 250px;
+    height: 100vh;
   }
   .view{
     width: calc(100vw - 250px);
