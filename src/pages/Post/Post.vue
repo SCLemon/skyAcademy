@@ -128,9 +128,7 @@ export default {
           this.showPermission = (res.data.userInfo.typeEng == 'teacher')
         }
       }
-      catch(e){
-        console.log(e)
-      }
+      catch(e){}
     },
     async getPost(){
       const res = await axios.get('/api/post/getPost',{
