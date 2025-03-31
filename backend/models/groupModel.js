@@ -10,10 +10,12 @@ const groupSchema = new mongoose.Schema({
     limit:{
         type:{
             memory:Number, // 單位 MB
+            classNum:Number,
             studentNum:Number
         },
         default:{ // 免費用戶
             memory: 512,
+            classNum:1,
             studentNum:1,
         }
     },

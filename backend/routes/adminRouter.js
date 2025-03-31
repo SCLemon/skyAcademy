@@ -91,6 +91,11 @@ async function createDatabase(){
     const newGroup = new groupModel({
         group:group,
         databaseUrl:databaseUrl,
+        limit:{
+            memory:1024,
+            classNum:5,
+            studentNum:10,
+        }
     })
 
     await newGroup.save();

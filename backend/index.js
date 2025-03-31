@@ -17,7 +17,7 @@ const whitelistRoutes = [
 
 const limiter = rateLimit({
     windowMs: 60 * 1000, // 1 分鐘
-    max: 100,
+    max: 200,
     message: 'Too many requests from this IP, please try again after a minute.',
     skip: (req, res) => {
         return whitelistRoutes.some(route => req.path.startsWith(route));

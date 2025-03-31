@@ -6,7 +6,7 @@
             <div class="sum_num">{{ student_num }}</div>
         </router-link>
         <router-link :to="{ path:'teacherCourseTable' }" class="sum">
-            <div class="sum_title">課程總數</div>
+            <div class="sum_title">課程總數 (上限 {{ limit.classNum }} 堂)</div>
             <div class="sum_num">{{ course_num }}</div>
         </router-link>
         <router-link :to="''" class="sum">
@@ -39,6 +39,7 @@ export default {
         limit:{
             memory:0,
             studentNum:0,
+            classNum:0
         }
       }
     },
