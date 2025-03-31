@@ -95,11 +95,7 @@ export default {
   async mounted(){
     this.inputKeyUpfunction = window.addEventListener('keyup',()=>{
       if(this.dialogTableVisible && this.$refs.input){
-        if(this.$refs.input.innerText.trim()=='' && this.$refs.input.innerHTML.length == 4){
-          this.$refs.input.innerHTML = ''
-          if(this.form.attachments.length == 0) this.sendEnabled = false; // 若僅有圖片也可以發送
-        }
-        else this.sendEnabled = true; // 若僅有文字也可以發送
+        if(this.$refs.input.innerText.trim()=='' && this.$refs.input.innerHTML.length == 4) this.$refs.input.innerHTML = ''
       }
     })
     await this.getPost()
@@ -198,13 +194,9 @@ export default {
     // 圖片處理
     handleUpload(file,fileList){
       this.form.attachments = fileList
-      if(this.form.attachments.length || this.$refs.input.innerHTML.length) this.sendEnabled = true;
-      else this.sendEnabled = false;
     },
     handleRemove(file, fileList) {
       this.form.attachments = fileList
-      if(this.form.attachments.length || this.$refs.input.innerHTML.length) this.sendEnabled = true;
-      else this.sendEnabled = false;
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
