@@ -346,6 +346,7 @@ export default {
     padding-left: 5px;
     padding-right: 5px;
     padding-bottom: 10px;
+    margin-top: 15px;
   }
   .postAll_empty{
     display: flex;
@@ -359,7 +360,7 @@ export default {
     border-radius: 5px;
     padding-bottom: 15px;
     position: relative;
-    margin-top: 15px;
+    margin-bottom: 15px;
   }
   .post_more{
     position: absolute;
