@@ -38,7 +38,7 @@
             </div>
             <div class="post_text" v-if="obj.content.trim()!=''" v-html="obj.content"></div>
             <div class="post_img" v-if="obj.postImg.length">
-              <el-carousel height="300px" :autoplay="false">
+              <el-carousel height="300px" :autoplay="false" :loop="false">
                 <el-carousel-item v-for="(item,id) in obj.postImg" :key="id">
                   <div class="carousel_img"><img :src="item.url" alt=""></div>
                 </el-carousel-item>

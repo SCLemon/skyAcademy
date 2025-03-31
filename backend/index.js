@@ -13,6 +13,7 @@ const rateLimit = require('express-rate-limit');
 // 不受限速
 const whitelistRoutes = [
     '/api/learn/getCourseBanner',
+    '/api/post/image'
 ];
 
 const limiter = rateLimit({
