@@ -56,7 +56,7 @@ async function createTeacher(){
     const account = 'blc0000421';
     const password = '34864015';
     const type = 'teacher';
-    const groupNum = '0002'
+    const groupNum = '0001'
     const name = 'SCLemon'
     
     // 檢查群組是否已建立
@@ -163,5 +163,6 @@ router.get('/api/getUsageMemory',authMiddleware, async (req, res) => {
         });
     }
 });
+
 
 module.exports = router;

@@ -2,7 +2,7 @@
   <div class="view">
     <div class="sum_box">
         <router-link to="clientTable" class="sum">
-            <div class="sum_title">學生總數</div>
+            <div class="sum_title">學生總數 (上限 {{ limit.studentNum }} 人)</div>
             <div class="sum_num">{{ student_num }}</div>
         </router-link>
         <router-link :to="{ path:'teacherCourseTable' }" class="sum">
@@ -38,6 +38,7 @@ export default {
         usage_memory:0,
         limit:{
             memory:0,
+            studentNum:0,
         }
       }
     },

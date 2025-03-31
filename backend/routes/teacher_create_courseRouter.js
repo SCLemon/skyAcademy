@@ -62,7 +62,7 @@ const checkUsageMemory = async(req,res,next)=>{
         if (size >= limitMemory) {
             return res.send({
                 type: 'error',
-                message: `檔案大小已達限制，已使用 ${size.toFixed(2)} MB，超過限制 ${limitMemory} MB。`,
+                message: `空間用量已超過限制 ${limitMemory} MB，如需調額請洽客服人員。`,
             });
         }
         next()
