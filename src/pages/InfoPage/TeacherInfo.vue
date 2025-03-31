@@ -77,7 +77,10 @@ export default {
                 }
             })
             if(res.data.type == 'success'){
-                this.usage_memory = parseFloat(res.data.size).toFixed(2)
+                if(res.data.size<100) this.usage_memory = parseFloat(res.data.size).toFixed(2)
+                else if(res.data.size<1000) this.usage_memory = parseFloat(res.data.size).toFixed(1)
+                else  this.usage_memory = parseInt(res.data.size)
+                
                 this.limit = res.data.limit;
             }
             else this.$bus.$emit('handleAlert','儲存空間資訊通知',res.data.message,res.data.type)
