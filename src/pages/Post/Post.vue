@@ -95,7 +95,7 @@ export default {
   async mounted(){
     this.inputKeyUpfunction = window.addEventListener('keyup',()=>{
       if(this.dialogTableVisible && this.$refs.input){
-        if(this.$refs.input.innerText.trim()==''){
+        if(this.$refs.input.innerText==''){
           this.$refs.input.innerHTML = ''
           if(this.form.attachments.length == 0) this.sendEnabled = false; // 若僅有圖片也可以發送
         }
