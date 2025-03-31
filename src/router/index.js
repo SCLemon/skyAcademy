@@ -71,7 +71,7 @@ const router = new VueRouter({
                 },
                 {
                     path:'/',
-                    redirect:'login'
+                    redirect:'post'
                 },
             ]
         },
@@ -89,11 +89,6 @@ router.beforeEach(async (to, from, next) => {
             'x-user-token':token
         }
     })
-    
-    if(to.path.includes('/academic/login') && res.data.userInfo){
-        if(res.data.userInfo.typeEng == 'teacher') return next('/academic/teacherInfo')
-        else return next('/academic/studentInfo')
-    }
 
     if (!allowedPaths.includes(to.path) && !(res.data.userInfo)){
         jsCookie.remove('authToken')

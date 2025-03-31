@@ -213,7 +213,7 @@ export default {
   },
   beforeDestroy(){
     window.removeEventListener('keyup',this.inputKeyUpfunction);
-    
+    clearInterval(this.timer)
   }
 }
 </script>
