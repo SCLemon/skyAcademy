@@ -59,7 +59,7 @@
       <el-dialog :visible.sync="dialogVisible">
         <img width="100%" :src="dialogImageUrl" alt="">
       </el-dialog>
-      <el-button type="primary" class="button" @click="create()" >建立貼文</el-button>
+      <el-button type="primary" class="button" @click="create()" :loading="isSending" >建立貼文</el-button>
     </el-dialog>
   </div>
 </template>
@@ -75,6 +75,7 @@ export default {
         content:'',
         attachments:[]
       },
+      isSending:false,
       showPlaceholder:true,
       // 貼文創建
       dialogTableVisible:false,
@@ -143,6 +144,7 @@ export default {
       else this.$bus.$emit('handleAlert','貼文創建通知',res.data.message,res.data.type)
     },
     async create(){
+      this.isSending = true;
       this.form.content = this.$refs.input.innerHTML;
       const formData = new FormData();
       formData.append('content', this.form.content);
@@ -168,6 +170,7 @@ export default {
           this.$bus.$emit('handleAlert','貼文創建通知',res.data.message,res.data.type)
       }
       else this.$bus.$emit('handleAlert','貼文創建通知',res.data.message,res.data.type)
+      this.isSending = false;
     },
     async deletePost(idx){
       try{
@@ -304,7 +307,7 @@ export default {
     width: 600px;
     margin: 0 auto;
     margin-top: 20px;
-    height: 95vh;
+    height: 100vh;
   }
   ::v-deep .el-dialog{
     width: 720px;
@@ -341,7 +344,7 @@ export default {
   }
   .postAll{
     width: 620px;
-    height: 600px;
+    height: calc(100vh - 160px);
     overflow-y:scroll;
     padding-left: 5px;
     padding-right: 5px;
