@@ -55,7 +55,7 @@ export default {
     height: 100vh;
   }
   .slide-fade-enter-active {
-    transition: transform .6s cubic-bezier(1.0, 0.5, 0.8, 1.0), opacity .6s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+    transition: opacity .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);
   }
 
   .slide-fade-leave-active {
@@ -63,12 +63,12 @@ export default {
   }
 
   .slide-fade-enter {
-    transform: translateX(100%);
+    /* transform: translateX(100%); */
     opacity: 0;
   }
 
   .slide-fade-leave-to {
-    transform: translateX(100%);
+    /* transform: translateX(100%); */
     opacity: 0;
   }
 </style>

@@ -1,7 +1,7 @@
 <!-- 線上影音 -->
 <template>
   <div class="view">
-    <div class="header">已開通課程</div>
+    <div class="header">課程儀表板</div>
     <div class="classList">
       <div class="classItem" v-for="(courses,id) in courseList" :key="id">
         <div class="banner">
