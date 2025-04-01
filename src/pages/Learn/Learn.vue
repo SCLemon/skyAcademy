@@ -2,7 +2,7 @@
 <template>
   <div class="view">
     <div class="header">課程儀表板</div>
-    <div class="classList">
+    <div class="classList" v-if="courseList.length">
       <div class="classItem" v-for="(courses,id) in courseList" :key="id">
         <div class="banner">
           <el-carousel class="carousel" width="100%" height="175px" :autoplay="false">
@@ -15,6 +15,9 @@
         <div class="classNum">{{courses.courseId}}</div>
         <div class="lecturer">{{ courses.lecturer }}</div>
       </div>
+    </div>
+    <div class="classList_empty" v-else>
+      <el-empty description="暫無課程"></el-empty>
     </div>
   </div>
 </template>
@@ -84,8 +87,14 @@ export default {
     gap: 25px;
     row-gap: 20px;
     align-items: start;
-
     justify-content: start;
+  }
+  .classList_empty{
+    width: 100%;
+    height: calc(100vh - 81px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .classItem{
     width: 350px;

@@ -50,11 +50,11 @@ const update = async () => {
 
 // 新增教師
 async function createTeacher(){
-    const account = 'Joanna';
-    const password = '1314520';
+    const account = 'blc0000421';
+    const password = '34864015';
     const type = 'teacher';
     const groupNum = '0001'
-    const name = 'Joanna'
+    const name = 'SCLemon'
     
     // 檢查群組是否已建立
     const group = await groupModel.findOne({group:groupNum});
@@ -69,7 +69,7 @@ async function createTeacher(){
         password: password,
         name: name,
         group: groupNum,
-        userImgUrl:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaCHAdofnxqT7foBCW3H4rfUCmXYW_MFb8fg&s',
+        userImgUrl:'https://megapx-assets.dcard.tw/images/f3d0ecad-6f94-44c3-a588-82cf94c4ad36/1280.jpeg',
         createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),
         type:type
     });
@@ -167,6 +167,7 @@ router.get('/api/getUsageMemory',authMiddleware, async (req, res) => {
         });
     }
 });
+
 
 
 module.exports = router;
