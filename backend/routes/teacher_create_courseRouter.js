@@ -128,19 +128,20 @@ router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', m
             try{
 
                 // 創建課程專屬資料夾
-                const folderPath = `${databaseUrl}/${idx}`
+                const folderPath = `${databaseUrl}/course/${idx}`
                 const bannerFolderPath = `${folderPath}/banner`
 
                 // 先寫入資料庫
                 const newCourse = new courseModel({
                     idx:idx,
-                    bannerFolderPath:bannerFolderPath,
+                    folderPath:folderPath,
                     courseId,
                     courseName,
                     lecturer,
                     group: req.user.group,
                     createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),
                 });
+                
                 await newCourse.save()
 
                 // 再創建和將 Banner 寫入資料夾中
@@ -258,10 +259,8 @@ router.delete('/api/infoPage/deleteCourse/:idx',authMiddleware,async(req,res)=>{
                     message:'課程刪除失敗（群組不存在）。'
                 });
             }
-            
-            const databaseUrl = groupInfo.databaseUrl;
 
-            const deletedCourse = await courseModel.findOneAndDelete({ idx: idx, group:req.user.group });
+            const deletedCourse = await courseModel.findOne({ idx: idx, group:req.user.group });
 
             if (!deletedCourse) {
                 return res.send({
@@ -269,12 +268,16 @@ router.delete('/api/infoPage/deleteCourse/:idx',authMiddleware,async(req,res)=>{
                     message: '課程刪除失敗！',
                 });
             }
+
+            // 先刪除課程專屬資料夾
+            const folderPath = deletedCourse.folderPath;
             
-            // 刪除課程專屬資料夾
-            const folderPath = `${databaseUrl}/${idx}`
             if (fs.existsSync(folderPath)){
                 fs.rmSync(folderPath, { recursive: true, force: true });
             }
+
+            // 再刪除課程
+            await deletedCourse.deleteOne();
 
             return res.send({
                 type: 'success',

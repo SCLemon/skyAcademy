@@ -59,7 +59,9 @@ router.get('/api/learn/getCourse', authMiddleware, async (req, res) => {
         courses = await Promise.all(
             courses.map(async (course) => {
                 let bannerImg = [];
-                const bannerFolderPath = course.bannerFolderPath;
+                
+                const folderPath = course.folderPath;
+                const bannerFolderPath = `${folderPath}/banner`
 
                 if (fs.existsSync(bannerFolderPath)) {
                     bannerImg = fs.readdirSync(bannerFolderPath).map((file) => {
@@ -102,8 +104,8 @@ router.get('/api/learn/getCourseBanner/:idx/:imageName',async (req, res) => {
     const { idx, imageName } = req.params;
     
     const course = await courseModel.findOne({ idx: idx });
-    const bannerFolderPath = course.bannerFolderPath;
-    const filePath = path.join(bannerFolderPath, imageName);
+    const folderPath = course.folderPath;
+    const filePath = path.join(folderPath, 'banner', imageName);
 
     if (fs.existsSync(filePath)) {
 

@@ -8,8 +8,9 @@ const courseSchema = new mongoose.Schema({
         unique: true,
         trim: true,
     },
-    bannerFolderPath:{
+    folderPath:{
         type: String,
+        require:true,
         trim: true,
         default:''
     },
