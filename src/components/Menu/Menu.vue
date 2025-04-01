@@ -39,7 +39,8 @@ export default {
         goTo(path){
             this.$router.push(path).catch((e)=>{})
         },
-        setUserInfo(userInfo){
+        setUserInfo(){
+            const userInfo = this.$bus.$currentUser
             if(userInfo) this.isLogin = true;
             this.userInfo = userInfo
         },
@@ -51,6 +52,8 @@ export default {
             }).then(() => {
                 jsCookie.remove('authToken')
                 this.isLogin = false;
+                this.$bus.$currentUser = {}
+                this.userInfo = {}
                 this.$bus.$emit('handleAlert','登出訊息','登出成功！','success')
                 this.$router.replace('/academic/login')
             }).catch(() => {});

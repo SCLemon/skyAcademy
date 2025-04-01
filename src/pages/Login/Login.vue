@@ -49,7 +49,8 @@ export default {
         const res = await axios.post('/login/verify',this[type])
         data = res.data;
         if(data.type == 'success'){
-          this.$bus.$emit('setUserInfo',data.userInfo)
+          this.$bus.$currentUser = res.data.userInfo
+          this.$bus.$emit('setUserInfo')
           this.$router.replace(`/academic/${type}Info`).catch((e)=>{})
         }
       }

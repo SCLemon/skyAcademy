@@ -44,6 +44,7 @@ router.post('/login/verify', async (req, res) => {
             maxAge:86400 * 1000 * 3, // 3 天
         })
         userData = {
+            idx:user.idx,
             account:user.account,
             typeEng:user.type,
             userImgUrl:user.userImgUrl,
@@ -78,6 +79,7 @@ router.post('/login/token', async (req, res) => {
             return res.send({type:'error', message:'此帳號已被凍結，請洽客服人員', showAlert:true});
         }
         userData = {
+            idx:user.idx,
             account:user.account,
             typeEng:user.type,
             name: user.name,

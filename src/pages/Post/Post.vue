@@ -5,7 +5,7 @@
       <div class="posterBox">
         <div class="inputBox">
           <div class="inputTextBox" @click="openDialog('img')">
-            <div class="inputTextBoxImg"><img src="img/user.png" alt=""></div>
+            <div class="inputTextBoxImg"><img :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt=""></div>
             <div class="textArea">發表您的貼文</div>
           </div>
           <div class="iconBox">
@@ -19,7 +19,7 @@
         </div>
         <div class="postAll" v-if="posts.length">
           <div class="post" v-for="(obj,id) in posts" :key="id">
-            <div class="post_more" v-if="showPermission">
+            <div class="post_more" v-if="showPermission && currentUser.idx == obj.creator.idx">
               <el-dropdown @command="handleCommand">
                 <span class="el-dropdown-link">
                   操作<i class="el-icon-arrow-down el-icon--right"></i>
@@ -30,7 +30,7 @@
               </el-dropdown>
             </div>
             <div class="post_top">
-              <div class="post_top_img"><img src="img/user.png" alt=""></div>
+              <div class="post_top_img"><img :src="obj.creator.userImgUrl?obj.creator.userImgUrl:'img/user.png'" alt=""></div>
               <div class="post_top_detail">
                 <div class="post_top_name">{{ obj.creator.name }}</div>
                 <div class="post_top_date">{{obj.createTime}}</div>
@@ -71,6 +71,9 @@ export default {
   name:'Post',
   data(){
     return {
+      currentUser:{
+
+      },
       form:{
         content:'',
         attachments:[]
@@ -100,6 +103,8 @@ export default {
     })
     await this.getPost()
     await this.getUserInfo()
+    
+    this.currentUser = this.$bus.$currentUser
 
     this.timer = setInterval(() => {
       this.getPost();
@@ -245,6 +250,8 @@ export default {
   .inputTextBoxImg{
     width: 40px;
     height: 40px;
+    border-radius: 40px;
+    overflow: hidden;
   }
   .inputTextBoxImg>img{
     width: 100%;
@@ -371,7 +378,8 @@ export default {
   .post_top_img{
     width: 40px;
     height: 40px;
-
+    border-radius: 40px;
+    overflow: hidden;
   }
   .post_top_img>img{
     width: 100%;

@@ -12,6 +12,7 @@ const postSchema = new mongoose.Schema({
         type: {
             idx:String,
             name:String,
+            userImgUrl:String,
         },
         required:true,
         trim: true,

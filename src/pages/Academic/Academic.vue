@@ -39,9 +39,13 @@ export default {
           'x-user-token':token
         }
       })
-      if(res.data.type == 'success') this.$bus.$emit('setUserInfo',res.data.userInfo)
+      if(res.data.type == 'success'){
+        this.$bus.$currentUser = res.data.userInfo;
+        this.$bus.$emit('setUserInfo')
+      }
       else {
         jsCookie.remove('authToken');
+        this.$bus.$currentUser = {};
         this.$bus.$emit('handleAlert','使用者權限異常通知',res.data.message,res.data.type)
       }
     }

@@ -50,11 +50,11 @@ const update = async () => {
 
 // 新增教師
 async function createTeacher(){
-    const account = 'blc0000421';
-    const password = '34864015';
+    const account = 'Joanna';
+    const password = '1314520';
     const type = 'teacher';
     const groupNum = '0001'
-    const name = 'SCLemon'
+    const name = 'Joanna'
     
     // 檢查群組是否已建立
     const group = await groupModel.findOne({group:groupNum});
@@ -69,6 +69,7 @@ async function createTeacher(){
         password: password,
         name: name,
         group: groupNum,
+        userImgUrl:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaCHAdofnxqT7foBCW3H4rfUCmXYW_MFb8fg&s',
         createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),
         type:type
     });
@@ -78,6 +79,7 @@ async function createTeacher(){
     console.log('教師資料創建完畢')
 }
 
+// createTeacher()
 // 新增群組資料庫
 async function createDatabase(){
     const group = '0001'

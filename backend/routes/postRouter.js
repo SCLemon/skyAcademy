@@ -112,7 +112,8 @@ router.post('/api/post/create',upload.fields([{ name: 'attachments'}]),authMiddl
                     idx:idx,
                     creator:{
                         idx:req.user.idx,
-                        name: req.user.name
+                        name: req.user.name,
+                        userImgUrl:req.user.userImgUrl
                     },
                     group: req.user.group,
                     content: content,
