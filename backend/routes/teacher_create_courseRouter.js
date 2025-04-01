@@ -143,7 +143,6 @@ router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', m
                 }
             })
             
-            console.log(timer)
             try{
                 // 創建課程專屬資料夾
                 const folderPath = `${databaseUrl}/course/${idx}`
