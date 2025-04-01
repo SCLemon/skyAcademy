@@ -71,7 +71,7 @@
       </div>
       <div class="todayCourse">
         <div class="todayCourseTitle">今日課表</div>
-        <el-table :data="todayCourse" height="305px" border style="width: 90%" empty-text="今日無課程">
+        <el-table :data="todayCourse" height="292px" border style="width: 90%" empty-text="今日無課程">
           <el-table-column prop="startTime" label="上課時間"></el-table-column>
           <el-table-column prop="courseId" label="課程代碼"></el-table-column>
           <el-table-column prop="courseName" label="課程名稱"></el-table-column>
@@ -556,8 +556,17 @@ export default {
     transition: opacity 1s;
   }
   .todayCourseTitle{
-    height: 40px;
-    font-size: 18px;
+    height: 53px;
+    line-height: 53px;
+    font-size: 16px;
+    padding-left: 18px;
+    border: 1px solid #EBEEF5;
+    border-bottom: 0;
+    border-radius: 4px 4px 0 0;
+    width: 90%;
+    box-sizing: border-box;
   }
-
+  ::v-deep .el-table{
+    border-radius: 0 0 4px 4px;
+  }
 </style>
