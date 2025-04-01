@@ -71,7 +71,7 @@
       </div>
       <div class="todayCourse">
         <div class="todayCourseTitle">今日課表</div>
-        <el-table :data="todayCourse" height="292px" border style="width: 90%" empty-text="今日無課程">
+        <el-table :data="todayCourse" height="282px" border style="width: 90%" empty-text="今日無課程">
           <el-table-column prop="startTime" label="上課時間"></el-table-column>
           <el-table-column prop="courseId" label="課程代碼"></el-table-column>
           <el-table-column prop="courseName" label="課程名稱"></el-table-column>
@@ -502,7 +502,7 @@ export default {
   .daily{
     margin-top: 20px;
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
   }
   
   .daily_card{
