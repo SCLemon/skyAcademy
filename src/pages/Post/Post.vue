@@ -69,6 +69,15 @@
           </div>
         </el-card>
       </div>
+      <div class="todayCourse">
+        <div class="todayCourseTitle">今日課表</div>
+        <el-table :data="todayCourse" height="305px" border style="width: 90%" empty-text="今日無課程">
+          <el-table-column prop="startTime" label="上課時間"></el-table-column>
+          <el-table-column prop="courseId" label="課程代碼"></el-table-column>
+          <el-table-column prop="courseName" label="課程名稱"></el-table-column>
+          <el-table-column prop="lecturer" label="授課教師"></el-table-column>
+        </el-table>
+      </div>
     </div>
     <el-dialog title="建立貼文" :visible.sync="dialogTableVisible" v-if="showPermission">
       <div class="real_input" ref="input" contenteditable="true"></div>
@@ -84,18 +93,22 @@
 <script>
 import axios from 'axios'
 import jsCookie from 'js-cookie'
-import { differenceInDays } from 'date-fns';
+import { format, differenceInDays } from 'date-fns';
 export default {
   name:'Post',
   data(){
     return {
       currentUser:{},
+      // 每日練習
       dailyQuestion:{
         title:'',
         deadline:'',
         question:{}
       },
       remainDay:0,
+      // 今日課程
+      todayCourse:[],
+      // 上傳內容
       form:{
         content:'',
         attachments:[]
@@ -126,17 +139,14 @@ export default {
     await this.getPost()
     await this.getUserInfo()
     await this.getDailyQuestion()
+    await this.getTodayCourse();
     this.currentUser = this.$bus.$currentUser
 
     this.timer = setInterval(() => {
       this.getPost();
     }, 15000);
   },
-  computed:{
-    remainTime(){
-      
-    }
-  },
+
   methods:{
     handleCommand(payload){
       if(payload.method == 'delete'){
@@ -154,6 +164,18 @@ export default {
         this.dailyQuestion = res.data.data
       }
       else this.$bus.$emit('handleAlert','獲取每日一題通知',res.data.message,res.data.type)
+    },
+    async getTodayCourse(){
+      const res = await axios.get('/api/post/getTodayCourse',{
+          headers:{
+              'x-user-token':jsCookie.get('authToken'),
+          }
+      })
+      if(res.data.type == 'success'){
+        this.todayCourse = res.data.courses;
+        console.log(this.todayCourse)
+      }
+      else this.$bus.$emit('handleAlert','獲取今日課程通知',res.data.message,res.data.type)
     },
     async getUserInfo(){
       const token = jsCookie.get('authToken');
@@ -480,15 +502,14 @@ export default {
   .daily{
     margin-top: 20px;
     width: 100%;
-    height: 400px;
+    margin-bottom: 20px;
   }
   
   .daily_card{
     width: 90%;
-    margin: 0 auto;
   }
   ::v-deep .el-card__body{
-    height: 226px;
+    min-height: 226px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -502,7 +523,7 @@ export default {
   .daily_content{
     line-height: 1.5;
     width: 100%;
-    max-height: 154px;
+    max-height: 200px;
     text-align: left;
     overflow-y: scroll;
     margin-bottom: 35px;
@@ -534,6 +555,9 @@ export default {
     color: red;
     transition: opacity 1s;
   }
-  
+  .todayCourseTitle{
+    height: 40px;
+    font-size: 18px;
+  }
 
 </style>

@@ -143,6 +143,7 @@ router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', m
                 }
             })
             
+            console.log(timer)
             try{
                 // 創建課程專屬資料夾
                 const folderPath = `${databaseUrl}/course/${idx}`
@@ -154,7 +155,7 @@ router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', m
                     folderPath:folderPath,
                     courseId,
                     courseName,
-                    courseTime: JSON.parse(courseTime),
+                    courseTime: timer,
                     lecturer,
                     group: req.user.group,
                     createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),

@@ -4,8 +4,9 @@ const router = express.Router();
 const userModel = require('../models/userModel');
 const groupModel = require('../models/groupModel')
 const postModel = require('../models/postModel')
+const courseModel = require('../models/courseModel')
 const fs = require('fs');
-const {format} = require('date-fns')
+const {format, compareAsc} = require('date-fns')
 const { v4: uuidv4 } = require('uuid');
 const multer = require('multer')
 const path = require('path')
@@ -332,4 +333,99 @@ router.get('/api/post/getDailyQuestion', authMiddleware, async (req, res) => {
     }
 });
 
+// 獲取今日課程
+function translateDayOfWeek(){
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    let dayName;
+    switch (dayOfWeek) {
+        case 0:
+            dayName = "星期日";
+            break;
+        case 1:
+            dayName = "星期一";
+            break;
+        case 2:
+            dayName = "星期二";
+            break;
+        case 3:
+            dayName = "星期三";
+            break;
+        case 4:
+            dayName = "星期四";
+            break;
+        case 5:
+            dayName = "星期五";
+            break;
+        case 6:
+            dayName = "星期六";
+            break;
+        default:
+            dayName = "未知";
+    }
+    return dayName
+}
+router.get('/api/post/getTodayCourse', authMiddleware, async (req, res) => {
+    try {
+        const dayOfWeek = translateDayOfWeek();
+        let courses = [];
+
+        if (req.user.type === 'teacher') {
+            courses = await courseModel.find({ group: req.user.group, 'courseTime.weekday': dayOfWeek ,status:true})
+        } 
+        else if (req.user.type === 'student') {
+            courses = await courseModel.find({
+                group: req.user.group,
+                'courseTime.weekday': dayOfWeek,
+                studentList: req.user.idx,
+                status: true,
+            })
+        }
+        else {
+            return res.send({
+                type: 'error',
+                message: '課程資料查詢失敗。',
+            })
+        }
+
+        if (courses.length === 0) {
+            return res.send({
+                type: 'success',
+                courses: [],
+                message: '課程資料查詢成功。',
+            });
+        }
+
+        const separatedCourses = courses.flatMap(course =>
+            course.courseTime.map(courseTime => ({
+                courseId: course.courseId,
+                courseName: course.courseName,
+                lecturer: course.lecturer,
+                group: course.group,
+                status: course.status,
+                startTime: format(new Date(courseTime.period[0][0]), 'HH:mm'),
+            }))
+          );
+          
+        // **按開始時間排序**
+        separatedCourses.sort((a, b) => {
+            const timeA = new Date(`1970-01-01T${a.startTime}:00`);
+            const timeB = new Date(`1970-01-01T${b.startTime}:00`);
+            return timeA - timeB;
+        });
+
+        return res.send({
+            type: 'success',
+            courses: separatedCourses,
+            message: '課程資料查詢成功。',
+        });
+
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+});
 module.exports = router;
