@@ -26,12 +26,7 @@ const authMiddleware = async (req, res, next) => {
             message: '未找到授權，請重新登入。',
         });
     }
-    req.user ={
-        idx: user.idx,
-        type: user.type,
-        name: user.name,
-        group: user.group
-    } 
+    req.user = user;
     next();
 };
 
