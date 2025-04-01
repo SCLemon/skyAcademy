@@ -304,6 +304,32 @@ router.get('/api/post/image/:idx/:imageName',async (req, res) => {
     }
 });
 
+// 獲取每日一題
+router.get('/api/post/getDailyQuestion', authMiddleware, async (req, res) => {
+    const dailyQuestion = require('../json/daily/daily.json');
+    try {
 
+        const length = dailyQuestion.list.length;
+        
+        const question = dailyQuestion.list[Math.floor(Math.random() * length)]
+
+        return res.send({
+            type: 'success',
+            data:{
+                title: dailyQuestion.title,
+                deadline: dailyQuestion.deadline,
+                question: question
+            },
+            message: '每日一題獲取成功。',
+        });
+        
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+});
 
 module.exports = router;

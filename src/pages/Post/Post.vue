@@ -52,7 +52,24 @@
       </div>
       
     </div>
-    <div class="column"></div>
+    <div class="column">
+      <div class="daily">
+        <el-card shadow="hover" class="daily_card">
+          <div slot="header"><span>每日練習</span><el-button style="float: right; padding: 3px 0" type="text" @click="getDailyQuestion()">隨機出題</el-button></div>
+          <div class="daily_content_all">
+            <div class="daily_content">
+              <div class="daily_question">{{dailyQuestion.question.question}}</div>
+              <div class="daily_options">{{dailyQuestion.question.options}}</div>
+            </div>
+            <div class="statistic">
+              <div class="statistic_title">距離 {{ dailyQuestion.title }}：</div>
+              <div class="statistic_num">{{ remainDay }}</div>
+              <div class="daily_answer">{{dailyQuestion.question.answer}}</div>
+            </div>
+          </div>
+        </el-card>
+      </div>
+    </div>
     <el-dialog title="建立貼文" :visible.sync="dialogTableVisible" v-if="showPermission">
       <div class="real_input" ref="input" contenteditable="true"></div>
       <el-upload action="#" :auto-upload="false" list-type="picture-card" :on-change="handleUpload" :on-preview="handlePictureCardPreview" :on-remove="handleRemove" :file-list="form.attachments" :multiple="true" accept="image/*"><i class="el-icon-plus"></i></el-upload>
@@ -67,13 +84,18 @@
 <script>
 import axios from 'axios'
 import jsCookie from 'js-cookie'
+import { differenceInDays } from 'date-fns';
 export default {
   name:'Post',
   data(){
     return {
-      currentUser:{
-
+      currentUser:{},
+      dailyQuestion:{
+        title:'',
+        deadline:'',
+        question:{}
       },
+      remainDay:0,
       form:{
         content:'',
         attachments:[]
@@ -103,18 +125,35 @@ export default {
     })
     await this.getPost()
     await this.getUserInfo()
-    
+    await this.getDailyQuestion()
     this.currentUser = this.$bus.$currentUser
 
     this.timer = setInterval(() => {
       this.getPost();
     }, 15000);
   },
+  computed:{
+    remainTime(){
+      
+    }
+  },
   methods:{
     handleCommand(payload){
       if(payload.method == 'delete'){
         this.deletePost(payload.idx)
       }
+    },
+    async getDailyQuestion(){
+      const res = await axios.get('/api/post/getDailyQuestion',{
+          headers:{
+              'x-user-token':jsCookie.get('authToken'),
+          }
+      })
+      if(res.data.type == 'success'){
+        this.remainDay = differenceInDays(new Date(res.data.data.deadline), Date.now());
+        this.dailyQuestion = res.data.data
+      }
+      else this.$bus.$emit('handleAlert','獲取每日一題通知',res.data.message,res.data.type)
     },
     async getUserInfo(){
       const token = jsCookie.get('authToken');
@@ -434,5 +473,67 @@ export default {
     height: 100%;  
     object-fit: cover; 
   }
+  .column{
+    width: calc(100% -700px);
+    height: 100vh;
+  }
+  .daily{
+    margin-top: 20px;
+    width: 100%;
+    height: 400px;
+  }
+  
+  .daily_card{
+    width: 90%;
+    margin: 0 auto;
+  }
+  ::v-deep .el-card__body{
+    height: 226px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .daily_content_all{
+    position: relative;
+  }
+  .daily_content_all:hover .daily_answer{
+    opacity: 1;
+  }
+  .daily_content{
+    line-height: 1.5;
+    width: 100%;
+    max-height: 154px;
+    text-align: left;
+    overflow-y: scroll;
+    margin-bottom: 35px;
+  }
+  .daily_question{
+    width: 100%;
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+  .daily_options{
+    font-size: 16px;
+  }
+  .statistic{
+    width: 100%;
+    text-align: center;
+    line-height: 1.5;
+    position: relative;
+  }
+  .statistic_title{
+    font-size: 12px;
+    color: gray;
+  }
+  .daily_answer{
+    position: absolute;
+    bottom: 0px;
+    right: 25px;
+    font-size: 32px;
+    opacity: 0;
+    color: red;
+    transition: opacity 1s;
+  }
+  
 
 </style>
