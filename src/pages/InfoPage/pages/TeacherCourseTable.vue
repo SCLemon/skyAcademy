@@ -35,6 +35,11 @@
                         <el-input v-model="form.lecturer" autocomplete="off" clearable></el-input>
                     </el-form-item>
                 </el-form>
+                <div class="courseTime_title">上課時間</div>
+                <div class="courseTime_block" v-for="(idx,id) in showTimeBlock" :key="id">
+                    <el-select class="courseTime_block_weekday" v-model="selected_weekday[idx-1]" placeholder="請選擇星期"> <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option></el-select>
+                    <el-time-picker is-range v-model="selected_period[idx-1]" range-separator="至" start-placeholder="開始時間" end-placeholder="結束時間" placeholder="請選擇時間範圍"></el-time-picker>
+                </div>
                 <div class="class_banner_title">課程封面上傳（限制兩張，上傳後暫不提供修改，至少 350 pixel x 175 pixel）</div>
                 <el-upload  action="#" :on-change="handleUpload" list-type="picture-card" :auto-upload="false" :file-list="fileList" :limit="2" :multiple="true" accept="image/*">
                     <i slot="default" class="el-icon-plus"></i>
@@ -84,8 +89,19 @@
                 form:{
                     courseName:'',
                     courseId:'',
-                    lecturer:''
+                    lecturer:'',
+                    courseTime:[]
                 },
+                // 上課時間
+                options:[
+                    {value: '星期一',label: '星期一'},{value: '星期二',label: '星期二'},{value: '星期三',label: '星期三'},
+                    {value: '星期四',label: '星期四'},{value: '星期五',label: '星期五'},{value: '星期六',label: '星期六'},
+                    {value: '星期日',label: '星期日'},
+                ],
+                
+                selected_weekday:[],
+                selected_period:[],
+
                 // 創建課程的圖片上傳
                 fileList: [],
                 dialogImageUrl: '',
@@ -105,6 +121,12 @@
         },
         mounted(){
             this.getCourseList()
+        },
+        computed:{
+             // 顯示時間選取框列數
+            showTimeBlock(){
+                return this.selected_weekday.length + 1
+            }
         },
         methods:{
             async getStudentList(){
@@ -135,10 +157,20 @@
             // 創建課程
             async create(){
 
+                for(var i = 0; i< Math.min(this.selected_weekday.length,this.selected_period.length) ; i++){
+                    console.log(this.selected_weekday[i], this.selected_period[i])
+                    if(!this.selected_weekday[i] || !this.selected_period[i]) return this.$bus.$emit('handleAlert','課程創建通知','時間不可為空','error')
+                    this.form.courseTime.push({
+                        weekday: this.selected_weekday[i],
+                        period: this.selected_period[i]
+                    })
+                }
+                
                 const formData = new FormData();
                 
                 formData.append('courseName', this.form.courseName);
                 formData.append('courseId', this.form.courseId);
+                formData.append('courseTime', JSON.stringify(this.form.courseTime));
                 formData.append('lecturer', this.form.lecturer);
 
                 if (this.fileList && this.fileList.length > 0) {
@@ -153,12 +185,18 @@
                 })
                 if(res.data.type == 'success'){
                     this.getCourseList();
+                    
+                    // 重置
                     this.dialogFormVisible = false;
                     this.form = {
                         courseName:'',
                         courseId:'',
+                        courseTime:[],
                         lecturer:''
                     },
+                    this.selected_weekday = []
+                    this.selected_period =[]
+
                     // 獲取使用容量
                     this.$bus.$emit('getUsageMemory')
                     this.$bus.$emit('handleAlert','課程資料創建通知',res.data.message,res.data.type)
@@ -321,7 +359,17 @@
             width:90%;
             margin: 0 auto;
         }
+        .courseTime_title{
+            margin-right: 10px;
+        }
+        .courseTime_block{
+            margin-top: 20px;
+        }
+        .courseTime_block_weekday{
+            margin-right: 10px;
+        }
         .class_banner_title{
+            margin-top: 20px;
             margin-bottom: 20px;
         }
         ::v-deep .el-dialog{
@@ -332,8 +380,8 @@
             display: none;
         }
         ::v-deep .el-upload--picture-card, ::v-deep .el-upload-list__item {
-            width: 330px !important;
-            height: 165px !important;
-            line-height: 170px !important; /* 讓圖標垂直置中 */
+            width: 260px !important;
+            height: 130px !important;
+            line-height: 130px !important; /* 讓圖標垂直置中 */
         }
     </style>

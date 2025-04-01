@@ -109,8 +109,8 @@ const checkClassNum = async(req,res,next)=>{
 const upload = multer();
 router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', maxCount: 2}]),authMiddleware,checkClassNum,checkUsageMemory, async (req, res) => {
     
-    const {courseId,courseName,lecturer} = req.body;
-    
+    const {courseId,courseName,courseTime,lecturer} = req.body;
+
     const groupInfo = await groupModel.findOne({group: req.user.group});
     if(!groupInfo){
         return res.send({
@@ -118,15 +118,32 @@ router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', m
             message:'課程創建失敗（群組不存在）。'
         });
     }
-    
+
     const databaseUrl = groupInfo.databaseUrl;
     try {
         if (req.user.type === 'teacher') {
             // 創建課程專屬 idx
             const idx = uuidv4();
-        
+            
+            
+            // 檢查時間是否為空
+            let timer = JSON.parse(courseTime);
+            if(timer.length == 0){
+                return res.send({
+                    type:'error',
+                    message:'課程創建失敗（時間不可為空）。'
+                });
+            }
+            timer.forEach((item)=>{
+                if(item.weekday.trim()=='' || !item.period[0][0] || !item.period[0][1]) {
+                    return res.send({
+                        type:'error',
+                        message:'課程創建失敗（時間不可為空）。'
+                    });
+                }
+            })
+            
             try{
-
                 // 創建課程專屬資料夾
                 const folderPath = `${databaseUrl}/course/${idx}`
                 const bannerFolderPath = `${folderPath}/banner`
@@ -137,6 +154,7 @@ router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', m
                     folderPath:folderPath,
                     courseId,
                     courseName,
+                    courseTime: JSON.parse(courseTime),
                     lecturer,
                     group: req.user.group,
                     createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),
@@ -210,6 +228,7 @@ router.get('/api/infoPage/getCourse',authMiddleware, async (req, res) => {
                     createTime:obj.createTime,
                     courseId:obj.courseId,
                     courseName:obj.courseName,
+                    courseTime:obj.courseTime,
                     lecturer:obj.lecturer,
                     status:obj.status,
                     studentList:obj.studentList
@@ -271,7 +290,7 @@ router.delete('/api/infoPage/deleteCourse/:idx',authMiddleware,async(req,res)=>{
 
             // 先刪除課程專屬資料夾
             const folderPath = deletedCourse.folderPath;
-            
+
             if (fs.existsSync(folderPath)){
                 fs.rmSync(folderPath, { recursive: true, force: true });
             }

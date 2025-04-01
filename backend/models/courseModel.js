@@ -23,6 +23,20 @@ const courseSchema = new mongoose.Schema({
         type: String,
         default: true,
     },
+    courseTime:{ // 上課時間
+        type:[{
+            weekday:{
+                type: String,
+                require:true
+            },
+            period:{
+                type:[[Date]],
+                require:true,
+            }
+        }],
+        require:true,
+        trim:true,
+    },
     lecturer:{
         type: String,
         default: true,
