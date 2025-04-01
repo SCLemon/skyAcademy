@@ -15,6 +15,12 @@ const userSchema = new mongoose.Schema({
         required:true,
         trim: true,
     },
+    // 頭像
+    userImgUrl:{
+        type: String,
+        trim: true,
+        default: 'img/user.png'
+    },
     // 不可傳到前端系統判定
     token: {
         type: String,

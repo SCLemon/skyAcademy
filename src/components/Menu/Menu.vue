@@ -2,7 +2,7 @@
   <div class="menu">
     <div :class="{user:true,list_selected: $route.path.includes('/login') || $route.path.includes('/studentInfo') || $route.path.includes('/teacherInfo')}"
          @click="isLogin?goTo(`/academic/${userInfo.typeEng}Info`):goTo('/academic/login')">
-        <img class="img" src="img/user.png" alt="">
+        <img class="img" :src="userInfo.userImgUrl?userInfo.userImgUrl:'img/user.png'" alt="">
         <div :class="`username ${isLogin?'username_login':''}`">
             {{ isLogin?`${userInfo.name}`:'登入/註冊' }}
             <div>(職稱：{{userInfo.type}})</div>
@@ -26,6 +26,7 @@ export default {
             userInfo:{
                 account:'',
                 name:'',
+                userImgUrl:'',
                 typeEng:'',
                 type:''
             }

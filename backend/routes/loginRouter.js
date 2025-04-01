@@ -46,6 +46,7 @@ router.post('/login/verify', async (req, res) => {
         userData = {
             account:user.account,
             typeEng:user.type,
+            userImgUrl:user.userImgUrl,
             type: user.type == 'teacher'?'教師':'學生',
             name: user.name
         }
@@ -80,6 +81,7 @@ router.post('/login/token', async (req, res) => {
             account:user.account,
             typeEng:user.type,
             name: user.name,
+            userImgUrl:user.userImgUrl,
             type: user.type == 'teacher'?'教師':'學生'
         }
 
