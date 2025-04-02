@@ -327,6 +327,8 @@ export default {
   }
   .inputTextBoxImg>img{
     width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   .textArea {
     width: 520px;
@@ -454,6 +456,8 @@ export default {
   }
   .post_top_img>img{
     width: 100%;
+    height: 100%;
+    object-fit: cover;
     display: inline-block;
   }
   .post_top_detail{
@@ -543,6 +547,8 @@ export default {
   }
   .viewer_inputTextBoxImg>img{
     width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   .viewer_textArea {
     width: 470px;

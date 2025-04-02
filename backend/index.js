@@ -58,6 +58,9 @@ app.use(postRouter);
 const learnRouter = require('./routes/learnRouter');
 app.use(learnRouter);
 
+const userInfoRouter = require('./routes/userInfoRouter');
+app.use(userInfoRouter);
+
 app.listen(3007,()=>{
     console.log('server is running on port 3007')
 })

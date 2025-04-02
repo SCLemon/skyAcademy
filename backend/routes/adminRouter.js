@@ -69,7 +69,9 @@ async function createTeacher(){
         password: password,
         name: name,
         group: groupNum,
-        userImgUrl:'https://megapx-assets.dcard.tw/images/f3d0ecad-6f94-44c3-a588-82cf94c4ad36/1280.jpeg',
+        userImgUrl:{
+            url:'https://megapx-assets.dcard.tw/images/f3d0ecad-6f94-44c3-a588-82cf94c4ad36/1280.jpeg',
+        },
         createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),
         type:type
     });
@@ -79,7 +81,6 @@ async function createTeacher(){
     console.log('教師資料創建完畢')
 }
 
-// createTeacher()
 // 新增群組資料庫
 async function createDatabase(){
     const group = '0001'
@@ -100,6 +101,9 @@ async function createDatabase(){
     await newGroup.save();
     console.log(`${group} 群組創建完畢`)
 }
+
+// createDatabase()
+// createTeacher()
 
 // 移動群組資料庫
 async function moveDataBase(){

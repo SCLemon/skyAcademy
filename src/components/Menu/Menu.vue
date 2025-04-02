@@ -2,7 +2,12 @@
   <div class="menu">
     <div :class="{user:true,list_selected: $route.path.includes('/login') || $route.path.includes('/studentInfo') || $route.path.includes('/teacherInfo')}"
          @click="isLogin?goTo(`/academic/${userInfo.typeEng}Info`):goTo('/academic/login')">
-        <img class="img" :src="userInfo.userImgUrl?userInfo.userImgUrl:'img/user.png'" alt="">
+        <div class="img_block" @click.stop="openImgUpload()">
+            <img class="img" :src="userInfo.userImgUrl?userInfo.userImgUrl:'img/user.png'" alt="">
+            <div class="img_upload">變更頭像
+                <input type="file" @change="uploadUserImg()" class="img_upload_file" ref="img_upload_file">
+            </div>
+        </div>
         <div :class="`username ${isLogin?'username_login':''}`">
             {{ isLogin?`${userInfo.name}`:'登入/註冊' }}
             <div>(職稱：{{userInfo.type}})</div>
@@ -18,6 +23,7 @@
 
 <script>
 import jsCookie from 'js-cookie'
+import axios from 'axios'
 export default {
     name:'Menu',
     data(){
@@ -36,12 +42,65 @@ export default {
         this.$bus.$on('setUserInfo',this.setUserInfo)
     },
     methods:{
+        openImgUpload(){
+            let el = this.$refs['img_upload_file'];
+            el.click();
+        },
+        async uploadUserImg(){
+            try{
+                const token = jsCookie.get('authToken')
+
+                let el = this.$refs['img_upload_file'];
+                let file = el.files[0];
+                if (!file) return;
+
+                await this.$confirm(`確認修改頭貼?`, '提示', {
+                    confirmButtonText: '確認',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                })
+                let formData = new FormData();
+                formData.append("attachments", file);
+
+                const res = await axios.post("/api/userInfo/updateIcon", formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        "x-user-token": token,
+                    },
+                })
+                if(res.data.type == 'success'){
+                    this.updateCurrentUser();
+                    this.$bus.$emit('handleAlert','頭像上傳通知',res.data.message,res.data.type)
+                }
+                else this.$bus.$emit('handleAlert','頭像上傳通知',res.data.message,res.data.type)
+            }
+            catch(e){
+                console.log(e)
+            }
+            finally{
+                this.$refs['img_upload_file'].value = '';
+            }
+        },
+        async updateCurrentUser(){
+            const token = jsCookie.get('authToken')
+            const res = await axios.post('/login/token',{save:true},{
+                headers:{
+                    'x-user-token':token
+                }
+            })
+            if(res.data.type == 'success'){
+                this.$bus.$currentUser = res.data.userInfo;
+                console.log(this.$bus.$currentUser)
+                this.setUserInfo();
+            }
+        },
         goTo(path){
             this.$router.push(path).catch((e)=>{})
         },
         setUserInfo(){
             const userInfo = this.$bus.$currentUser
             if(userInfo) this.isLogin = true;
+            userInfo.userImgUrl += `?${new Date().getTime()}`
             this.userInfo = userInfo
         },
         logout(){
@@ -77,11 +136,40 @@ export default {
         align-items: center;
         color:white;
     }
-    .img{
+    .img_block{
         width: 90px;
         height: 90px;
         background: white;
         border-radius: 90px;
+        overflow: hidden;
+        position: relative;
+    }
+    .img{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .img_upload{
+        position: absolute;
+        width: 100%;
+        height: 30px;
+        line-height: 30px;
+        color: white;
+        font-size: 10px;
+        text-align: center;
+        background-color: rgba(0,0,0,0.5);
+        left: 0;
+        bottom: -30px;
+        transition: bottom 0.75s;
+    }
+    .img_block:hover{
+        cursor: pointer;
+    }
+    .img_block:hover .img_upload{
+        bottom: 0;
+    }
+    .img_upload_file{
+        display: none;
     }
     .username{
         width: 120px;

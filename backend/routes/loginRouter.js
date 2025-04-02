@@ -47,7 +47,7 @@ router.post('/login/verify', async (req, res) => {
             idx:user.idx,
             account:user.account,
             typeEng:user.type,
-            userImgUrl:user.userImgUrl,
+            userImgUrl:user.userImgUrl.url,
             type: user.type == 'teacher'?'教師':'學生',
             name: user.name
         }
@@ -83,7 +83,7 @@ router.post('/login/token', async (req, res) => {
             account:user.account,
             typeEng:user.type,
             name: user.name,
-            userImgUrl:user.userImgUrl,
+            userImgUrl:user.userImgUrl.url,
             type: user.type == 'teacher'?'教師':'學生'
         }
 
