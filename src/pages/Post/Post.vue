@@ -6,7 +6,7 @@
         <div class="inputBox">
           <div class="inputTextBox" @click="openDialog('img')">
             <div class="inputTextBoxImg"><img :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt=""></div>
-            <div class="textArea">發表您的貼文</div>
+            <div class="textArea">發表您的貼文和公告</div>
           </div>
           <div class="iconBox">
             <div class="icon_item" @click="openDialog('post')">
@@ -19,7 +19,7 @@
         </div>
         <div class="postAll" v-if="posts.length">
           <div class="post" v-for="(obj,id) in posts" :key="id">
-            <div class="post_more" v-if="showPermission && currentUser.idx == obj.creator.idx">
+            <div class="post_more" v-if="showPermission">
               <el-dropdown @command="handleCommand">
                 <span class="el-dropdown-link">
                   操作<i class="el-icon-arrow-down el-icon--right"></i>
@@ -43,6 +43,17 @@
                   <div class="carousel_img"><img :src="item.url" alt=""></div>
                 </el-carousel-item>
               </el-carousel>
+            </div>
+            <div class="post_footer">
+              <div class="post_option_box">
+                <div class="post_option"><i class="fa-regular fa-thumbs-up icon"></i> 按讚</div>
+                <div class="post_option"><i class="fa-regular fa-message icon"></i> 留言</div>
+              </div>
+              <div class="post_viewer_input_box">
+                <div class="viewer_inputTextBoxImg"><img :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt=""></div>
+                <textarea class="viewer_textArea" placeholder="在此貼文下進行留言"></textarea>
+                <div class="viewer_send"><i class="fa-solid fa-feather"></i></div>
+              </div>
             </div>
           </div>
         </div>
@@ -419,7 +430,6 @@ export default {
     height: auto;
     box-shadow: 0px 1px 3px gray;
     border-radius: 5px;
-    padding-bottom: 15px;
     position: relative;
     margin-bottom: 15px;
   }
@@ -464,6 +474,7 @@ export default {
     width: 93%;
     margin: 0 auto;
     margin-top: 5px;
+    margin-bottom: 10px;
     max-height: 100px;
     line-height: 1.5;
     text-align: justify;
@@ -472,7 +483,6 @@ export default {
   .post_img{
     width: 93%;
     margin: 0 auto;
-    margin-top: 10px;
     height: 300px;
   }
   .carousel_img{
@@ -494,6 +504,78 @@ export default {
     width: 100%;   
     height: 100%;  
     object-fit: cover; 
+  }
+  .post_footer{
+    width: 95%;
+    height: 95px;
+    margin: 0 auto;
+  }
+  .post_option_box{
+    width: 100%;
+    height: 40px;
+    display: flex;
+    justify-content: space-evenly;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  .post_option{
+    text-align: center;
+    height: 40px;
+    line-height: 40px;
+    width: 50%;
+    border-radius: 5px;
+  }
+  .post_option:hover{
+    cursor: pointer;
+    background-color: rgba(240,240,240);
+  }
+  .post_viewer_input_box{
+    width: 100%;
+    height: 55px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .viewer_inputTextBoxImg{
+    width: 35px;
+    height: 35px;
+    border-radius: 35px;
+    overflow: hidden;
+  }
+  .viewer_inputTextBoxImg>img{
+    width: 100%;
+  }
+  .viewer_textArea {
+    width: 470px;
+    height: 35px;
+    padding-top: 9px;
+    line-height: 17.5px;
+    overflow-y: auto;
+    padding-left: 20px;
+    margin-left: 10px;
+    font-size: 14px;
+    border-radius: 20px;
+    border: none;
+    outline: none;
+    background-color: #F0F2F5;
+    box-sizing: border-box;
+    color: gray;
+    resize: none;
+  }
+  .viewer_textArea:hover{
+    cursor: pointer;
+    background-color:rgb(240,240,240);
+  }
+  .viewer_send{
+    text-align: center;
+    width: 35px;
+    height: 35px;
+    line-height: 35px;
+    font-size: 18px;
+    border-radius: 5px;
+  }
+  .viewer_send:hover{
+    cursor: pointer;
+    background-color:rgb(240,240,240);
   }
   .column{
     width: calc(100% -700px);
