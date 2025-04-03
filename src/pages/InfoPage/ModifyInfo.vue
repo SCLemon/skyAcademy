@@ -76,7 +76,7 @@ export default {
         async modifyData(){
             this.loading = true;
             let formData = new FormData();
-            formData.append('userInfo',this.userInfo);
+            formData.append('userInfo',JSON.stringify(this.userInfo));
             formData.append('attachments',this.file)
             try{
                 const token = jsCookie.get('authToken')

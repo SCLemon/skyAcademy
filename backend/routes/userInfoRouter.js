@@ -216,7 +216,8 @@ router.get('/api/userInfo/getUserInfo/:idx',authMiddleware,async (req, res) => {
 
 router.post('/api/userInfo/modifyUserInfo/:idx',upload.fields([{ name: 'attachments', maxCount: 1}]), authMiddleware, checkUsageMemory,async (req, res) => {
     const idx = req.params.idx;
-    const { password, name, phone, address, mailAddress} = req.body.userInfo;
+    const { password, name, phone, address, mailAddress} = JSON.parse(req.body.userInfo);
+
     try{
         if(req.user.type  == 'teacher'){
 
