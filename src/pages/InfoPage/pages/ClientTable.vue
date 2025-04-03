@@ -2,6 +2,7 @@
   <div>
     <div class="tableTitle">
         <div class="tableTitle_left">學生總覽</div>
+        <el-button class="tableTitle_right" @click="editSelf()">編輯個人資料</el-button>
         <el-button class="tableTitle_right" @click="dialogFormVisible = true">新增學生</el-button>
     </div>
         <el-table :data="tableData" border height="calc(100vh - 360px)" style="width: 100%" class="tableData" empty-text="暫無數據">
@@ -133,6 +134,9 @@ export default {
                 else this.$bus.$emit('handleAlert','用戶權限變更通知',res.data.message,res.data.type)
             }
             catch(e){}
+        },
+        async editSelf(){
+            this.$router.push({ path: '/academic/modifyInfo', query: { idx: this.$bus.$currentUser.idx } }).catch(e => {})
         },
         async editUser(idx){
             this.$router.push({ path: '/academic/modifyInfo', query: { idx:idx } }).catch(e => {})
