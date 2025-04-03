@@ -107,6 +107,7 @@ export default {
                 })
                 if(res.data.type == 'success'){
                     this.getData();
+                    this.$bus.$emit('getUsageMemory')
                     this.$bus.$emit('handleAlert','用戶資料刪除通知',res.data.message,res.data.type)
                 }
                 else this.$bus.$emit('handleAlert','用戶資料刪除通知',res.data.message,res.data.type)
@@ -133,8 +134,8 @@ export default {
             }
             catch(e){}
         },
-        async editUser(account,idx){
-
+        async editUser(idx){
+            this.$router.push({ path: '/academic/modifyInfo', query: { idx:idx } }).catch(e => {})
         }
     }
 }

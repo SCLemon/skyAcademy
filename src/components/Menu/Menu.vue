@@ -1,11 +1,11 @@
 <template>
   <div class="menu">
-    <div :class="{user:true,list_selected: $route.path.includes('/login') || $route.path.includes('/studentInfo') || $route.path.includes('/teacherInfo')}"
+    <div :class="{user:true,list_selected: $route.path.includes('/login') || $route.path.includes('Info')}"
          @click="isLogin?goTo(`/academic/${userInfo.typeEng}Info`):goTo('/academic/login')">
         <div class="img_block" @click.stop="openImgUpload()">
             <img class="img" :src="userInfo.userImgUrl?userInfo.userImgUrl:'img/user.png'" alt="">
             <div class="img_upload">變更頭像
-                <input type="file" @change="uploadUserImg()" class="img_upload_file" ref="img_upload_file">
+                <input type="file" @change="uploadUserImg()" class="img_upload_file" ref="img_upload_file" accept="image/*">
             </div>
         </div>
         <div :class="`username ${isLogin?'username_login':''}`">

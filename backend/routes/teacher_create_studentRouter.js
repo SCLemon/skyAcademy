@@ -5,7 +5,7 @@ const userModel = require('../models/userModel');
 const groupModel = require('../models/groupModel')
 const {format} = require('date-fns')
 const { v4: uuidv4 } = require('uuid');
-
+const fs = require('fs')
 
 // 檢查身份
 const authMiddleware = async (req, res, next) => {
@@ -108,6 +108,25 @@ router.post('/api/infoPage/createStudent',authMiddleware,checkStudentNum, async 
 });
 
 // 刪除用戶
+async function deleteFolderOfUser(idx,req){
+    const group = await groupModel.findOne({group:req.user.group})
+
+    if(!group){
+        return res.send({
+            type:'error',
+            message: '用戶刪除失敗！',
+        })
+    }
+    const databaseUrl = group.databaseUrl;
+    const folders = ['userIcon','userInfo']
+    try{
+        folders.forEach(folder =>{
+            const path = `${databaseUrl}/${folder}/${idx}`
+            if(fs.existsSync(path)) fs.rmSync(path,{recursive:true})
+        })
+    }
+    catch(e){}
+}
 router.delete('/api/infoPage/deleteStudent/:idx',authMiddleware,async(req,res)=>{
     try {
         if (req.user.type === 'teacher') {
@@ -120,6 +139,8 @@ router.delete('/api/infoPage/deleteStudent/:idx',authMiddleware,async(req,res)=>
                     message: '用戶刪除失敗！'
                 });
             }
+
+            await deleteFolderOfUser(idx,req)
 
             const deletedUser = await userModel.findOneAndDelete({ idx: idx });
 

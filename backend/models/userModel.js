@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
         required:true,
         trim: true,
     },
-    // 頭像
+    // 頭像 -- 顯現在前端用
     userImgUrl: {
         url: { 
             type: String, 
@@ -67,6 +67,32 @@ const userSchema = new mongoose.Schema({
         type:String,
         default:''
     },
+    detail:{
+        photoStickers:{  // 4.5x3.5
+            url: { 
+                type: String, 
+                trim: true, 
+                default: 'img/photoStickers.png' 
+            },
+            original: { 
+                type: String, 
+                trim: true, 
+                default: '' 
+            }
+        },
+        phoneNumber:{
+            type:String,
+            default:''
+        },
+        address:{
+            type:String,
+            default:''
+        },
+        mailAddress:{
+            type:String,
+            default:''
+        },
+    }
 });
 
 const userModel = mongoose.model('User', userSchema);
