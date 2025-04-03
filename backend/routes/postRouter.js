@@ -262,6 +262,9 @@ router.get('/api/post/getPost', authMiddleware, async (req, res) => {
                     });
                 }
                 
+                const creator = await userModel.findOne({idx:post.creator.idx})
+                if(creator) post.creator.name = creator.name;
+
                 return {
                     idx: post.idx,
                     createTime: post.createTime,

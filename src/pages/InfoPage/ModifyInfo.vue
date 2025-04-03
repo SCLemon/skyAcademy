@@ -24,9 +24,9 @@
         <div class="id_card_box">
             <div class="id_card  id_card_forward" ref="forward">
                 <div class="id_card_forward_top"><img src="img/horizontal_logo.png" alt=""></div>
-                <div class="id_card_forward_name_title">姓名 / Name</div>
+                <div class="id_card_forward_name_title">姓名/Name</div>
                 <div class="id_card_forward_name">{{ userInfo.name }}</div>
-                <div class="id_card_forward_id_title">證號 / {{ userInfo.type=='teacher'?'Teacher':'Student' }} ID</div>
+                <div class="id_card_forward_id_title">證號/{{ userInfo.type=='teacher'?'Teacher':'Student' }} ID</div>
                 <div class="id_card_forward_id">{{userInfo.account}}</div>
                 <div class="id_card_forward_imgBox"><img :src="userInfo.userImgUrl" alt=""></div>
                 <div class="id_card_forward_barcode">
@@ -99,6 +99,7 @@ export default {
             if(res.data.type == 'success'){
                 res.data.user.userImgUrl += `?${new Date().getTime()}`
                 this.userInfo = res.data.user
+                this.$bus.$emit('updateCurrentUser')
                 this.generateBarcode()
             }
             else this.$bus.$emit('handleAlert','使用者資料獲取通知',res.data.message,res.data.type)

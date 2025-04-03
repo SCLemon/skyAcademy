@@ -40,6 +40,7 @@ export default {
     },
     mounted(){
         this.$bus.$on('setUserInfo',this.setUserInfo)
+        this.$bus.$on('updateCurrentUser',this.updateCurrentUser)
     },
     methods:{
         openImgUpload(){
@@ -90,7 +91,6 @@ export default {
             })
             if(res.data.type == 'success'){
                 this.$bus.$currentUser = res.data.userInfo;
-                console.log(this.$bus.$currentUser)
                 this.setUserInfo();
             }
         },
