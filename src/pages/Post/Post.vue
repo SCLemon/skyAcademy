@@ -3,7 +3,7 @@
   <div class="view">
     <div class="posterContainer">
       <div class="posterBox">
-        <div class="inputBox">
+        <div class="inputBox" v-if="currentUser.typeEng == 'teacher'">
           <div class="inputTextBox" @click="openDialog('img')">
             <div class="inputTextBoxImg"><img :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt=""></div>
             <div class="textArea">發表您的貼文和公告</div>
@@ -47,7 +47,7 @@
             </div>
             <div class="post_footer">
               <div class="post_option_box">
-                <div :class="`post_option ${obj.isLike?'like':''}`" @click="toggleLikePost(obj.idx, $event)"><i :class="`fa-regular fa-thumbs-up icon ${obj.isLike?'fa-solid':''}`"></i> 按讚</div>
+                <div :class="`post_option ${obj.isLike?'like':''}`" @click="toggleLikePost(obj.idx, $event)"><i :class="`fa-regular fa-thumbs-up icon ${obj.isLike?'fa-solid':''}`"></i> <span>{{ obj.isLike?'收回讚':'按讚' }}</span></div>
                 <div class="post_option"><i class="fa-regular fa-message icon"></i> 留言</div>
               </div>
               <div class="post_viewer_input_box">
@@ -322,6 +322,7 @@ export default {
     async toggleLikePost(idx,event){
       const wrapper = event.currentTarget; 
       const icon = wrapper.querySelector('i');
+      const span = wrapper.querySelector('span')
       try{
         const res = await axios.get(`/api/post/toggleLikePost/${idx}`,{
           headers:{
@@ -331,6 +332,7 @@ export default {
         if(res.data.type == 'success'){
           wrapper.classList.toggle('like')
           icon.classList.toggle('fa-solid')
+          span.innerText == '按讚'? span.innerText='收回讚':span.innerText='按讚'
         }
         else this.$bus.$emit('handleAlert','貼文按讚通知',res.data.message,res.data.type)
       }
