@@ -273,7 +273,7 @@ router.post('/api/post/modifyPost/:idx',authMiddleware,async(req,res)=>{
 // 獲取貼文資料
 router.get('/api/post/getPost', authMiddleware, async (req, res) => {
     const page = req.query.page || 1;
-    const pageSize = 3;
+    const pageSize = 5;
     const offset = (page - 1) * pageSize;
     try {
         let posts = [];
