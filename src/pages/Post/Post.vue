@@ -313,7 +313,7 @@ export default {
           }
         })
         if(res.data.type == 'success'){
-          this.getPost();
+          this.getPost('refresh');
           this.dialogTableVisible2 = false;
           this.modifyContent = '';
           this.modifyIdx = '';
