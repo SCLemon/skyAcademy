@@ -222,6 +222,54 @@ router.delete('/api/post/deletePost/:idx',authMiddleware,async(req,res)=>{
     }
 })
 
+// 修改貼文內容
+router.post('/api/post/modifyPost/:idx',authMiddleware,async(req,res)=>{
+
+    try {
+        if (req.user.type === 'teacher') {
+
+            const idx = req.params.idx;
+
+            if (!idx || typeof idx !== 'string' || idx.length !== 36) {
+                return res.send({
+                    type: 'error',
+                    message: '貼文修改失敗！'
+                });
+            }
+
+            const post = await postModel.findOneAndUpdate({idx:idx, 'creator.idx':req.user.idx, group:req.user.group},{
+                $set:{
+                    content: req.body.content
+                }
+            },{new:true})
+
+            if(!post){
+                return res.send({
+                    type: 'error',
+                    message: `貼文修改失敗！`,
+                });
+            }
+
+            return res.send({
+                type: 'success',
+                message: `貼文已成功修改。`,
+            });
+        } 
+        else {
+            return res.send({
+                type: 'error',
+                message: '您沒有權限修改貼文資料。',
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+})
+
 // 獲取貼文資料
 router.get('/api/post/getPost', authMiddleware, async (req, res) => {
     try {
@@ -290,6 +338,7 @@ router.get('/api/post/getPost', authMiddleware, async (req, res) => {
         });
     }
 });
+
 
 // 返回圖片
 router.get('/api/post/image/:idx/:imageName',async (req, res) => {

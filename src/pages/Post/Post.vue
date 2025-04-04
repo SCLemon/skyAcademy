@@ -25,6 +25,7 @@
                   操作<i class="el-icon-arrow-down el-icon--right"></i>
                 </span>
                 <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item :command="{ method:'modify',content: obj.content, idx: obj.idx}">編輯</el-dropdown-item>
                   <el-dropdown-item :command="{ method:'delete', idx: obj.idx}">刪除</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
@@ -98,13 +99,17 @@
       </el-dialog>
       <el-button type="primary" class="button" @click="create()" :loading="isSending" >建立貼文</el-button>
     </el-dialog>
+    <el-dialog title="修改貼文" :visible.sync="dialogTableVisible2" v-if="showPermission">
+      <div class="real_input" ref="modifyContent" contenteditable="true"></div>
+      <el-button type="primary" class="button" @click="modifyPost()" :loading="isSending" >修改貼文</el-button>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
 import jsCookie from 'js-cookie'
-import { format, differenceInDays } from 'date-fns';
+import { differenceInDays } from 'date-fns';
 export default {
   name:'Post',
   data(){
@@ -138,6 +143,11 @@ export default {
       posts:[],
       showPermission:false,
       timer:-1, // 自動汲取貼文
+
+      // 修改貼文內容
+      modifyIdx:'',
+      modifyContent:'',
+      dialogTableVisible2:false,
       
     }
   },
@@ -163,6 +173,9 @@ export default {
       if(payload.method == 'delete'){
         this.deletePost(payload.idx)
       }
+      if(payload.method == 'modify'){
+        this.openModifyBox(payload.content,payload.idx)
+      }
     },
     async getDailyQuestion(){
       const res = await axios.get('/api/post/getDailyQuestion',{
@@ -184,7 +197,6 @@ export default {
       })
       if(res.data.type == 'success'){
         this.todayCourse = res.data.courses;
-        console.log(this.todayCourse)
       }
       else this.$bus.$emit('handleAlert','獲取今日課程通知',res.data.message,res.data.type)
     },
@@ -260,6 +272,32 @@ export default {
           this.$bus.$emit('handleAlert','貼文刪除通知',res.data.message,res.data.type)
         }
         else this.$bus.$emit('handleAlert','貼文刪除通知',res.data.message,res.data.type)
+      }
+      catch(e){}
+    },
+    async openModifyBox(content, idx){
+      this.dialogTableVisible2 = true;
+      this.$nextTick(()=>{
+        this.$refs['modifyContent'].innerHTML = content;
+      })
+      this.modifyIdx = idx;
+    },
+    async modifyPost(){
+      try{
+        this.modifyContent =  this.$refs['modifyContent'].innerHTML;
+        const res = await axios.post(`/api/post/modifyPost/${this.modifyIdx}`,{content:this.modifyContent},{
+          headers:{
+            'x-user-token':jsCookie.get('authToken')
+          }
+        })
+        if(res.data.type == 'success'){
+          this.getPost();
+          this.dialogTableVisible2 = false;
+          this.modifyContent = '';
+          this.modifyIdx = '';
+          this.$bus.$emit('handleAlert','貼文修改通知',res.data.message,res.data.type)
+        }
+        else this.$bus.$emit('handleAlert','貼文修改通知',res.data.message,res.data.type)
       }
       catch(e){}
     },
