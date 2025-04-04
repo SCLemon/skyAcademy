@@ -595,7 +595,7 @@ export default {
     margin: 0 auto;
     margin-top: 5px;
     margin-bottom: 10px;
-    max-height: 100px;
+    max-height: 105px;
     line-height: 1.5;
     text-align: justify;
     overflow-y:scroll;
