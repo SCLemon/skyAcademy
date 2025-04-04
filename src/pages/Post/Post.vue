@@ -47,7 +47,7 @@
             </div>
             <div class="post_footer">
               <div class="post_option_box">
-                <div class="post_option"><i class="fa-regular fa-thumbs-up icon"></i> 按讚</div>
+                <div :class="`post_option ${obj.isLike?'like':''}`" @click="toggleLikePost(obj.idx, $event)"><i :class="`fa-regular fa-thumbs-up icon ${obj.isLike?'fa-solid':''}`"></i> 按讚</div>
                 <div class="post_option"><i class="fa-regular fa-message icon"></i> 留言</div>
               </div>
               <div class="post_viewer_input_box">
@@ -301,11 +301,27 @@ export default {
       }
       catch(e){}
     },
+    async toggleLikePost(idx,event){
+      const wrapper = event.currentTarget; 
+      const icon = wrapper.querySelector('i');
+      try{
+        const res = await axios.get(`/api/post/toggleLikePost/${idx}`,{
+          headers:{
+            'x-user-token':jsCookie.get('authToken')
+          }
+        })
+        if(res.data.type == 'success'){
+          wrapper.classList.toggle('like')
+          icon.classList.toggle('fa-solid')
+        }
+        else this.$bus.$emit('handleAlert','貼文按讚通知',res.data.message,res.data.type)
+      }
+      catch(e){}
+    },
     openDialog(){
       if(this.showPermission) this.dialogTableVisible = true;
       else this.$bus.$emit('handleAlert','創建貼文權限通知','目前平台並未開放學生進行貼文','warning')
     },
-
     // 圖片處理
     handleUpload(file,fileList){
       this.form.attachments = fileList
@@ -407,6 +423,9 @@ export default {
   }
   .icon{
     margin-right: 5px;
+  }
+  .like{
+    color: rgb(88, 88, 250);
   }
   .column{
     width: 490px;

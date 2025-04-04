@@ -39,8 +39,14 @@ const postSchema = new mongoose.Schema({
     },
     meta:{
         like:{
-            type: Number,
-            default:0
+            type:[
+                {
+                    idx:{
+                        type:String,
+                    }
+                }
+            ],
+            default:[]
         },
         message:{
             type:[String],

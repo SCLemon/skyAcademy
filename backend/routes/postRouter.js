@@ -6,7 +6,7 @@ const groupModel = require('../models/groupModel')
 const postModel = require('../models/postModel')
 const courseModel = require('../models/courseModel')
 const fs = require('fs');
-const {format, compareAsc} = require('date-fns')
+const {format} = require('date-fns')
 const { v4: uuidv4 } = require('uuid');
 const multer = require('multer')
 const path = require('path')
@@ -305,13 +305,15 @@ router.get('/api/post/getPost', authMiddleware, async (req, res) => {
                     postImg = fs.readdirSync(databaseUrl).map((file) => {
                         return {
                             name: file,
-                            url: `/api/post/image/${post.idx}/${file}`, // 使用相對URL返回圖片
+                            url: `/api/post/image/${post.idx}/${file}`,
                         };
                     });
                 }
                 
                 const creator = await userModel.findOne({idx:post.creator.idx})
                 if(creator) post.creator.name = creator.name;
+
+                const isLike = post.meta.like.some((likeUser) => likeUser.idx === req.user.idx);
 
                 return {
                     idx: post.idx,
@@ -321,6 +323,7 @@ router.get('/api/post/getPost', authMiddleware, async (req, res) => {
                     status: post.status,
                     meta: post.meta,
                     postImg: postImg,
+                    isLike: isLike
                 };
             })
         );
@@ -338,6 +341,59 @@ router.get('/api/post/getPost', authMiddleware, async (req, res) => {
         });
     }
 });
+
+// 按讚
+router.get('/api/post/toggleLikePost/:idx', authMiddleware, async (req, res) => {
+    try {
+        const postIdx = req.params.idx;
+    
+        const post = await postModel.findOne({
+            idx: postIdx,
+            group: req.user.group,
+            'meta.like.idx': req.user.idx
+        });
+    
+        if (post) {
+            // 如果已經按過讚，則取消按讚（$pull）
+            const updatedPost = await postModel.findOneAndUpdate(
+            { idx: postIdx, group: req.user.group },
+            {
+                $pull: {
+                'meta.like': { idx: req.user.idx }
+                }
+            },
+            { new: true }
+            );
+    
+            if (!updatedPost) return res.send({ type: 'error', message: '取消按讚失敗' });
+            return res.send({ type: 'success', message: '已取消按讚' });
+
+        } 
+        else {
+            // 如果沒按過讚，則按讚（$push）
+            const updatedPost = await postModel.findOneAndUpdate(
+            { idx: postIdx, group: req.user.group },
+            {
+                $push: {
+                'meta.like': { idx: req.user.idx }
+                }
+            },
+            { new: true }
+            );
+    
+            if (!updatedPost) return res.send({ type: 'error', message: '貼文按讚失敗' });
+            return res.send({ type: 'success', message: '貼文按讚成功' });
+        }
+  
+    } catch (e) {
+        console.error(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+});
+  
 
 
 // 返回圖片
