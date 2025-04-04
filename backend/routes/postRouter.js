@@ -272,14 +272,17 @@ router.post('/api/post/modifyPost/:idx',authMiddleware,async(req,res)=>{
 
 // 獲取貼文資料
 router.get('/api/post/getPost', authMiddleware, async (req, res) => {
+    const page = req.query.page || 1;
+    const pageSize = 3;
+    const offset = (page - 1) * pageSize;
     try {
         let posts = [];
 
         if (req.user.type === 'teacher') {
-            posts = await postModel.find({ group: req.user.group });
+            posts = (await postModel.find({ group: req.user.group }).sort({ _id: -1 }).skip(offset).limit(pageSize)).reverse();
         } 
         else if (req.user.type === 'student') {
-            posts = await postModel.find({ group: req.user.group, status: true });
+            posts = (await postModel.find({ group: req.user.group, status: true }).sort({ _id: -1 }).skip(offset).limit(pageSize)).reverse();
         }
         else {
             return res.send({
@@ -330,7 +333,7 @@ router.get('/api/post/getPost', authMiddleware, async (req, res) => {
 
         return res.send({
             type: 'success',
-            posts:posts,
+            posts:posts.reverse(),
             message: '課程資料查詢成功。',
         });
     } catch (e) {

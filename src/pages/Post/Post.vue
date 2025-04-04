@@ -17,7 +17,7 @@
             </div>
           </div>
         </div>
-        <div class="postAll" v-if="posts.length">
+        <div class="postAll" ref="postAll" @scroll="postDivScroll()" v-if="posts.length">
           <div class="post" v-for="(obj,id) in posts" :key="id">
             <div class="post_more" v-if="showPermission">
               <el-dropdown @command="handleCommand">
@@ -141,8 +141,9 @@ export default {
 
       // 顯示貼文
       posts:[],
+      page:1,
       showPermission:false,
-      timer:-1, // 自動汲取貼文
+      isLoadingMore: false, // 加載狀態，避免重複請求
 
       // 修改貼文內容
       modifyIdx:'',
@@ -163,9 +164,6 @@ export default {
     await this.getTodayCourse();
     this.currentUser = this.$bus.$currentUser
 
-    this.timer = setInterval(() => {
-      this.getPost();
-    }, 15000);
   },
 
   methods:{
@@ -215,16 +213,36 @@ export default {
       }
       catch(e){}
     },
-    async getPost(){
-      const res = await axios.get('/api/post/getPost',{
+
+    postDivScroll(){
+      const postAllDiv = this.$refs.postAll;
+      if (postAllDiv.scrollHeight - postAllDiv.scrollTop === postAllDiv.clientHeight) {
+        this.getPost();
+      }
+    },
+    async getPost(flag){
+      if (this.isLoading) return;
+      this.isLoading = true;
+      if(flag == 'refresh'){
+        this.posts = [];
+        this.page = 1;
+      }
+      try{
+        const res = await axios.get(`/api/post/getPost?page=${this.page}`,{
           headers:{
               'x-user-token':jsCookie.get('authToken'),
           }
-      })
-      if(res.data.type == 'success'){
-        this.posts = res.data.posts.reverse()
+        })
+        if(res.data.type == 'success'){
+          this.posts = this.posts.concat(res.data.posts);
+          this.page++;
+        }
+        else this.$bus.$emit('handleAlert','貼文創建通知',res.data.message,res.data.type)
       }
-      else this.$bus.$emit('handleAlert','貼文創建通知',res.data.message,res.data.type)
+      catch(e){}
+      finally{
+        this.isLoading = false;
+      }
     },
     async create(){
       this.isSending = true;
@@ -243,7 +261,7 @@ export default {
           }
       })
       if(res.data.type == 'success'){
-          this.getPost()
+          this.getPost('refresh')
           this.dialogTableVisible = false;
           this.form = {
               content:'',
@@ -268,7 +286,7 @@ export default {
           }
         })
         if(res.data.type == 'success'){
-          this.getPost();
+          this.getPost('refresh');
           this.$bus.$emit('handleAlert','貼文刪除通知',res.data.message,res.data.type)
         }
         else this.$bus.$emit('handleAlert','貼文刪除通知',res.data.message,res.data.type)
@@ -336,7 +354,6 @@ export default {
   },
   beforeDestroy(){
     window.removeEventListener('keyup',this.inputKeyUpfunction);
-    clearInterval(this.timer)
   }
 }
 </script>
