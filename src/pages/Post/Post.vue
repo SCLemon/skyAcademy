@@ -639,14 +639,15 @@ export default {
   }
   .userMessage{
     width: 100%;
-    min-height: 30px;
-    line-height: 30px;
+    min-height: 25px;
+    line-height: 25px;
     border-bottom: 1px solid rgba(0,0,0,0.1);
     height: auto;
     padding-left: 5px;
     padding-right: 5px;
     word-wrap: break-word;
     box-sizing: border-box;
+    font-size: 14px;
   }
   .userMessageBox_open{
     height: auto;
