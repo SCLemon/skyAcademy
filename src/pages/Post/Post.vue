@@ -597,6 +597,7 @@ export default {
     margin-bottom: 10px;
     max-height: 105px;
     line-height: 1.5;
+    font-size: 14px;
     text-align: justify;
     overflow-y:scroll;
   }
