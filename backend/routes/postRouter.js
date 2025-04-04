@@ -362,7 +362,7 @@ router.get('/api/post/toggleLikePost/:idx', authMiddleware, async (req, res) => 
             { idx: postIdx, group: req.user.group },
             {
                 $pull: {
-                'meta.like': { idx: req.user.idx }
+                    'meta.like': { idx: req.user.idx }
                 }
             },
             { new: true }
@@ -396,8 +396,52 @@ router.get('/api/post/toggleLikePost/:idx', authMiddleware, async (req, res) => 
         });
     }
 });
-  
 
+// 匿名留言
+router.post('/api/post/message', authMiddleware, async (req, res) => {
+    try {
+        const postIdx = req.body.postIdx;
+        const message = req.body.message;
+        if(!postIdx || message.trim() == ''){
+            return res.send({
+                type: 'error',
+                message: '留言失敗（訊息不可為空）',
+            });
+        }
+        const post = await postModel.findOneAndUpdate({postIdx:postIdx, group:req.user.group},
+            {
+                $push:{
+                    'meta.message':{
+                        ip: req.ip,
+                        message: message
+                    }
+                }
+            }
+        )
+        if(!post){
+            return res.send({
+                type: 'error',
+                message: '留言失敗',
+            });
+        }
+
+        return res.send({
+            type: 'success',
+            data: {
+                ip: req.ip,
+                message: message
+            },
+            message: '留言成功',
+        });
+  
+    } catch (e) {
+        console.error(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+});
 
 // 返回圖片
 router.get('/api/post/image/:idx/:imageName',async (req, res) => {

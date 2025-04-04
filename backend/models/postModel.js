@@ -49,7 +49,12 @@ const postSchema = new mongoose.Schema({
             default:[]
         },
         message:{
-            type:[String],
+            type:[
+                {
+                    ip:String,
+                    message:String
+                }
+            ],
             default:[]
         }
     }

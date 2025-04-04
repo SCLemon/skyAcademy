@@ -17,7 +17,7 @@
             </div>
           </div>
         </div>
-        <div class="postAll" ref="postAll" @scroll="postDivScroll()" v-if="posts.length">
+        <div :class="`postAll ${currentUser.typeEng=='teacher'?'':'postAll_student'}`" ref="postAll" @scroll="postDivScroll()" v-if="posts.length">
           <div class="post" v-for="(obj,id) in posts" :key="id">
             <div class="post_more" v-if="showPermission">
               <el-dropdown @command="handleCommand">
@@ -48,12 +48,16 @@
             <div class="post_footer">
               <div class="post_option_box">
                 <div :class="`post_option ${obj.isLike?'like':''}`" @click="toggleLikePost(obj.idx, $event)"><i :class="`fa-regular fa-thumbs-up icon ${obj.isLike?'fa-solid':''}`"></i> <span>{{ obj.isLike?'收回讚':'按讚' }}</span></div>
-                <div class="post_option"><i class="fa-regular fa-message icon"></i> 留言</div>
+                <div class="post_option" @click="openUserMessageBox($event)"><i class="fa-regular fa-message icon"></i> 留言</div>
+              </div>
+              <div class="userMessageBox">
+                <div class="userMessage" style="text-align: center; color:gray; font-size: 14px;" v-if="!obj.message.length">目前暫時沒有人留言</div>
+                <div class="userMessage" v-for="(item,id) in obj.message" :key="id">{{ item.ip }} 說：{{ item.message }}</div>
               </div>
               <div class="post_viewer_input_box">
                 <div class="viewer_inputTextBoxImg"><img :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt=""></div>
                 <textarea class="viewer_textArea" placeholder="在此貼文下進行留言"></textarea>
-                <div class="viewer_send"><i class="fa-solid fa-feather"></i></div>
+                <div class="viewer_send" @click="sendUserMessage(obj.idx, $event)"><i class="fa-solid fa-feather"></i></div>
               </div>
             </div>
           </div>
@@ -352,7 +356,40 @@ export default {
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
+    },
+
+    // 留言區
+    openUserMessageBox(event){
+      const postOption = event.currentTarget;
+      const icon = postOption.querySelector('i')
+      icon.classList.toggle('fa-solid');
+      const userMessageBox = postOption.closest('.post_option_box').nextElementSibling;
+      userMessageBox.classList.toggle('userMessageBox_open');
+    },
+    async sendUserMessage(idx, event){
+      try{
+        const sendButton = event.currentTarget;
+        const textArea = sendButton.previousElementSibling;
+        const message = textArea.value;
+
+        const res = await axios.post(`/api/post/message`,{postIdx:idx, message:message},{
+          headers:{
+            'x-user-token':jsCookie.get('authToken')
+          }
+        })
+
+        if(res.data.type == 'success'){
+          const post = this.posts.find(post => post.idx == idx)
+          post.message.push(res.data.data)
+          textArea.value = '';
+        }
+        else this.$bus.$emit('handleAlert','貼文留言通知',res.data.message,res.data.type)
+      }
+      catch(e){
+        console.log(e)
+      }
     }
+
   },
   beforeDestroy(){
     window.removeEventListener('keyup',this.inputKeyUpfunction);
@@ -498,6 +535,9 @@ export default {
     padding-bottom: 10px;
     margin-top: 15px;
   }
+  .postAll_student{
+    height: calc(100vh - 50px);
+  }
   .postAll_empty{
     display: flex;
     justify-content: center;
@@ -587,8 +627,28 @@ export default {
   }
   .post_footer{
     width: 95%;
-    height: 95px;
+    height: auto;
     margin: 0 auto;
+  }
+  .userMessageBox{
+    width: 100%;
+    height: 0;
+    max-height: 160px;
+    overflow-y: scroll;
+  }
+  .userMessage{
+    width: 100%;
+    min-height: 30px;
+    line-height: 30px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    height: auto;
+    padding-left: 5px;
+    padding-right: 5px;
+    word-wrap: break-word;
+    box-sizing: border-box;
+  }
+  .userMessageBox_open{
+    height: auto;
   }
   .post_option_box{
     width: 100%;
@@ -633,6 +693,7 @@ export default {
     line-height: 17.5px;
     overflow-y: auto;
     padding-left: 20px;
+    padding-right: 20px;
     margin-left: 10px;
     font-size: 14px;
     border-radius: 20px;
