@@ -321,7 +321,7 @@ router.get('/api/post/getPost', authMiddleware, async (req, res) => {
                     creator: post.creator,
                     content: post.content,
                     status: post.status,
-                    meta: post.meta,
+                    message: post.meta.message,
                     postImg: postImg,
                     isLike: isLike
                 };
