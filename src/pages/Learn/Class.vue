@@ -10,7 +10,7 @@
             </iframe>
             <div class="title">{{ currentMaterial.title }}</div>
             <div class="abstract">{{ currentMaterial.abstract }}</div>
-            <div class="attachmentBox">
+            <div class="attachmentBox" >
                 教材檔案下載： <a :href="currentMaterial.attachmentUrl" class="downloadLink">點擊下載</a>
             </div>
         </div>
@@ -67,7 +67,7 @@ export default {
     name:'Class',
     data(){
         return {
-            currentUser:this.$bus.$currentUser,
+            currentUser:{},
             courseIdx:this.$route.query.idx,
             selectedItem:null,
             // 教材列表
@@ -102,6 +102,7 @@ export default {
     },
     async mounted(){
         await this.getData();
+        this.currentUser = this.$bus.$currentUser
     },
     methods:{
         async getData(flag){
@@ -193,6 +194,7 @@ export default {
                 if(res.data.type == 'success'){
                     this.getData('refresh');
                     this.dialogTableVisible2 = false
+                    this.currentMaterial = this.modifyForm
                     this.modifyForm = {
                         idx:'',
                         title:'',
