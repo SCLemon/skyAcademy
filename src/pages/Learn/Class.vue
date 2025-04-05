@@ -1,49 +1,152 @@
 <template>
   <div class="view">
     <div class="videoBox">
-        <div class="video">
+        <div class="video"  v-if="showMaterial">
             <iframe width="860" height="483.75"
-                src="https://www.youtube.com/embed/ruXoiCjdMNY?si=NY4zQc1drWMv3tNk&modestbranding=1&rel=0&controls=1&showinfo=0"
+                :src="currentMaterial.videoSrc"
                 title="YouTube video player" frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
             </iframe>
-            <div class="title">線性代數（上）-極限微分之微妙解法</div>
-            <div class="abstract">這門課程介紹線性代數的基本概學導技巧。透過實門課程技巧。透過實例課程介紹線性代數的基點，深入探討向量空間中的變化與推導技巧。透過實例課程介紹線性代數的基本概念，並以「極限與微分」為切入點，深入探討向量空間中的變化與推導技巧。透過實例課程介紹線性代數的基本概念，並以「極限與微分」為切入點，深入探討向量空間中的變化與推導技巧。透過實例課程介紹線性代數的基本概念，並以「極限與微分」為切入點，深入探討向量空間中的變化與推導技巧。透過實例解析，帶你掌握微分在多維空間中的幾何意涵，揭開線性轉換與導數之間的微妙關聯。適合打好數學基礎、準備進階工程與科學應用的學生。備進階工程與科學應用的學生。這門課程介紹線性代數的基本概念，並以「極限與微分」為切入點，深入探討向量空間中的變化與推導技巧。透過實例解析，帶你掌握微分在多維空間中的幾何意涵，揭開線性轉換與導數之間的微妙關聯。適合打好數學基礎、準備進階工程與科學應用的學生。</div>
-            
+            <div class="title">{{ currentMaterial.title }}</div>
+            <div class="abstract">{{ currentMaterial.abstract }}</div>
             <div class="attachmentBox">
-                教材檔案下載： <a href="" class="downloadLink">點擊下載</a>
+                教材檔案下載： <a :href="currentMaterial.attachmentUrl" class="downloadLink">點擊下載</a>
             </div>
+        </div>
+        <div class="video_empty" v-else>
+            <el-empty description="目前本課程暫無上課教材"></el-empty>
         </div>
         <div class="videoList">
             <div class="videoList_title">
                 <div>上課教材</div>
-                <div class="video_add_btn"><el-button type="primary">上傳<i class="el-icon-upload el-icon--right"></i></el-button></div>
+                <div class="video_add_btn" @click="dialogTableVisible=true"><el-button type="primary">上傳<i class="el-icon-upload el-icon--right"></i></el-button></div>
             </div>
             <div class="videoList_item_box">
-                <div class="videoList_item">教材一：線性代數（上）-極限微分之微妙解法 <i class="fa-solid fa-pen pen"></i></div>
-                <div class="videoList_item">教材一：線性代數（上）-極限微分之微妙解法 <i class="fa-solid fa-pen pen"></i></div>
-                <div class="videoList_item">教材一：線性代數（上）-極限微分之微妙解法 <i class="fa-solid fa-pen pen"></i></div>
-                <div class="videoList_item">教材一：線性代數（上）-極限微分之微妙解法 <i class="fa-solid fa-pen pen"></i></div>
-                <div class="videoList_item">教材一：線性代數（上）-極限微分之微妙解法 <i class="fa-solid fa-pen pen"></i></div>
-                <div class="videoList_item">教材一：線性代數（上）-極限微分之微妙解法 <i class="fa-solid fa-pen pen"></i></div>
-                <div class="videoList_item">教材一：線性代數（上）-極限微分之微妙解法 <i class="fa-solid fa-pen pen"></i></div>
-                <div class="videoList_item">教材一：線性代數（上）-極限微分之微妙解法 <i class="fa-solid fa-pen pen"></i></div>
-                <div class="videoList_item">教材一：線性代數（上）-極限微分之微妙解法 <i class="fa-solid fa-pen pen"></i></div>
-                <div class="videoList_item">教材一：線性代數（上）-極限微分之微妙解法 <i class="fa-solid fa-pen pen"></i></div>
-                <div class="videoList_item">教材一：線性代數（上）-極限微分之微妙解法 <i class="fa-solid fa-pen pen"></i></div>
-                <div class="videoList_item">教材一：線性代數（上）-極限微分之微妙解法 <i class="fa-solid fa-pen pen"></i></div>
-                <div class="videoList_item">教材一：線性代數（上）-極限微分之微妙解法 <i class="fa-solid fa-pen pen"></i></div>
-                <div class="videoList_item">教材一：線性代數（上）-極限微分之微妙解法 <i class="fa-solid fa-pen pen"></i></div>
+                <div :class="`videoList_item ${selectedItem === obj.idx?'videoList_item_checked':''}`" v-for="(obj,id) in material" :key="id" @click="openMaterial(obj)">{{ obj.title }} <i class="fa-solid fa-pen pen"></i></div>
             </div>
         </div>
     </div>
+    <el-dialog title="上傳教材" :visible.sync="dialogTableVisible">
+       <div class="uploadTitle">影片標題</div>
+       <el-input v-model="form.title" placeholder="請輸入影片標題" clearable=""></el-input>
+       <div class="uploadTitle">影片簡介</div>
+       <el-input v-model="form.abstract" placeholder="請輸入影片簡介" clearable=""></el-input>
+       <div class="uploadTitle">影片連結</div>
+       <el-input v-model="form.videoSrc" placeholder="請先將影片上傳至 Youtube 並設置為不公開，而後將內嵌 <iframe> 中的 src 貼至此處。" clearable=""></el-input>
+       <div class="uploadTitle">教材上傳</div>
+       <el-upload
+            class="upload-demo" action="#" :auto-upload="false" drag multiple :on-change="handleChange" :file-list="form.fileList" accept="application/*, image/*">
+            <i class="el-icon-upload"></i>
+            <div class="el-upload__text">將文件拖到此處，或<em>點擊上傳</em></div>
+        </el-upload>
+        <el-button type="primary" class="materialBtn" :loading="addLoading" @click="addMaterial()">確認上傳教材</el-button>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+import jsCookie from 'js-cookie';
 export default {
-    name:'Class'
+    name:'Class',
+    data(){
+        return {
+            courseIdx:this.$route.query.idx,
+            selectedItem:null,
+            // 教材列表
+            material:[],
+
+            // 顯示影片與教材
+            showMaterial:false,
+            currentMaterial:{
+
+            },
+            // 教材上傳
+            addLoading:false,
+            dialogTableVisible:false,
+            form:{
+                title:'',
+                abstract:'',
+                videoSrc:'',
+                fileList:[],
+            },
+        }
+    },
+    async mounted(){
+        await this.getData();
+    },
+    methods:{
+        async getData(){
+            const token = jsCookie.get('authToken');
+            const res = await axios.get(`/api/learn/getCourserMaterial/${this.courseIdx}`,{
+                headers:{
+                    'x-user-token':token
+                }
+            });
+            if(res.data.type == 'success'){
+                if(res.data.material == 0) this.showMaterial = false;
+                else {
+                    this.material = res.data.material
+                    this.currentMaterial = this.material[0];
+                    this.selectedItem = this.currentMaterial.idx;
+                    this.showMaterial = true;
+                }
+            }
+            else this.$bus.$emit('handleAlert','課程教材獲取通知', res.data.message, res.data.type)
+        },
+        async addMaterial(){
+            this.addLoading = true;
+            try{
+                const token = jsCookie.get('authToken');
+
+                let formData = new FormData();
+                formData.append('idx',this.courseIdx);
+                formData.append('title',this.form.title)
+                formData.append('abstract', this.form.abstract)
+                formData.append('videoSrc', this.form.videoSrc)
+
+                console.log(this.form.fileList)
+                this.form.fileList.forEach(file => {
+                    formData.append('attachments', file.raw);
+                });
+
+                const res = await axios.post(`/api/learn/createMaterial`,formData,{
+                    headers:{
+                        'x-user-token':token
+                    }
+                });
+                if(res.data.type == 'success'){
+                    this.getData();
+                    this.dialogTableVisible = false
+                    this.form = {
+                        idx:'',
+                        title:'',
+                        abstract:'',
+                        videoSrc:'',
+                        fileList:[],
+                    }
+                    this.$bus.$emit('handleAlert','課程教材獲取通知', res.data.message, res.data.type)
+                }
+                else this.$bus.$emit('handleAlert','課程教材獲取通知', res.data.message, res.data.type)
+            }
+            catch(e){
+                console.log(e)
+            }
+            finally{
+                this.addLoading = false;
+            }
+        },
+
+        handleChange(file,fileList){
+            this.form.fileList = fileList
+        },
+
+        openMaterial(material){
+            this.selectedItem = material.idx;
+            this.currentMaterial = material
+        }
+    }
 }
 </script>
 
@@ -63,6 +166,13 @@ export default {
     .video{
         width: 860px;
         height: 483.75px;
+    }
+    .video_empty{
+        width: 860px;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
     .title{
         width: 100%;
@@ -133,6 +243,15 @@ export default {
         box-sizing: border-box;  
         position: relative;
     }
+    .videoList_item:hover{
+        cursor: pointer;
+        background: black;
+        color: white;
+    }
+    .videoList_item_checked{
+        background: black;
+        color: white;
+    }
     .pen{
         position: absolute;
         top:5px;
@@ -141,5 +260,19 @@ export default {
     }
     .pen:hover{
         cursor: pointer;
+    }
+    ::v-deep .el-dialog{
+        min-width: 720px;
+    }
+    ::v-deep .el-upload-dragger{
+        width: 680px;
+    }
+    .uploadTitle{
+        height: 30px;
+        line-height: 30px;
+    }
+    .materialBtn{
+        width: 100%;
+        margin-top: 15px;
     }
 </style>

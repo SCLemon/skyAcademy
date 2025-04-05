@@ -3,10 +3,12 @@ const express = require('express');
 const router = express.Router();
 const userModel = require('../models/userModel');
 const courseModel = require('../models/courseModel');
+const groupModel = require('../models/groupModel');
 const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
-
+const multer = require('multer')
+const { v4: uuidv4 } = require('uuid');
 
 // 檢查身份
 const authMiddleware = async (req, res, next) => {
@@ -173,7 +175,7 @@ router.post('/api/learn/createMaterial',upload.fields([{ name: 'attachments'}]),
     if(!courses){
         return res.send({
             type:'error',
-            message:'教材上傳失敗。'
+            message:'教材上傳失敗（課程不存在）。'
         });
     }
 
@@ -196,6 +198,7 @@ router.post('/api/learn/createMaterial',upload.fields([{ name: 'attachments'}]),
                 else fs.mkdirSync(folderPath, { recursive: true });
 
                 let attachments = req.files['attachments']?req.files['attachments']:[]
+
                 attachments.forEach((file) => {
                     const filePath = `${folderPath}/${file.originalname}`
                     fs.writeFileSync(filePath, file.buffer);
@@ -204,11 +207,11 @@ router.post('/api/learn/createMaterial',upload.fields([{ name: 'attachments'}]),
                 const url = `/api/learn/getMaterial/${idx}/${materialIdx}`
 
                 courses.meta.push({
-                    idx:idx,
+                    idx: materialIdx,
                     title:title,
                     abstract:abstract,
                     videoSrc:videoSrc,
-                    attachments:{
+                    attachmentUrl:{
                         name:title,
                         url:url,
                         original: folderPath
@@ -246,12 +249,12 @@ router.post('/api/learn/createMaterial',upload.fields([{ name: 'attachments'}]),
     }
 });
 
-// 特定教材下載
-router.get('/api/learn/getMaterial/:idx/:materialIdx',authMiddleware,async (req,res)=>{
+// 特定教材下載 --> debug
+router.get('/api/learn/getMaterial/:idx/:materialIdx',async (req,res)=>{
     const { idx, materialIdx } = req.params;
 
     try {
-        const course = await courseModel.findOne({ idx: idx, group: req.user.group });
+        const course = await courseModel.findOne({ idx: idx });
 
         if (!course || !course.meta) {
             return res.send({ type: 'error', message: '找不到課程資料。' });
@@ -262,14 +265,19 @@ router.get('/api/learn/getMaterial/:idx/:materialIdx',authMiddleware,async (req,
             return res.send({ type: 'error', message: '找不到指定教材。' });
         }
 
-        const folderPath = material.attachments.original;
+        const folderPath = material.attachmentUrl.original;
 
         if (!fs.existsSync(folderPath)) {
             return res.send({ type: 'error', message: '教材資料夾不存在。' });
         }
 
         res.setHeader('Content-Type', 'application/zip');
-        res.setHeader('Content-Disposition', `attachment; filename="${material.title || 'material'}.zip"`);
+
+        const fileName = material.title; 
+        const encodedFileName = encodeURIComponent(fileName);
+
+        res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodedFileName}.zip`);
+   
 
         const archive = archiver('zip', { zlib: { level: 9 } });
         archive.pipe(res);
@@ -286,7 +294,8 @@ router.get('/api/learn/getMaterial/:idx/:materialIdx',authMiddleware,async (req,
 // 獲取教材列表
 router.get('/api/learn/getCourserMaterial/:idx', authMiddleware, async (req, res) => {
     try {
-        const idx = req.params.idx
+        const idx = req.params.idx;
+
         const course = await courseModel.findOne({ idx:idx, group: req.user.group});
         
         if (!course) {
@@ -296,9 +305,16 @@ router.get('/api/learn/getCourserMaterial/:idx', authMiddleware, async (req, res
             });
         }
 
+        const simplifiedMaterial = course.meta.map(material => {
+            return {
+                ...material._doc,
+                attachmentUrl:material.attachmentUrl.url
+            };
+        });
+
         return res.send({
             type: 'success',
-            material: course.meta,
+            material: simplifiedMaterial,
             message: '課程教材查詢成功。',
         });
     } catch (e) {
