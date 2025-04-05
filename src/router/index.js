@@ -4,6 +4,7 @@ import jsCookie from 'js-cookie'
 
 import Academic from '../pages/Academic/Academic.vue'
 import Learn from '../pages/Learn/Learn.vue'
+import Class from '../pages/Learn/Class.vue'
 import Post from '../pages/Post/Post.vue'
 import Practice from '../pages/Practice/Practice.vue'
 import Login from '../pages/Login/Login.vue'
@@ -33,6 +34,10 @@ const router = new VueRouter({
                 {
                     path:'learn',
                     component:Learn
+                },
+                {
+                    path:'class',
+                    component:Class
                 },
                 {
                     path:'practice',

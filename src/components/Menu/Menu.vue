@@ -14,7 +14,7 @@
         </div>
     </div>
     <div @click="goTo('/academic/post')" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/post')}"><i class="fa-solid fa-lock lock" v-if="!isLogin"></i>平台公告</div>
-    <div @click="isLogin?goTo('/academic/learn'):''" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/learn')}"><i class="fa-solid fa-lock lock" v-if="!isLogin"></i>課程列表</div>
+    <div @click="isLogin?goTo('/academic/learn'):''" :class="{list:true,list_lock:!isLogin,list_selected: ($route.path.includes('/learn') || $route.path.includes('/class'))}"><i class="fa-solid fa-lock lock" v-if="!isLogin"></i>課程列表</div>
     <div @click="isLogin?goTo('/academic/practice'):''" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/practice')}"><i class="fa-solid fa-lock lock" v-if="!isLogin"></i>課後練習</div>
     <div v-if="isLogin" :class="{list:true}" @click="logout()">登出系統</div>
     <div class="footer"><img class="footer_img" src="img/horizontal_logo_white.png" alt="" @click="goTo('/')"> </div>

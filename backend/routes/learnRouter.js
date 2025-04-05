@@ -5,6 +5,7 @@ const userModel = require('../models/userModel');
 const courseModel = require('../models/courseModel');
 const fs = require('fs');
 const path = require('path');
+const archiver = require('archiver');
 
 
 // 檢查身份
@@ -26,6 +27,50 @@ const authMiddleware = async (req, res, next) => {
     req.user = user;
     next();
 };
+
+// 檢查是否超過空間用量
+function getFolderSize(folderPath) {
+    let totalSize = 0;
+    const files = fs.readdirSync(folderPath);
+    files.forEach((file) => {
+      const filePath = path.join(folderPath, file);
+      const stat = fs.statSync(filePath);
+      if (stat.isDirectory()) totalSize += getFolderSize(filePath);
+      else totalSize += stat.size;
+    });
+  
+    return totalSize;
+}
+const checkUsageMemory = async(req,res,next)=>{
+    try{
+        const group = await groupModel.findOne({group: req.user.group})
+        if (!group) {
+            return res.send({
+                type: 'error',
+                message: '課程群組不存在。',
+            });
+        }
+        const limitMemory = group.limit.memory;
+        const databaseUrl = group.databaseUrl;
+        const size = getFolderSize(databaseUrl) / (1024*1024);
+
+        if (size >= limitMemory) {
+            return res.send({
+                type: 'error',
+                message: `空間用量已超過限制 ${limitMemory} MB，如需調額請洽客服人員。`,
+            });
+        }
+        next()
+    }
+    catch(e){
+        console.error(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+}
+
 
 router.get('/api/learn/getCourse', authMiddleware, async (req, res) => {
     try {
@@ -117,4 +162,151 @@ router.get('/api/learn/getCourseBanner/:idx/:imageName',async (req, res) => {
 });
 
 
+// 教材建立
+const upload = multer();
+router.post('/api/learn/createMaterial',upload.fields([{ name: 'attachments'}]),authMiddleware,checkUsageMemory, async (req, res) => {
+    
+    const {idx, title, abstract, videoSrc} = req.body;
+
+    const courses = await courseModel.findOne({idx:idx, group:req.user.group});
+
+    if(!courses){
+        return res.send({
+            type:'error',
+            message:'教材上傳失敗。'
+        });
+    }
+
+    const databaseUrl = courses.folderPath;
+    
+    try {
+        if (req.user.type === 'teacher') {
+            
+            // 創建教材專屬 idx
+            const materialIdx = uuidv4();
+            
+            try{
+                // 創建教材專屬資料夾
+                const folderPath = `${databaseUrl}/${materialIdx}`
+
+                if (fs.existsSync(folderPath)){
+                    fs.rmSync(folderPath,{recursive:true})
+                    fs.mkdirSync(folderPath, { recursive: true });
+                }
+                else fs.mkdirSync(folderPath, { recursive: true });
+
+                let attachments = req.files['attachments']?req.files['attachments']:[]
+                attachments.forEach((file) => {
+                    const filePath = `${folderPath}/${file.originalname}`
+                    fs.writeFileSync(filePath, file.buffer);
+                });
+
+                const url = `/api/learn/getMaterial/${idx}/${materialIdx}`
+
+                courses.meta.push({
+                    idx:idx,
+                    title:title,
+                    abstract:abstract,
+                    videoSrc:videoSrc,
+                    attachments:{
+                        name:title,
+                        url:url,
+                        original: folderPath
+                    }
+                });
+
+                await courses.save();
+
+                return res.send({
+                    type:'success',
+                    message:'課程教材上傳成功。'
+                });
+
+            }
+            catch(e){
+                console.log(e)
+                return res.send({
+                    type:'error',
+                    message:'課程教材上傳失敗。'
+                });
+            }
+        } 
+        else {
+            return res.send({
+                type: 'error',
+                message: '您沒有權限創建課程資料。',
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+});
+
+// 特定教材下載
+router.get('/api/learn/getMaterial/:idx/:materialIdx',authMiddleware,async (req,res)=>{
+    const { idx, materialIdx } = req.params;
+
+    try {
+        const course = await courseModel.findOne({ idx: idx, group: req.user.group });
+
+        if (!course || !course.meta) {
+            return res.send({ type: 'error', message: '找不到課程資料。' });
+        }
+
+        const material = course.meta.find(m => m.idx === materialIdx);
+        if (!material) {
+            return res.send({ type: 'error', message: '找不到指定教材。' });
+        }
+
+        const folderPath = material.attachments.original;
+
+        if (!fs.existsSync(folderPath)) {
+            return res.send({ type: 'error', message: '教材資料夾不存在。' });
+        }
+
+        res.setHeader('Content-Type', 'application/zip');
+        res.setHeader('Content-Disposition', `attachment; filename="${material.title || 'material'}.zip"`);
+
+        const archive = archiver('zip', { zlib: { level: 9 } });
+        archive.pipe(res);
+
+        archive.directory(folderPath, false);
+
+        archive.finalize();
+    } catch (e) {
+        console.error(e);
+        return res.send({ type: 'error', message: '伺服器錯誤，請稍後再試。' });
+    }
+})
+
+// 獲取教材列表
+router.get('/api/learn/getCourserMaterial/:idx', authMiddleware, async (req, res) => {
+    try {
+        const idx = req.params.idx
+        const course = await courseModel.findOne({ idx:idx, group: req.user.group});
+        
+        if (!course) {
+            return res.send({
+                type: 'success',
+                message: '課程教材查詢失敗。',
+            });
+        }
+
+        return res.send({
+            type: 'success',
+            material: course.meta,
+            message: '課程教材查詢成功。',
+        });
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+});
 module.exports = router;

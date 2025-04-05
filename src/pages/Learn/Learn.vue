@@ -3,7 +3,7 @@
   <div class="view">
     <div class="header">課程儀表板</div>
     <div class="classList" v-if="courseList.length">
-      <div class="classItem" v-for="(courses,id) in courseList" :key="id">
+      <div class="classItem" v-for="(courses,id) in courseList" :key="id" @click="goToClass(courses.idx)">
         <div class="banner">
           <el-carousel class="carousel" width="100%" height="175px" :autoplay="false">
             <el-carousel-item v-for="(item,id) in courses.bannerImg" :key="id">
@@ -52,6 +52,14 @@ export default {
         this.courseList = data.courses;
       }
       else this.$bus.$emit('handleAlert','課程資料查詢通知',res.data.message,res.data.type)
+    },
+    goToClass(idx){
+      this.$router.push({
+        path:'class',
+        query:{
+          idx:idx
+        }
+      }).catch(e=>{})
     }
   }
 }
