@@ -249,7 +249,158 @@ router.post('/api/learn/createMaterial',upload.fields([{ name: 'attachments'}]),
     }
 });
 
-// 特定教材下載 --> debug
+// 教材更新
+router.post('/api/learn/modifyMaterial',upload.fields([{ name: 'attachments'}]),authMiddleware,checkUsageMemory, async (req, res) => {
+    
+    const {idx, materialIdx, title, abstract, videoSrc} = req.body;
+
+    const result = await courseModel.updateOne(
+        { idx: idx, group: req.user.group, 'meta.idx': materialIdx }, // 查找符合條件的課程
+        {
+            $set: {
+                'meta.$.title': title,
+                'meta.$.abstract': abstract,
+                'meta.$.videoSrc': videoSrc
+            }
+        }
+    ,{ returnDocument: 'after' } );
+
+    if(!result){
+        return res.send({
+            type:'error',
+            message:'教材更新失敗（教材不存在）。'
+        });
+    }
+    
+    try {
+        if (req.user.type === 'teacher') {
+            
+            try{
+
+                const updatedCourse = await courseModel.findOne({ idx: idx, group: req.user.group });
+                const updatedMaterial = updatedCourse.meta.find(item => item.idx === materialIdx);
+            
+                const folderPath = updatedMaterial.attachmentUrl.original
+
+                if (fs.existsSync(folderPath)){
+                    fs.rmSync(folderPath,{recursive:true})
+                    fs.mkdirSync(folderPath, { recursive: true });
+                }
+                else fs.mkdirSync(folderPath, { recursive: true });
+
+                let attachments = req.files['attachments']?req.files['attachments']:[]
+
+                attachments.forEach((file) => {
+                    const filePath = `${folderPath}/${file.originalname}`
+                    fs.writeFileSync(filePath, file.buffer);
+                });
+
+                return res.send({
+                    type:'success',
+                    message:'課程教材更新成功。'
+                });
+
+            }
+            catch(e){
+                console.log(e)
+                return res.send({
+                    type:'error',
+                    message:'課程教材更新失敗。'
+                });
+            }
+        } 
+        else {
+            return res.send({
+                type: 'error',
+                message: '您沒有權限更新課程資料。',
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+});
+
+// 刪除教材
+router.get('/api/learn/deleteMaterial/:idx/:materialIdx', authMiddleware, async (req, res) => {
+    const { idx, materialIdx } = req.params;
+
+    const courses = await courseModel.findOne({ idx: idx, group: req.user.group });
+
+    if (!courses) {
+        return res.send({
+            type: 'error',
+            message: '找不到課程資料。',
+        });
+    }
+
+    const material = courses.meta.find(item => item.idx === materialIdx);
+
+    if (!material) {
+        return res.send({
+            type: 'error',
+            message: '教材未找到。',
+        });
+    }
+
+    try {
+        if (req.user.type === 'teacher') {
+            try {
+                const folderPath = material.attachmentUrl.original;
+
+                if (fs.existsSync(folderPath)) {
+                    fs.rmSync(folderPath, { recursive: true });
+                }
+
+                const result = await courseModel.findOneAndUpdate(
+                    { idx: idx, group: req.user.group, 'meta.idx': materialIdx },
+                    {
+                        $pull: {
+                            meta: { idx: materialIdx }
+                        }
+                    },
+                    { new: true }
+                );
+
+                if (!result) {
+                    return res.send({
+                        type: 'error',
+                        message: '教材刪除失敗（教材不存在）。'
+                    });
+                }
+
+                return res.send({
+                    type: 'success',
+                    message: '課程教材刪除成功。'
+                });
+
+            } catch (e) {
+                console.log(e);
+                return res.send({
+                    type: 'error',
+                    message: '課程教材刪除失敗。',
+                });
+            }
+        } else {
+            return res.send({
+                type: 'error',
+                message: '您沒有權限刪除課程資料。',
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+});
+
+
+// 特定教材下載
 router.get('/api/learn/getMaterial/:idx/:materialIdx',async (req,res)=>{
     const { idx, materialIdx } = req.params;
 

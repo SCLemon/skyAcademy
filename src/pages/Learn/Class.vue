@@ -20,10 +20,10 @@
         <div class="videoList">
             <div class="videoList_title">
                 <div>上課教材</div>
-                <div class="video_add_btn" @click="dialogTableVisible=true"><el-button type="primary">上傳<i class="el-icon-upload el-icon--right"></i></el-button></div>
+                <div class="video_add_btn" @click="dialogTableVisible=true" v-if="currentUser.typeEng=='teacher'"><el-button type="primary">上傳<i class="el-icon-upload el-icon--right"></i></el-button></div>
             </div>
             <div class="videoList_item_box">
-                <div :class="`videoList_item ${selectedItem === obj.idx?'videoList_item_checked':''}`" v-for="(obj,id) in material" :key="id" @click="openMaterial(obj)">{{ obj.title }} <i class="fa-solid fa-pen pen"></i></div>
+                <div :class="`videoList_item ${selectedItem === obj.idx?'videoList_item_checked':''}`" v-for="(obj,id) in material" :key="id" @click="openMaterial(obj)">{{ obj.title }} <i class="fa-solid fa-pen pen" @click.stop="openModify(obj)" v-if="currentUser.typeEng=='teacher'"></i><i class="fa-solid fa-trash delete" @click="deleteMaterial(obj)" v-if="currentUser.typeEng=='teacher'"></i></div>
             </div>
         </div>
     </div>
@@ -42,6 +42,21 @@
         </el-upload>
         <el-button type="primary" class="materialBtn" :loading="addLoading" @click="addMaterial()">確認上傳教材</el-button>
     </el-dialog>
+    <el-dialog title="更改教材" :visible.sync="dialogTableVisible2">
+       <div class="uploadTitle">影片標題</div>
+       <el-input v-model="modifyForm.title" placeholder="請輸入影片標題" clearable=""></el-input>
+       <div class="uploadTitle">影片簡介</div>
+       <el-input v-model="modifyForm.abstract" placeholder="請輸入影片簡介" clearable=""></el-input>
+       <div class="uploadTitle">影片連結</div>
+       <el-input v-model="modifyForm.videoSrc" placeholder="請先將影片上傳至 Youtube 並設置為不公開，而後將內嵌 <iframe> 中的 src 貼至此處。" clearable=""></el-input>
+       <div class="uploadTitle">教材上傳（更新須將原先上傳的檔案再次上傳）</div>
+       <el-upload
+            class="upload-demo" action="#" :auto-upload="false" drag multiple :on-change="handleChange2" :file-list="modifyForm.fileList" accept="application/*, image/*">
+            <i class="el-icon-upload"></i>
+            <div class="el-upload__text">將文件拖到此處，或<em>點擊上傳</em></div>
+        </el-upload>
+        <el-button type="primary" class="materialBtn" :loading="addLoading" @click="modifyMaterial()">更新上傳教材</el-button>
+    </el-dialog>
   </div>
 </template>
 
@@ -52,6 +67,7 @@ export default {
     name:'Class',
     data(){
         return {
+            currentUser:this.$bus.$currentUser,
             courseIdx:this.$route.query.idx,
             selectedItem:null,
             // 教材列表
@@ -71,13 +87,24 @@ export default {
                 videoSrc:'',
                 fileList:[],
             },
+
+            // 教材更新
+            modifyLoading:false,
+            dialogTableVisible2:false,
+            modifyForm:{
+                materialIdx:'',
+                title:'',
+                abstract:'',
+                videoSrc:'',
+                fileList:[],
+            }
         }
     },
     async mounted(){
         await this.getData();
     },
     methods:{
-        async getData(){
+        async getData(flag){
             const token = jsCookie.get('authToken');
             const res = await axios.get(`/api/learn/getCourserMaterial/${this.courseIdx}`,{
                 headers:{
@@ -85,11 +112,13 @@ export default {
                 }
             });
             if(res.data.type == 'success'){
-                if(res.data.material == 0) this.showMaterial = false;
+                this.material = res.data.material
+                if(this.material.length == 0) this.showMaterial = false;
                 else {
-                    this.material = res.data.material
-                    this.currentMaterial = this.material[0];
-                    this.selectedItem = this.currentMaterial.idx;
+                    if(flag != 'refresh'){
+                        this.currentMaterial = this.material[0];
+                        this.selectedItem = this.currentMaterial.idx;
+                    }
                     this.showMaterial = true;
                 }
             }
@@ -106,10 +135,11 @@ export default {
                 formData.append('abstract', this.form.abstract)
                 formData.append('videoSrc', this.form.videoSrc)
 
-                console.log(this.form.fileList)
-                this.form.fileList.forEach(file => {
-                    formData.append('attachments', file.raw);
-                });
+                if(this.form.fileList){
+                    this.form.fileList.forEach(file => {
+                        formData.append('attachments', file.raw);
+                    });
+                }
 
                 const res = await axios.post(`/api/learn/createMaterial`,formData,{
                     headers:{
@@ -137,9 +167,85 @@ export default {
                 this.addLoading = false;
             }
         },
+        async modifyMaterial(){
+            this.modifyLoading = true;
+            try{
+                const token = jsCookie.get('authToken');
 
+                let formData = new FormData();
+                formData.append('idx',this.courseIdx);
+                formData.append('materialIdx',this.modifyForm.materialIdx)
+                formData.append('title',this.modifyForm.title)
+                formData.append('abstract', this.modifyForm.abstract)
+                formData.append('videoSrc', this.modifyForm.videoSrc)
+
+                if(this.modifyForm.fileList){
+                    this.modifyForm.fileList.forEach(file => {
+                        formData.append('attachments', file.raw);
+                    });
+                }
+
+                const res = await axios.post(`/api/learn/modifyMaterial`,formData,{
+                    headers:{
+                        'x-user-token':token
+                    }
+                });
+                if(res.data.type == 'success'){
+                    this.getData('refresh');
+                    this.dialogTableVisible2 = false
+                    this.modifyForm = {
+                        idx:'',
+                        title:'',
+                        abstract:'',
+                        videoSrc:'',
+                        fileList:[],
+                    }
+                    this.$bus.$emit('handleAlert','課程教材更新通知', res.data.message, res.data.type)
+                }
+                else this.$bus.$emit('handleAlert','課程教材更新通知', res.data.message, res.data.type)
+            }
+            catch(e){
+                console.log(e)
+            }
+            finally{
+                this.modifyLoading = false;
+            }
+        },
+        async deleteMaterial(obj){
+            try{
+                await this.$confirm(`確認是否刪除教材?`, '提示', {
+                    confirmButtonText: '刪除',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                })
+                const token = jsCookie.get('authToken');
+                const res = await axios.get(`/api/learn/deleteMaterial/${this.courseIdx}/${obj.idx}`,{
+                    headers:{
+                        'x-user-token':token
+                    }
+                });
+                if(res.data.type == 'success'){
+                    this.getData();
+                    this.$bus.$emit('handleAlert','課程教材刪除通知', res.data.message, res.data.type)
+                }
+                else this.$bus.$emit('handleAlert','課程教材刪除通知', res.data.message, res.data.type)
+            }
+            catch(e){}
+        },
+        async openModify(obj){
+            this.dialogTableVisible2 = true;
+            this.modifyForm = {
+                materialIdx:obj.idx,
+                title: obj.title,
+                abstract: obj.abstract,
+                videoSrc: obj.videoSrc
+            }
+        },
         handleChange(file,fileList){
             this.form.fileList = fileList
+        },
+        handleChange2(file,fileList){
+            this.modifyForm.fileList = fileList
         },
 
         openMaterial(material){
@@ -218,7 +324,7 @@ export default {
         display: flex;
         align-items: center;
         padding-left: 10px;
-        padding-right: 10px;
+
         box-sizing: border-box;
         border-bottom: 1px solid rgba(0,0,0,0.1);
     }
@@ -255,10 +361,19 @@ export default {
     .pen{
         position: absolute;
         top:5px;
+        right:20px;
+        font-size: 10px;
+    }
+    .delete{
+        position: absolute;
+        top:5px;
         right:5px;
         font-size: 10px;
     }
     .pen:hover{
+        cursor: pointer;
+    }
+    .delete:hover{
         cursor: pointer;
     }
     ::v-deep .el-dialog{
