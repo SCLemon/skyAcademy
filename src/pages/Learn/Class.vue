@@ -194,7 +194,11 @@ export default {
                 if(res.data.type == 'success'){
                     this.getData('refresh');
                     this.dialogTableVisible2 = false
-                    this.currentMaterial = this.modifyForm
+                    
+                    this.currentMaterial.title = this.modifyForm.title;
+                    this.currentMaterial.abstract = this.modifyForm.abstract;
+                    this.currentMaterial.videoSrc = this.modifyForm.videoSrc;
+
                     this.modifyForm = {
                         idx:'',
                         title:'',
