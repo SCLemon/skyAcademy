@@ -2,8 +2,10 @@
   <div>
     <div class="tableTitle">
         <div class="tableTitle_left">學生總覽</div>
-        <el-button class="tableTitle_right" @click="editSelf()">編輯個人資料</el-button>
-        <el-button class="tableTitle_right" @click="dialogFormVisible = true">新增學生</el-button>
+        <div class="tableTitle_right">
+            <el-button  @click="editSelf()">編輯個人資料</el-button>
+            <el-button  @click="dialogFormVisible = true">新增學生</el-button>
+        </div>
     </div>
         <el-table :data="tableData" border height="calc(100vh - 360px)" style="width: 100%" class="tableData" empty-text="暫無數據">
             <el-table-column prop="createTime" label="創建時間"></el-table-column>
@@ -167,6 +169,8 @@ export default {
         /* 放置最右邊 */
         margin-left: auto;
         font-size: 14px;
+        display: flex;
+        align-items: center;
     }
     .tableTitle_right:hover{
         cursor: pointer;
