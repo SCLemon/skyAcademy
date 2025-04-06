@@ -17,7 +17,7 @@
                     <div class="subTitle"><div class="subText" ref="subText">{{ subTitle }}</div></div>
                     <div class="box">
                         <div class="btn btn-1" @click="goTo('/academic')">快速開始 <i class="fa-solid fa-arrow-right start-arrow"></i></div>
-                        <div class="btn btn-2">詳細資料 <i class="fa-solid fa-chevron-right"></i></div>
+                        <div class="btn btn-2" @click="scrollToSection('introduction')">詳細資料 <i class="fa-solid fa-chevron-right"></i></div>
                     </div>
                 </div>
                 <div class="carousel">
