@@ -37,7 +37,12 @@ export default {
     },
     methods:{
         goToCourse(idx){
-            this.$router.push(path)
+            this.$router.push({
+                path:'/academic/class',
+                query:{
+                    idx:idx
+                }
+            }).catch((e)=>{})
         },
         async getCourseList(){
             const res = await axios.get('/api/infoPage/getStudentCourse',{
