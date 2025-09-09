@@ -412,7 +412,7 @@ router.post('/api/post/message', authMiddleware, async (req, res) => {
             {
                 $push:{
                     'meta.message':{
-                        ip: req.ip,
+                        account: req.user.account,
                         message: message
                     }
                 }
@@ -428,7 +428,7 @@ router.post('/api/post/message', authMiddleware, async (req, res) => {
         return res.send({
             type: 'success',
             data: {
-                ip: req.ip,
+                account: req.user.account,
                 message: message
             },
             message: '留言成功',

@@ -100,10 +100,10 @@ async function createDatabase(){
 
     await newGroup.save();
     console.log(`${group} 群組創建完畢`)
+    createTeacher()
 }
 
 // createDatabase()
-// createTeacher()
 
 // 移動群組資料庫
 async function moveDataBase(){

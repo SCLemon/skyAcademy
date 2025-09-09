@@ -52,12 +52,12 @@
               </div>
               <div class="userMessageBox">
                 <div class="userMessage" style="text-align: center; color:gray; font-size: 14px;" v-if="!obj.message.length">目前暫時沒有人留言</div>
-                <div class="userMessage" v-for="(item,id) in obj.message" :key="id">{{ item.ip }} 說：{{ item.message }}</div>
-              </div>
-              <div class="post_viewer_input_box">
-                <div class="viewer_inputTextBoxImg"><img :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt=""></div>
-                <textarea class="viewer_textArea" placeholder="在此貼文下進行留言"></textarea>
-                <div class="viewer_send" @click="sendUserMessage(obj.idx, $event)"><i class="fa-solid fa-feather"></i></div>
+                <div class="userMessage" v-for="(item,id) in obj.message" :key="id">{{ item.account }} 說：{{ item.message }}</div>
+                <div class="post_viewer_input_box">
+                  <div class="viewer_inputTextBoxImg"><img :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt=""></div>
+                  <textarea class="viewer_textArea" placeholder="在此貼文下進行留言"></textarea>
+                  <div class="viewer_send" @click="sendUserMessage(obj.idx, $event)"><i class="fa-solid fa-feather"></i></div>
+                </div>
               </div>
             </div>
           </div>
@@ -594,7 +594,7 @@ export default {
     width: 93%;
     margin: 0 auto;
     margin-top: 5px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     max-height: 105px;
     line-height: 1.5;
     font-size: 14px;
@@ -605,6 +605,8 @@ export default {
     width: 93%;
     margin: 0 auto;
     height: 300px;
+    padding-top: 5px;
+    padding-bottom: 10px;
   }
   .carousel_img{
     width: 100%;
@@ -627,6 +629,7 @@ export default {
     object-fit: cover; 
   }
   .post_footer{
+    border-top: 1px solid rgba(0,0,0,0.1);
     width: 95%;
     height: auto;
     margin: 0 auto;
@@ -636,6 +639,7 @@ export default {
     height: 0;
     max-height: 160px;
     overflow-y: scroll;
+    position: relative;
   }
   .userMessage{
     width: 100%;
@@ -676,6 +680,10 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    background: white;
   }
   .viewer_inputTextBoxImg{
     width: 35px;
