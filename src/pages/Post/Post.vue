@@ -36,6 +36,7 @@
                 <div class="post_top_name">{{ obj.creator.name }}</div>
                 <div class="post_top_date">{{obj.createTime}}</div>
               </div>
+              <div class="post_text_expand_logo" v-if="obj.content.trim()!=''" @click="expandPostText($event)"><i class="fa-solid fa-expand"></i></div>
             </div>
             <div class="post_text" v-if="obj.content.trim()!=''" v-html="obj.content"></div>
             <div class="post_img" v-if="obj.postImg.length">
@@ -49,10 +50,11 @@
               <div class="post_option_box">
                 <div :class="`post_option ${obj.isLike?'like':''}`" @click="toggleLikePost(obj.idx, $event)"><i :class="`fa-regular fa-thumbs-up icon ${obj.isLike?'fa-solid':''}`"></i> <span>{{ obj.isLike?'收回讚':'按讚' }}</span></div>
                 <div class="post_option" @click="openUserMessageBox($event)"><i class="fa-regular fa-message icon"></i> 留言</div>
+                <div class="post_option"><i class="fa-regular fa-share-from-square icon"></i> 分享</div>
               </div>
               <div class="userMessageBox">
                 <div class="userMessage" style="text-align: center; color:gray; font-size: 14px;" v-if="!obj.message.length">目前暫時沒有人留言</div>
-                <div class="userMessage" v-for="(item,id) in obj.message" :key="id">{{ item.account }} 說：{{ item.message }}</div>
+                <div class="userMessage" v-for="(item,id) in obj.message" :key="id">{{ item.name }} 說：{{ item.message }}</div>
                 <div class="post_viewer_input_box">
                   <div class="viewer_inputTextBoxImg"><img :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt=""></div>
                   <textarea class="viewer_textArea" placeholder="在此貼文下進行留言"></textarea>
@@ -388,6 +390,13 @@ export default {
       catch(e){
         console.log(e)
       }
+    },
+    expandPostText(event){
+      const postTop = event.currentTarget.closest('.post_top'); 
+      const postText = postTop.nextElementSibling;
+      event.currentTarget.querySelector('i').classList.toggle('fa-expand');
+      event.currentTarget.querySelector('i').classList.toggle('fa-compress');
+      postText.classList.toggle('post_text_expand');
     }
 
   },
@@ -554,7 +563,7 @@ export default {
   .post_more{
     position: absolute;
     top: 10px;
-    right: 10px;
+    right: 15px;
   }
   .post_top{
     width: 95%;
@@ -590,6 +599,14 @@ export default {
     width: 100%;
     font-size: 10px;
   }
+  .post_text_expand_logo{
+    position: absolute;
+    top: 38px;
+    right: 15px;
+  }
+  .post_text_expand_logo:hover{
+    cursor: pointer;
+  }
   .post_text{
     width: 93%;
     margin: 0 auto;
@@ -600,9 +617,13 @@ export default {
     font-size: 14px;
     text-align: justify;
     overflow-y:scroll;
+    word-break: break-all;
+  }
+  .post_text_expand{
+    max-height: none !important;
   }
   .post_img{
-    width: 93%;
+    width: 100%;
     margin: 0 auto;
     height: 300px;
     padding-top: 5px;

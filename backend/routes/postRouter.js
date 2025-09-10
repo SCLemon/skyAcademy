@@ -397,7 +397,7 @@ router.get('/api/post/toggleLikePost/:idx', authMiddleware, async (req, res) => 
     }
 });
 
-// 匿名留言
+// 留言
 router.post('/api/post/message', authMiddleware, async (req, res) => {
     try {
         const postIdx = req.body.postIdx;
@@ -413,6 +413,8 @@ router.post('/api/post/message', authMiddleware, async (req, res) => {
                 $push:{
                     'meta.message':{
                         account: req.user.account,
+                        name: req.user.name,
+                        ip: req.ip,
                         message: message
                     }
                 }
@@ -428,7 +430,7 @@ router.post('/api/post/message', authMiddleware, async (req, res) => {
         return res.send({
             type: 'success',
             data: {
-                account: req.user.account,
+                name: req.user.name,
                 message: message
             },
             message: '留言成功',

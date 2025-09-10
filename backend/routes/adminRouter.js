@@ -70,7 +70,7 @@ async function createTeacher(){
         name: name,
         group: groupNum,
         userImgUrl:{
-            url:'https://megapx-assets.dcard.tw/images/f3d0ecad-6f94-44c3-a588-82cf94c4ad36/1280.jpeg',
+            url:'img/user.png',
         },
         createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),
         type:type

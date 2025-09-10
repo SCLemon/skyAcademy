@@ -52,6 +52,8 @@ const postSchema = new mongoose.Schema({
             type:[
                 {
                     account:String,
+                    name: String,
+                    ip:String,
                     message:String
                 }
             ],
