@@ -328,6 +328,7 @@ router.get('/api/post/getPost', authMiddleware, async (req, res) => {
                     const user = await userModel.findOne({ idx: i.idx });
                     if (!user) continue;
                     message.push({
+                        idx: user.idx,
                         name: user.name,
                         userImgUrl: user.userImgUrl.url,
                         message: i.message
