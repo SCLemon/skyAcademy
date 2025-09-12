@@ -109,7 +109,7 @@ const checkClassNum = async(req,res,next)=>{
 const upload = multer();
 router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', maxCount: 2}]),authMiddleware,checkClassNum,checkUsageMemory, async (req, res) => {
     
-    const {courseId,courseName,courseTime,lecturer} = req.body;
+    const {courseId,courseName,lecturer} = req.body;
 
     const groupInfo = await groupModel.findOne({group: req.user.group});
     if(!groupInfo){
@@ -126,23 +126,6 @@ router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', m
             const idx = uuidv4();
             
             
-            // 檢查時間是否為空
-            let timer = JSON.parse(courseTime);
-            if(timer.length == 0){
-                return res.send({
-                    type:'error',
-                    message:'課程創建失敗（時間不可為空）。'
-                });
-            }
-            timer.forEach((item)=>{
-                if(item.weekday.trim()=='' || !item.period[0][0] || !item.period[0][1]) {
-                    return res.send({
-                        type:'error',
-                        message:'課程創建失敗（時間不可為空）。'
-                    });
-                }
-            })
-            
             try{
                 // 創建課程專屬資料夾
                 const folderPath = `${databaseUrl}/course/${idx}`
@@ -154,7 +137,6 @@ router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', m
                     folderPath:folderPath,
                     courseId,
                     courseName,
-                    courseTime: timer,
                     lecturer,
                     group: req.user.group,
                     createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),

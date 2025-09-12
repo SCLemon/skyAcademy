@@ -87,15 +87,6 @@
           </div>
         </el-card>
       </div>
-      <div class="todayCourse">
-        <div class="todayCourseTitle">今日課表</div>
-        <el-table :data="todayCourse" height="282px" border style="width: 90%" empty-text="今日無課程">
-          <el-table-column prop="startTime" label="上課時間"></el-table-column>
-          <el-table-column prop="courseId" label="課程代碼"></el-table-column>
-          <el-table-column prop="courseName" label="課程名稱"></el-table-column>
-          <el-table-column prop="lecturer" label="授課教師"></el-table-column>
-        </el-table>
-      </div>
     </div>
     <el-dialog title="建立貼文" :visible.sync="dialogTableVisible" v-if="showPermission">
       <div class="real_input" ref="input" contenteditable="true"></div>
@@ -167,7 +158,6 @@ export default {
     await this.getPost()
     await this.getUserInfo()
     await this.getDailyQuestion()
-    await this.getTodayCourse();
     this.currentUser = this.$bus.$currentUser
 
   },
@@ -192,17 +182,6 @@ export default {
         this.dailyQuestion = res.data.data
       }
       else this.$bus.$emit('handleAlert','獲取每日一題通知',res.data.message,res.data.type)
-    },
-    async getTodayCourse(){
-      const res = await axios.get('/api/post/getTodayCourse',{
-          headers:{
-              'x-user-token':jsCookie.get('authToken'),
-          }
-      })
-      if(res.data.type == 'success'){
-        this.todayCourse = res.data.courses;
-      }
-      else this.$bus.$emit('handleAlert','獲取今日課程通知',res.data.message,res.data.type)
     },
     async getUserInfo(){
       const token = jsCookie.get('authToken');
