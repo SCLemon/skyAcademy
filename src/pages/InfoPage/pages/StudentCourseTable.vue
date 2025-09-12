@@ -1,21 +1,21 @@
 <template>
     <div>
     <div class="tableTitle">
-        <div class="tableTitle_left">課程總覽</div>
+        <div class="tableTitle_left">專欄總覽</div>
     </div>
         <el-table :data="tableData" border height="calc(100vh - 360px)" style="width: 100%" class="tableData" empty-text="暫無數據">
-            <el-table-column prop="createTime" label="開課時間"></el-table-column>
-            <el-table-column prop="courseId" label="課程代碼"></el-table-column>
-            <el-table-column prop="courseName" label="課程名稱"></el-table-column>
-            <el-table-column prop="lecturer" label="授課教師"></el-table-column>
+            <el-table-column prop="createTime" label="創建時間"></el-table-column>
+            <el-table-column prop="courseId" label="專欄代碼"></el-table-column>
+            <el-table-column prop="courseName" label="專欄名稱"></el-table-column>
+            <el-table-column prop="lecturer" label="專欄負責人"></el-table-column>
             <el-table-column prop="status" label="狀態">
                 <template v-slot="scope">
                     <div :class="scope.row.status?'valid':'invalid'">{{ scope.row.status?'公開':'不公開' }}</div>
                 </template>
             </el-table-column>
-            <el-table-column label="課程通道" width="250">
+            <el-table-column label="專欄通道" width="250">
                 <template v-slot="scope">
-                    <div class="btn" @click="scope.row.status?goToCourse(scope.row.idx):''">{{ scope.row.status?'進入課程':'目前無法進入課程' }}</div>
+                    <div class="btn" @click="scope.row.status?goToCourse(scope.row.idx):''">{{ scope.row.status?'進入專欄':'目前無法進入專欄' }}</div>
                 </template>
             </el-table-column>
         </el-table>

@@ -2,16 +2,16 @@
 <template>
   <div class="view">
     <div class="box">
-      <div class="header"><i class="fa-solid fa-id-card"></i> 學生登入</div>
-      <div class="login"><div class="login_text">學號：</div><el-input placeholder="請輸入學號" v-model="student.account" clearable></el-input></div>
+      <div class="header"><i class="fa-solid fa-id-card"></i> 用戶登入</div>
+      <div class="login"><div class="login_text">帳號：</div><el-input placeholder="請輸入帳號" v-model="student.account" clearable></el-input></div>
       <div class="login"><div class="login_text">密碼：</div><el-input placeholder="請輸入密碼" v-model="student.password" clearable show-password></el-input></div>
-      <div class="btn"><el-button type="primary" @click="login('student')">學生登入</el-button></div>
+      <div class="btn"><el-button type="primary" @click="login('student')">用戶登入</el-button></div>
     </div>
     <div class="box">
-      <div class="header"><i class="fa-solid fa-id-card"></i> 教師登入</div>
+      <div class="header"><i class="fa-solid fa-id-card"></i> 管理員登入</div>
       <div class="login"><div class="login_text">帳號：</div><el-input placeholder="請輸入帳號" v-model="teacher.account" clearable></el-input></div>
       <div class="login"><div class="login_text">密碼：</div><el-input placeholder="請輸入密碼" v-model="teacher.password" clearable show-password></el-input></div>
-      <div class="btn"><el-button type="primary" @click="login('teacher')">教師登入</el-button></div>
+      <div class="btn"><el-button type="primary" @click="login('teacher')">管理員登入</el-button></div>
     </div>
   </div>
 </template>

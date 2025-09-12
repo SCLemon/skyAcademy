@@ -1,13 +1,13 @@
     <template>
         <div>
         <div class="tableTitle">
-            <div class="tableTitle_left">課程總覽</div>
-            <el-button class="tableTitle_right" @click="dialogFormVisible = true">新增課程</el-button>
+            <div class="tableTitle_left">專欄總覽</div>
+            <el-button class="tableTitle_right" @click="dialogFormVisible = true">新增專欄</el-button>
         </div>
             <el-table :data="tableData" border height="calc(100vh - 360px)" style="width: 100%" class="tableData" empty-text="暫無數據">
                 <el-table-column prop="createTime" label="創建時間"></el-table-column>
-                <el-table-column prop="courseId" label="課程代碼"></el-table-column>
-                <el-table-column prop="lecturer" label="授課教師"></el-table-column>
+                <el-table-column prop="courseId" label="專欄代碼"></el-table-column>
+                <el-table-column prop="lecturer" label="專欄負責人"></el-table-column>
                 <el-table-column prop="status" label="狀態">
                     <template v-slot="scope">
                         <div :class="scope.row.status?'valid':'invalid'">{{ scope.row.status?'公開':'不公開' }}</div>
@@ -23,19 +23,19 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <el-dialog title="創建課程" :visible.sync="dialogFormVisible">
+            <el-dialog title="創建專欄" :visible.sync="dialogFormVisible">
                 <el-form :model="form">
-                    <el-form-item label="課程名稱">
+                    <el-form-item label="專欄名稱">
                         <el-input v-model="form.courseName" autocomplete="off" clearable></el-input>
                     </el-form-item>
-                    <el-form-item label="課程代碼">
+                    <el-form-item label="專欄代碼">
                         <el-input v-model="form.courseId" autocomplete="off" clearable></el-input>
                     </el-form-item>
-                    <el-form-item label="授課教師">
+                    <el-form-item label="專欄負責人">
                         <el-input v-model="form.lecturer" autocomplete="off" clearable></el-input>
                     </el-form-item>
                 </el-form>
-                <div class="class_banner_title">課程封面上傳（限制兩張，上傳後暫不提供修改，至少 350 pixel x 175 pixel）</div>
+                <div class="class_banner_title">專欄封面上傳（限制兩張，上傳後暫不提供修改，至少 350 pixel x 175 pixel）</div>
                 <el-upload  action="#" :on-change="handleUpload" list-type="picture-card" :auto-upload="false" :file-list="fileList" :limit="2" :multiple="true" accept="image/*">
                     <i slot="default" class="el-icon-plus"></i>
                     <div slot="file" slot-scope="{file}">
@@ -52,17 +52,17 @@
                     <el-button type="primary" @click="create()">創建</el-button>
                 </div>
             </el-dialog>
-            <el-dialog :title="`${setStudentList.courseId} - 修課名單`" :visible.sync="dialogFormVisible2">
+            <el-dialog :title="`${setStudentList.courseId} - 用戶名單`" :visible.sync="dialogFormVisible2">
                 <el-form :model="setStudentList">
-                    <el-form-item label="課程代碼">
+                    <el-form-item label="專欄代碼">
                         <el-input v-model="setStudentList.courseId" autocomplete="off" clearable></el-input>
                     </el-form-item>
-                    <el-form-item label="授課教師">
+                    <el-form-item label="專欄負責人">
                         <el-input v-model="setStudentList.lecturer" autocomplete="off" clearable></el-input>
                     </el-form-item>
                 </el-form>
                 <el-transfer class="transfer" v-model="setStudentList.studentList" :props="{key: 'idx', label: 'name'}" :filterable="true" :filter-method="customFilter"
-                filter-placeholder="請輸入學生姓名或學號" :data="students" :titles="['學生列表', '已選學生']"></el-transfer>
+                filter-placeholder="請輸入用戶姓名或帳號" :data="students" :titles="['用戶列表', '已選用戶']"></el-transfer>
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="dialogFormVisible2 = false">取消</el-button>
                     <el-button type="primary" @click="pushStudentList()">保存</el-button>

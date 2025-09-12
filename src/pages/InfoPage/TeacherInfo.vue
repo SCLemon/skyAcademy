@@ -2,11 +2,11 @@
   <div class="view">
     <div class="sum_box">
         <router-link to="clientTable" class="sum">
-            <div class="sum_title">學生總數 (上限 {{ limit.studentNum }} 人)</div>
+            <div class="sum_title">用戶總數 (上限 {{ limit.studentNum }} 人)</div>
             <div class="sum_num">{{ student_num }}</div>
         </router-link>
         <router-link :to="{ path:'teacherCourseTable' }" class="sum">
-            <div class="sum_title">課程總數 (上限 {{ limit.classNum }} 堂)</div>
+            <div class="sum_title">專欄總數 (上限 {{ limit.classNum }} 堂)</div>
             <div class="sum_num">{{ course_num }}</div>
         </router-link>
         <router-link :to="''" class="sum">

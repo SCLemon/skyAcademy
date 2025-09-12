@@ -6,7 +6,7 @@
     <div class="box">
         <div class="userInfoBox">
             <div class="user_info">
-                <div class="inputBox"><div class="input_title">學號：</div><el-input placeholder="請輸入使用者學號" disabled v-model="userInfo.account"></el-input></div>
+                <div class="inputBox"><div class="input_title">帳號：</div><el-input placeholder="請輸入使用者學號" disabled v-model="userInfo.account"></el-input></div>
                 <div class="inputBox"><div class="input_title">姓名：</div><el-input placeholder="請輸入使用者姓名" v-model="userInfo.name"></el-input></div>
                 <div class="inputBox"><div class="input_title">密碼：</div><el-input placeholder="請輸入使用者密碼" show-password v-model="userInfo.password"></el-input></div>
                 <div class="inputBox"><div class="input_title">電話：</div><el-input placeholder="請輸入電話號碼" v-model="userInfo.phone"></el-input></div>
@@ -26,14 +26,16 @@
                 <div class="id_card_forward_top"><img src="img/horizontal_logo.png" alt=""></div>
                 <div class="id_card_forward_name_title">姓名/Name</div>
                 <div class="id_card_forward_name">{{ userInfo.name }}</div>
-                <div class="id_card_forward_id_title">證號/{{ userInfo.type=='teacher'?'Teacher':'Student' }} ID</div>
+                <div class="id_card_forward_id_title">證號/{{ userInfo.type=='teacher'?'Admin':'User' }} ID</div>
                 <div class="id_card_forward_id">{{userInfo.account}}</div>
                 <div class="id_card_forward_imgBox"><img :src="userInfo.userImgUrl" alt=""></div>
                 <div class="id_card_forward_barcode">
                     <svg ref="barcode"></svg>
                 </div>
-                <div class="id_card_forward_type">{{userInfo.type=='teacher'?'教師':'學生'}}證</div>
-                <div class="id_card_forward_type_eng">{{ userInfo.type=='teacher'?'Teacher':'Student' }} ID Card</div>
+                <div class="id_card_forward_type_box">
+                    <div class="id_card_forward_type">{{userInfo.type=='teacher'?'管理員':'訂閱者'}}證</div>
+                    <div class="id_card_forward_type_eng">{{ userInfo.type=='teacher'?'Admin':'User' }}  ID Card</div>
+                </div>
                 <!-- <div class="id_card_foward_center_logo" ref="logo"></div> -->
             </div>
             <div class="id_card id_card_backward" ref="backward">
@@ -367,19 +369,27 @@ export default {
         height: 100%;
         object-fit: cover;
     }
-    .id_card_forward_type{
+    .id_card_forward_type_box{
         position: absolute;
-        right:57px;
-        bottom: 40px;
+        right:28px;
+        bottom: 20px;
         font-size: 14px;
         z-index: 1;
+        height: auto;
+        width: 100px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .id_card_forward_type{
+        font-size: 14px;
+        z-index: 1;
+        line-height: 1.5;
     }
     .id_card_forward_type_eng{
-        position: absolute;
-        right: 33px;
-        bottom: 23px;
         font-size: 12px;
         z-index: 1;
+        line-height: 1.5;
     }
     .id_card_foward_center_logo{
         width: 150px;

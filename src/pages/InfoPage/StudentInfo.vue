@@ -2,15 +2,15 @@
     <div class="view">
       <div class="sum_box">
           <router-link to="" class="sum">
-              <div class="sum_title">已開通課程</div>
+              <div class="sum_title">已訂閱專欄</div>
               <div class="sum_num">{{ course_num }}</div>
           </router-link>
           <router-link to="" class="sum">
-              <div class="sum_title">可使用課程</div>
+              <div class="sum_title">可使用專欄</div>
               <div class="sum_num">{{ available_num }}</div>
           </router-link>
           <router-link to="" class="sum">
-              <div class="sum_title">已失效課程</div>
+              <div class="sum_title">已失效專欄</div>
               <div class="sum_num">{{ inavailable_num }}</div>
           </router-link>
       </div>

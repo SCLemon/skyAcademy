@@ -1,15 +1,15 @@
 <template>
   <div>
     <div class="tableTitle">
-        <div class="tableTitle_left">學生總覽</div>
+        <div class="tableTitle_left">用戶總覽</div>
         <div class="tableTitle_right">
             <el-button  @click="editSelf()">編輯個人資料</el-button>
-            <el-button  @click="dialogFormVisible = true">新增學生</el-button>
+            <el-button  @click="dialogFormVisible = true">新增用戶</el-button>
         </div>
     </div>
         <el-table :data="tableData" border height="calc(100vh - 360px)" style="width: 100%" class="tableData" empty-text="暫無數據">
             <el-table-column prop="createTime" label="創建時間"></el-table-column>
-            <el-table-column prop="name" label="學生姓名"></el-table-column>
+            <el-table-column prop="name" label="用戶姓名"></el-table-column>
             <el-table-column prop="lastOnline" label="上次訪問時間"></el-table-column>
             <el-table-column prop="loginIP" label="登入 IP"></el-table-column>
             <el-table-column prop="status" label="狀態">
@@ -27,15 +27,15 @@
                 </template>
             </el-table-column>
         </el-table>
-        <el-dialog title="創建學生" :visible.sync="dialogFormVisible">
+        <el-dialog title="創建用戶" :visible.sync="dialogFormVisible">
             <el-form :model="form">
-                <el-form-item label="學生學號">
+                <el-form-item label="用戶帳號">
                     <el-input v-model="form.account" autocomplete="off" clearable></el-input>
                 </el-form-item>
-                <el-form-item label="學生名稱">
+                <el-form-item label="用戶名稱">
                     <el-input v-model="form.name" autocomplete="off" clearable></el-input>
                 </el-form-item>
-                <el-form-item label="學生密碼">
+                <el-form-item label="用戶密碼">
                     <el-input v-model="form.password" autocomplete="off" show-password clearable></el-input>
                 </el-form-item>
             </el-form>
