@@ -11,8 +11,6 @@ const postSchema = new mongoose.Schema({
     creator:{
         type: {
             idx:String,
-            name:String,
-            userImgUrl:String,
         },
         required:true,
         trim: true,
@@ -51,8 +49,7 @@ const postSchema = new mongoose.Schema({
         message:{
             type:[
                 {
-                    account:String,
-                    name: String,
+                    idx: String,
                     ip:String,
                     message:String
                 }

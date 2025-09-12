@@ -1,4 +1,4 @@
-// 針對課程貼文
+// 針對用戶貼文
 const express = require('express');
 const router = express.Router();
 const userModel = require('../models/userModel');
@@ -50,7 +50,7 @@ const checkUsageMemory = async(req,res,next)=>{
         if (!group) {
             return res.send({
                 type: 'error',
-                message: '課程群組不存在。',
+                message: '用戶群組不存在。',
             });
         }
         const limitMemory = group.limit.memory;
@@ -312,19 +312,35 @@ router.get('/api/post/getPost', authMiddleware, async (req, res) => {
                         };
                     });
                 }
-                
+
+                // 創建者
                 const creator = await userModel.findOne({idx:post.creator.idx})
-                if(creator) post.creator.name = creator.name;
+                let creatorInfo = {
+                    name : creator.name,
+                    userImgUrl: creator.userImgUrl.url
+                }
 
                 const isLike = post.meta.like.some((likeUser) => likeUser.idx === req.user.idx);
 
+                // 留言
+                let message = [];
+                for (const i of post.meta.message) {
+                    const user = await userModel.findOne({ idx: i.idx });
+                    if (!user) continue;
+                    message.push({
+                        name: user.name,
+                        userImgUrl: user.userImgUrl.url,
+                        message: i.message
+                    });
+                }
+                
                 return {
                     idx: post.idx,
                     createTime: post.createTime,
-                    creator: post.creator,
+                    creator: creatorInfo,
                     content: post.content,
                     status: post.status,
-                    message: post.meta.message,
+                    message: message,
                     postImg: postImg,
                     isLike: isLike
                 };
@@ -334,7 +350,7 @@ router.get('/api/post/getPost', authMiddleware, async (req, res) => {
         return res.send({
             type: 'success',
             posts:posts.reverse(),
-            message: '課程資料查詢成功。',
+            message: '用戶資料查詢成功。',
         });
     } catch (e) {
         console.log(e);
@@ -412,8 +428,7 @@ router.post('/api/post/message', authMiddleware, async (req, res) => {
             {
                 $push:{
                     'meta.message':{
-                        account: req.user.account,
-                        name: req.user.name,
+                        idx: req.user.idx,
                         ip: req.ip,
                         message: message
                     }
@@ -445,7 +460,7 @@ router.post('/api/post/message', authMiddleware, async (req, res) => {
     }
 });
 
-// 返回圖片
+// 返回貼文圖片
 router.get('/api/post/image/:idx/:imageName',async (req, res) => {
     const { idx, imageName } = req.params;
     
