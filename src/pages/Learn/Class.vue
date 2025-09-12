@@ -15,11 +15,11 @@
             </div>
         </div>
         <div class="video_empty" v-else>
-            <el-empty description="目前本專欄暫無上課教材"></el-empty>
+            <el-empty description="目前本專欄暫無專欄分類"></el-empty>
         </div>
         <div class="videoList">
             <div class="videoList_title">
-                <div>上課教材</div>
+                <div>專欄分類</div>
                 <div class="video_add_btn" @click="dialogTableVisible=true" v-if="currentUser.typeEng=='teacher'"><el-button type="primary">上傳<i class="el-icon-upload el-icon--right"></i></el-button></div>
             </div>
             <div class="videoList_item_box">
@@ -70,7 +70,7 @@ export default {
             currentUser:{},
             courseIdx:this.$route.query.idx,
             selectedItem:null,
-            // 教材列表
+            // 教材分類
             material:[],
 
             // 顯示影片與教材
@@ -123,7 +123,7 @@ export default {
                     this.showMaterial = true;
                 }
             }
-            else this.$bus.$emit('handleAlert','專欄教材獲取通知', res.data.message, res.data.type)
+            else this.$bus.$emit('handleAlert','專欄分類獲取通知', res.data.message, res.data.type)
         },
         async addMaterial(){
             this.addLoading = true;
