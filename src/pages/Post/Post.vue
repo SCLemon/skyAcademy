@@ -119,7 +119,7 @@ export default {
         question:{}
       },
       remainDay:0,
-      // 今日課程
+      // 今日專欄
       todayCourse:[],
       // 上傳內容
       form:{

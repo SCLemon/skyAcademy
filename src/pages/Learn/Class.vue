@@ -15,7 +15,7 @@
             </div>
         </div>
         <div class="video_empty" v-else>
-            <el-empty description="目前本課程暫無上課教材"></el-empty>
+            <el-empty description="目前本專欄暫無上課教材"></el-empty>
         </div>
         <div class="videoList">
             <div class="videoList_title">
@@ -123,7 +123,7 @@ export default {
                     this.showMaterial = true;
                 }
             }
-            else this.$bus.$emit('handleAlert','課程教材獲取通知', res.data.message, res.data.type)
+            else this.$bus.$emit('handleAlert','專欄教材獲取通知', res.data.message, res.data.type)
         },
         async addMaterial(){
             this.addLoading = true;
@@ -157,9 +157,9 @@ export default {
                         videoSrc:'',
                         fileList:[],
                     }
-                    this.$bus.$emit('handleAlert','課程教材獲取通知', res.data.message, res.data.type)
+                    this.$bus.$emit('handleAlert','專欄教材獲取通知', res.data.message, res.data.type)
                 }
-                else this.$bus.$emit('handleAlert','課程教材獲取通知', res.data.message, res.data.type)
+                else this.$bus.$emit('handleAlert','專欄教材獲取通知', res.data.message, res.data.type)
             }
             catch(e){
                 console.log(e)
@@ -206,9 +206,9 @@ export default {
                         videoSrc:'',
                         fileList:[],
                     }
-                    this.$bus.$emit('handleAlert','課程教材更新通知', res.data.message, res.data.type)
+                    this.$bus.$emit('handleAlert','專欄教材更新通知', res.data.message, res.data.type)
                 }
-                else this.$bus.$emit('handleAlert','課程教材更新通知', res.data.message, res.data.type)
+                else this.$bus.$emit('handleAlert','專欄教材更新通知', res.data.message, res.data.type)
             }
             catch(e){
                 console.log(e)
@@ -232,9 +232,9 @@ export default {
                 });
                 if(res.data.type == 'success'){
                     this.getData();
-                    this.$bus.$emit('handleAlert','課程教材刪除通知', res.data.message, res.data.type)
+                    this.$bus.$emit('handleAlert','專欄教材刪除通知', res.data.message, res.data.type)
                 }
-                else this.$bus.$emit('handleAlert','課程教材刪除通知', res.data.message, res.data.type)
+                else this.$bus.$emit('handleAlert','專欄教材刪除通知', res.data.message, res.data.type)
             }
             catch(e){}
         },

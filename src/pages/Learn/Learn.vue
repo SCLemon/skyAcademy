@@ -1,7 +1,7 @@
 <!-- 線上影音 -->
 <template>
   <div class="view">
-    <div class="header">課程儀表板</div>
+    <div class="header">專欄儀表板</div>
     <div class="classList" v-if="courseList.length">
       <div class="classItem" v-for="(courses,id) in courseList" :key="id" @click="goToClass(courses.idx)">
         <div class="banner">
@@ -17,7 +17,7 @@
       </div>
     </div>
     <div class="classList_empty" v-else>
-      <el-empty description="暫無課程"></el-empty>
+      <el-empty description="暫無專欄"></el-empty>
     </div>
   </div>
 </template>
@@ -51,7 +51,7 @@ export default {
       if(data.type == 'success'){
         this.courseList = data.courses;
       }
-      else this.$bus.$emit('handleAlert','課程資料查詢通知',res.data.message,res.data.type)
+      else this.$bus.$emit('handleAlert','專欄資料查詢通知',res.data.message,res.data.type)
     },
     goToClass(idx){
       this.$router.push({
