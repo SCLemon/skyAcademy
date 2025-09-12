@@ -54,7 +54,7 @@ export default {
                 this.tableData = res.data.courses
                 this.$bus.$emit('setCourseNum',this.tableData.length)
             }
-            else this.$bus.$emit('handleAlert','課程資料查詢通知',res.data.message,res.data.type)
+            else this.$bus.$emit('handleAlert','專欄資料查詢通知',res.data.message,res.data.type)
         },
 
     }

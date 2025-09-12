@@ -79,19 +79,19 @@
         data(){
             return{
                 tableData: [],
-                // 創建課程
+                // 創建專欄
                 dialogFormVisible:false, 
                 form:{
                     courseName:'',
                     courseId:'',
                     lecturer:'',
                 },
-                // 創建課程的圖片上傳
+                // 創建專欄的圖片上傳
                 fileList: [],
                 dialogImageUrl: '',
                 dialogVisible: false,
 
-                // 指派課程
+                // 指派專欄
                 dialogFormVisible2:false, 
                 students:[],// 呈現在左列
                 setStudentList:{
@@ -129,10 +129,10 @@
                     this.tableData = res.data.courses
                     this.$bus.$emit('setCourseNum',this.tableData.length)
                 }
-                else this.$bus.$emit('handleAlert','課程資料查詢通知',res.data.message,res.data.type)
+                else this.$bus.$emit('handleAlert','專欄資料查詢通知',res.data.message,res.data.type)
             },
 
-            // 創建課程
+            // 創建專欄
             async create(){
                 
                 const formData = new FormData();
@@ -164,13 +164,13 @@
 
                     // 獲取使用容量
                     this.$bus.$emit('getUsageMemory')
-                    this.$bus.$emit('handleAlert','課程資料創建通知',res.data.message,res.data.type)
+                    this.$bus.$emit('handleAlert','專欄資料創建通知',res.data.message,res.data.type)
                 }
-                else this.$bus.$emit('handleAlert','課程資料創建通知',res.data.message,res.data.type)
+                else this.$bus.$emit('handleAlert','專欄資料創建通知',res.data.message,res.data.type)
             },
             async deleteCourse(courseId, idx){
                 try{
-                    await this.$confirm(`確認是否刪除課程 (${courseId})?`, '提示', {
+                    await this.$confirm(`確認是否刪除專欄 (${courseId})?`, '提示', {
                         confirmButtonText: '刪除',
                         cancelButtonText: '取消',
                         type: 'warning'
@@ -184,15 +184,15 @@
                         this.getCourseList();
                         // 獲取使用容量
                         this.$bus.$emit('getUsageMemory')
-                        this.$bus.$emit('handleAlert','課程資料刪除通知',res.data.message,res.data.type)
+                        this.$bus.$emit('handleAlert','專欄資料刪除通知',res.data.message,res.data.type)
                     }
-                    else this.$bus.$emit('handleAlert','課程資料刪除通知',res.data.message,res.data.type)
+                    else this.$bus.$emit('handleAlert','專欄資料刪除通知',res.data.message,res.data.type)
                 }
                 catch(e){}
             },
             async stopCourse(courseId, idx){
                 try{
-                    await this.$confirm(`確認是否變更課程 (${courseId}) 權限?`, '提示', {
+                    await this.$confirm(`確認是否變更專欄 (${courseId}) 權限?`, '提示', {
                         confirmButtonText: '刪除',
                         cancelButtonText: '取消',
                         type: 'warning'
@@ -204,13 +204,13 @@
                     })
                     if(res.data.type == 'success'){
                         this.getCourseList();
-                        this.$bus.$emit('handleAlert','課程權限變更通知',res.data.message,res.data.type)
+                        this.$bus.$emit('handleAlert','專欄權限變更通知',res.data.message,res.data.type)
                     }
-                    else this.$bus.$emit('handleAlert','課程權限變更通知',res.data.message,res.data.type)
+                    else this.$bus.$emit('handleAlert','專欄權限變更通知',res.data.message,res.data.type)
                 }
                 catch(e){}
             },
-            // 創建課程的 banner 上傳
+            // 創建專欄的 banner 上傳
             handleUpload(file){
                 this.fileList.push(file)
             },
@@ -223,7 +223,7 @@
                 this.dialogVisible = true;
             },
 
-            // 指派課程
+            // 指派專欄
             async openStudentList(target){
                 this.setStudentList.idx = target.idx;
                 this.setStudentList.courseId = target.courseId;
@@ -242,7 +242,7 @@
             },
             async pushStudentList(){
                 try{
-                    await this.$confirm(`確認是否修改課程 (${this.setStudentList.courseId})?`, '提示', {
+                    await this.$confirm(`確認是否修改專欄 (${this.setStudentList.courseId})?`, '提示', {
                         confirmButtonText: '確認',
                         cancelButtonText: '取消',
                         type: 'warning'
@@ -262,9 +262,9 @@
                             lecturer:'',
                             studentList:[]
                         },
-                        this.$bus.$emit('handleAlert','課程修改通知',res.data.message,res.data.type)
+                        this.$bus.$emit('handleAlert','專欄修改通知',res.data.message,res.data.type)
                     }
-                    else this.$bus.$emit('handleAlert','課程修改通知',res.data.message,res.data.type)
+                    else this.$bus.$emit('handleAlert','專欄修改通知',res.data.message,res.data.type)
                 }
                 catch(e){}
             },
