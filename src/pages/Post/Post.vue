@@ -42,7 +42,7 @@
             <div class="post_img" v-if="obj.postImg.length">
               <el-carousel :autoplay="false" :loop="false">
                 <el-carousel-item v-for="(item,id) in obj.postImg" :key="id">
-                  <div class="carousel_img"><img :src="item.url" alt=""></div>
+                  <div class="carousel_img"><img src="img/imgLoading.jpg" :data-src="item.url" v-lazy alt=""></div>
                 </el-carousel-item>
               </el-carousel>
             </div>
@@ -626,7 +626,7 @@ export default {
     height: calc((100vw - 250px) * 0.3) !important;
     height: auto;
     padding-top: 5px;
-    padding-bottom: 10px;
+    padding-bottom: 5px;
   }
   .carousel_img{
     width: 100%;
@@ -654,17 +654,18 @@ export default {
     object-fit: cover; 
   }
   .post_footer{
-    border-top: 1px solid rgba(0,0,0,0.1);
     width: 95%;
     height: auto;
     margin: 0 auto;
   }
   .userMessageBox{
+    border-top: 1px solid rgba(0,0,0,0.1);
     width: 100%;
     height: 0;
-    max-height: 220px;
+    max-height: 250px;
     overflow-y: scroll;
     position: relative;
+    display: none;
   }
   .userMessage{
     width: 100%;
@@ -715,13 +716,13 @@ export default {
   }
   .userMessageBox_open{
     height: auto;
+    display: block;
   }
   .post_option_box{
     width: 100%;
     height: 40px;
     display: flex;
     justify-content: space-evenly;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   }
   .post_option{
     text-align: center;
@@ -849,17 +850,7 @@ export default {
     color: red;
     transition: opacity 1s;
   }
-  .todayCourseTitle{
-    height: 53px;
-    line-height: 53px;
-    font-size: 16px;
-    padding-left: 18px;
-    border: 1px solid #EBEEF5;
-    border-bottom: 0;
-    border-radius: 4px 4px 0 0;
-    width: 90%;
-    box-sizing: border-box;
-  }
+
   ::v-deep .el-table{
     border-radius: 0 0 4px 4px;
   }
