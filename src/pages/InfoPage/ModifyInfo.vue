@@ -1,5 +1,5 @@
 <template>
-  <div class="view">
+  <div>
     <div class="header">使用者資料維護
         <el-button type="primary" class="btn" :loading="loading" @click="modifyData()">更新資料</el-button>
     </div>
@@ -184,10 +184,6 @@ export default {
 </script>
 
 <style scoped>
-    .view{
-        width: calc(100vh - 250px);
-        height: 100vh;
-    }
     .header{
         height: 80px;
         width: 95%;

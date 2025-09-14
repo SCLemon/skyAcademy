@@ -40,7 +40,7 @@
             </div>
             <div class="post_text" v-if="obj.content.trim()!=''" v-html="obj.content"></div>
             <div class="post_img" v-if="obj.postImg.length">
-              <el-carousel height="300px" :autoplay="false" :loop="false">
+              <el-carousel :autoplay="false" :loop="false">
                 <el-carousel-item v-for="(item,id) in obj.postImg" :key="id">
                   <div class="carousel_img"><img :src="item.url" alt=""></div>
                 </el-carousel-item>
@@ -393,7 +393,7 @@ export default {
     justify-content: space-evenly;
   }
   .posterContainer{
-    width: 700px;
+    width: 75%;
     height: 100vh;
   }
   .inputBox{
@@ -429,11 +429,12 @@ export default {
     object-fit: cover;
   }
   .textArea {
-    width: 520px;
+    width: calc(100% - 60px);
     height: 40px;
     line-height: 40px;
     overflow-y: auto;
     padding-left: 20px;
+    margin-left: 20px;
     font-size: 14px;
     border-radius: 20px;
     border: none;
@@ -476,7 +477,7 @@ export default {
     height: 100vh;
   }
   .posterBox{
-    width: 600px;
+    width: 80%;
     margin: 0 auto;
     margin-top: 20px;
     height: 100vh;
@@ -515,7 +516,7 @@ export default {
     width: 100%;
   }
   .postAll{
-    width: 620px;
+    width: 100%;
     height: calc(100vh - 160px);
     overflow-y:scroll;
     padding-left: 5px;
@@ -532,12 +533,13 @@ export default {
     align-items: center;
   }
   .post{
-    width: 600px;
+    width: 100%;
     height: auto;
     box-shadow: 0px 1px 3px gray;
     border-radius: 5px;
     position: relative;
     margin-bottom: 15px;
+    padding-top: 5px;
   }
   .post_more{
     position: absolute;
@@ -545,11 +547,10 @@ export default {
     right: 15px;
   }
   .post_top{
-    width: 95%;
+    width: 97%;
     height: 55px;
     margin: 0 auto;
     display: flex;
-    justify-content: space-between;
     align-items: center;
   }
   .post_top_img{
@@ -565,9 +566,10 @@ export default {
     display: inline-block;
   }
   .post_top_detail{
-    width: 520px;
+    width: 90%;
     height: 40px;
     line-height: 20px;
+    margin-left: 12px;
   }
   .post_top_name{
     width: 100%;
@@ -587,13 +589,13 @@ export default {
     cursor: pointer;
   }
   .post_text{
-    width: 93%;
+    width: 96.5%;
     margin: 0 auto;
     margin-top: 5px;
     margin-bottom: 5px;
-    max-height: 105px;
+    max-height: 103px;
     line-height: 1.5;
-    font-size: 14px;
+    font-size: 16px;
     text-align: justify;
     overflow-y:scroll;
     word-break: break-all;
@@ -603,14 +605,16 @@ export default {
   }
   .post_img{
     width: 100%;
-    margin: 0 auto;
-    height: 300px;
+    min-height: 300px !important;
+    height: calc((100vw - 250px) * 0.3) !important;
+    height: auto;
     padding-top: 5px;
     padding-bottom: 10px;
   }
   .carousel_img{
     width: 100%;
-    height: 300px;
+    min-height: 300px !important;
+    height: calc((100vw - 250px) * 0.3) !important;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -619,6 +623,10 @@ export default {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+  }
+  ::v-deep .el-carousel__container{
+    min-height: 300px !important;
+    height: calc((100vw - 250px) * 0.3) !important;
   }
   ::v-deep .el-carousel__indicator{
     display: none;
@@ -697,7 +705,7 @@ export default {
     object-fit: cover;
   }
   .viewer_textArea {
-    width: 470px;
+    width: 90%;
     height: 35px;
     padding-top: 9px;
     line-height: 17.5px;
