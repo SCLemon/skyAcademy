@@ -54,7 +54,13 @@
               </div>
               <div class="userMessageBox">
                 <div class="userMessage" style="text-align: center; color:gray; font-size: 14px;" v-if="!obj.message.length">目前暫時沒有人留言</div>
-                <div class="userMessage" v-for="(item,id) in obj.message" :key="id">{{ item.name }} 說：{{ item.message }}</div>
+                <div class="userMessage_active" v-for="(item,id) in obj.message" :key="id">
+                  <img class="userMessage_active_img" src="img/user.png" :data-src="item.userImgUrl" v-lazy alt="" loading="lazy">
+                  <div class="userMessage_active_msgBox">
+                    <div class="userMessage_active_name">{{ item.name }} <span class="userMessage_active_createTime">{{ item.createTime }}</span></div>
+                    <div class="userMessage_active_msg">{{ item.message }}</div>
+                  </div>
+                </div>
                 <div class="post_viewer_input_box">
                   <div class="viewer_inputTextBoxImg"><img :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt=""></div>
                   <textarea class="viewer_textArea" placeholder="在此貼文下進行留言"></textarea>
@@ -340,6 +346,14 @@ export default {
     },
 
     // 留言區
+    msgScrollToBottom(event){
+      this.$nextTick(() => {
+        const box = event.target.closest('.userMessageBox')  // 找到留言框
+        if (box) {
+          box.scrollTop = box.scrollHeight
+        }
+      })
+    },
     openUserMessageBox(event){
       const postOption = event.currentTarget;
       const icon = postOption.querySelector('i')
@@ -363,6 +377,7 @@ export default {
           const post = this.posts.find(post => post.idx == idx)
           post.message.push(res.data.data)
           textArea.value = '';
+          this.msgScrollToBottom(event);
         }
         else this.$bus.$emit('handleAlert','貼文留言通知',res.data.message,res.data.type)
       }
@@ -370,6 +385,8 @@ export default {
         console.log(e)
       }
     },
+
+    // 貼文內文展開
     expandPostText(event){
       const postTop = event.currentTarget.closest('.post_top'); 
       const postText = postTop.nextElementSibling;
@@ -547,7 +564,7 @@ export default {
     right: 15px;
   }
   .post_top{
-    width: 97%;
+    width: 95%;
     height: 55px;
     margin: 0 auto;
     display: flex;
@@ -589,7 +606,7 @@ export default {
     cursor: pointer;
   }
   .post_text{
-    width: 96.5%;
+    width: 94.5%;
     margin: 0 auto;
     margin-top: 5px;
     margin-bottom: 5px;
@@ -645,7 +662,7 @@ export default {
   .userMessageBox{
     width: 100%;
     height: 0;
-    max-height: 160px;
+    max-height: 220px;
     overflow-y: scroll;
     position: relative;
   }
@@ -653,13 +670,48 @@ export default {
     width: 100%;
     min-height: 25px;
     line-height: 25px;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
     height: auto;
     padding-left: 5px;
     padding-right: 5px;
     word-wrap: break-word;
     box-sizing: border-box;
     font-size: 14px;
+  }
+  .userMessage_active{
+    width: 100%;
+    display: flex;
+    box-sizing: border-box;
+    padding-top: 10px;
+  }
+  .userMessage_active_img{
+    width: 35px;
+    height: 35px;
+    border-radius: 35px;
+  }
+  .userMessage_active_msgBox{
+    max-width: calc(100% - 44px);
+    margin-left: 9px;
+    border-radius: 10px;
+    background: #F0F2F5;
+    padding: 7px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .userMessage_active_name{
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  .userMessage_active_createTime{
+    font-size: 9px;
+    display: inline-block;
+    margin-left: 7.5px;
+    color: gray;
+  }
+  .userMessage_active_msg{
+    font-size: 14px;
+    line-height: 1.5;
+    word-break: break-all;
   }
   .userMessageBox_open{
     height: auto;
@@ -702,7 +754,6 @@ export default {
   .viewer_inputTextBoxImg>img{
     width: 100%;
     height: 100%;
-    object-fit: cover;
   }
   .viewer_textArea {
     width: 90%;

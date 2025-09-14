@@ -330,6 +330,7 @@ router.get('/api/post/getPost', authMiddleware, async (req, res) => {
                     message.push({
                         name: user.name,
                         userImgUrl: user.userImgUrl.url,
+                        createTime: i.createTime,
                         message: i.message
                     });
                 }
@@ -418,6 +419,7 @@ router.post('/api/post/message', authMiddleware, async (req, res) => {
     try {
         const postIdx = req.body.postIdx;
         const message = req.body.message;
+        const createTime = format(new Date(),'yyyy-MM-dd HH:mm:ss');
         if(!postIdx || message.trim() == ''){
             return res.send({
                 type: 'error',
@@ -429,6 +431,7 @@ router.post('/api/post/message', authMiddleware, async (req, res) => {
                 $push:{
                     'meta.message':{
                         idx: req.user.idx,
+                        createTime: createTime,
                         ip: req.ip,
                         message: message
                     }
@@ -446,6 +449,8 @@ router.post('/api/post/message', authMiddleware, async (req, res) => {
             type: 'success',
             data: {
                 name: req.user.name,
+                createTime: createTime,
+                userImgUrl: req.user.userImgUrl.url,
                 message: message
             },
             message: '留言成功',

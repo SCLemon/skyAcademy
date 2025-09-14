@@ -9,6 +9,19 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(ElementUI);
 
+// v-lazy
+Vue.directive('lazy', {
+  inserted(el) {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        el.src = el.dataset.src 
+        observer.unobserve(el)
+      }
+    }, { threshold: 0.1 })
+
+    observer.observe(el)
+  }
+})
 
 new Vue({
   render: h => h(App),

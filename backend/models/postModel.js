@@ -50,6 +50,7 @@ const postSchema = new mongoose.Schema({
             type:[
                 {
                     idx: String,
+                    createTime: String,
                     ip:String,
                     message:String
                 }
