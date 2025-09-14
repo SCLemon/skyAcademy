@@ -343,7 +343,8 @@ router.get('/api/post/getPost', authMiddleware, async (req, res) => {
                     status: post.status,
                     message: message,
                     postImg: postImg,
-                    isLike: isLike
+                    isLike: isLike,
+                    likeCount:post.meta.like.length
                 };
             })
         );
@@ -373,9 +374,9 @@ router.get('/api/post/toggleLikePost/:idx', authMiddleware, async (req, res) => 
             'meta.like.idx': req.user.idx
         });
     
+        let updatedPost;
         if (post) {
-            // 如果已經按過讚，則取消按讚（$pull）
-            const updatedPost = await postModel.findOneAndUpdate(
+            updatedPost = await postModel.findOneAndUpdate(
             { idx: postIdx, group: req.user.group },
             {
                 $pull: {
@@ -386,12 +387,10 @@ router.get('/api/post/toggleLikePost/:idx', authMiddleware, async (req, res) => 
             );
     
             if (!updatedPost) return res.send({ type: 'error', message: '取消按讚失敗' });
-            return res.send({ type: 'success', message: '已取消按讚' });
-
         } 
         else {
             // 如果沒按過讚，則按讚（$push）
-            const updatedPost = await postModel.findOneAndUpdate(
+            updatedPost = await postModel.findOneAndUpdate(
             { idx: postIdx, group: req.user.group },
             {
                 $push: {
@@ -402,8 +401,9 @@ router.get('/api/post/toggleLikePost/:idx', authMiddleware, async (req, res) => 
             );
     
             if (!updatedPost) return res.send({ type: 'error', message: '貼文按讚失敗' });
-            return res.send({ type: 'success', message: '貼文按讚成功' });
         }
+
+        return res.send({ type: 'success', message: '貼文按讚執行完畢', likeCount: updatedPost.meta.like.length});
   
     } catch (e) {
         console.error(e);
@@ -426,7 +426,7 @@ router.post('/api/post/message', authMiddleware, async (req, res) => {
                 message: '留言失敗（訊息不可為空）',
             });
         }
-        const post = await postModel.findOneAndUpdate({postIdx:postIdx, group:req.user.group},
+        const post = await postModel.findOneAndUpdate({idx:postIdx, group:req.user.group},
             {
                 $push:{
                     'meta.message':{
@@ -444,7 +444,6 @@ router.post('/api/post/message', authMiddleware, async (req, res) => {
                 message: '留言失敗',
             });
         }
-
         return res.send({
             type: 'success',
             data: {

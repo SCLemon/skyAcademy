@@ -42,13 +42,22 @@
             <div class="post_img" v-if="obj.postImg.length">
               <el-carousel :autoplay="false" :loop="false">
                 <el-carousel-item v-for="(item,id) in obj.postImg" :key="id">
-                  <div class="carousel_img"><img src="img/imgLoading.jpg" :data-src="item.url" v-lazy alt=""></div>
+                  <div class="carousel_img"><img src="img/Loading.gif" :data-src="item.url" v-lazy alt=""></div>
                 </el-carousel-item>
               </el-carousel>
             </div>
             <div class="post_footer">
+              <div class="post_summary" v-if="obj.likeCount || obj.message.length">
+                <div class="post_summary_thumb" v-if="obj.likeCount || obj.isLike">
+                  <i class="fa-solid fa-thumbs-up post_summary_thumb_icon"></i>
+                  <span v-if="obj.isLike && obj.likeCount != 1">你和其他 {{obj.likeCount - 1}} 人</span>
+                  <span v-else-if="obj.isLike">你</span>
+                  <span v-else>{{obj.likeCount}}</span>
+                </div>
+                <div class="post_summary_msg" v-if="obj.message.length">{{obj.message.length}} <i class="fa-solid fa-message post_summary_msg_icon"></i></div>
+              </div>
               <div class="post_option_box">
-                <div :class="`post_option ${obj.isLike?'like':''}`" @click="toggleLikePost(obj.idx, $event)"><i :class="`fa-regular fa-thumbs-up icon ${obj.isLike?'fa-solid':''}`"></i> <span>{{ obj.isLike?'收回讚':'按讚' }}</span></div>
+                <div :class="`post_option ${obj.isLike?'like':''}`" @click="toggleLikePost(obj.idx, $event, obj)"><i :class="`fa-regular fa-thumbs-up icon ${obj.isLike?'fa-solid':''}`"></i> <span>{{ obj.isLike?'收回讚':'按讚' }}</span></div>
                 <div class="post_option" @click="openUserMessageBox($event)"><i class="fa-regular fa-message icon"></i> 留言</div>
                 <div class="post_option"><i class="fa-regular fa-share-from-square icon"></i> 分享</div>
               </div>
@@ -62,7 +71,7 @@
                   </div>
                 </div>
                 <div class="post_viewer_input_box">
-                  <div class="viewer_inputTextBoxImg"><img :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt=""></div>
+                  <img class="viewer_inputTextBoxImg" :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt="">
                   <textarea class="viewer_textArea" placeholder="在此貼文下進行留言"></textarea>
                   <div class="viewer_send" @click="sendUserMessage(obj.idx, $event)"><i class="fa-solid fa-feather"></i></div>
                 </div>
@@ -310,7 +319,7 @@ export default {
       }
       catch(e){}
     },
-    async toggleLikePost(idx,event){
+    async toggleLikePost(idx,event,obj){
       const wrapper = event.currentTarget; 
       const icon = wrapper.querySelector('i');
       const span = wrapper.querySelector('span')
@@ -324,6 +333,8 @@ export default {
           wrapper.classList.toggle('like')
           icon.classList.toggle('fa-solid')
           span.innerText == '按讚'? span.innerText='收回讚':span.innerText='按讚'
+          obj.likeCount = res.data.likeCount;
+          obj.isLike ? obj.isLike = false : obj.isLike = true;
         }
         else this.$bus.$emit('handleAlert','貼文按讚通知',res.data.message,res.data.type)
       }
@@ -718,6 +729,34 @@ export default {
     height: auto;
     display: block;
   }
+  .post_summary{
+    width: 100%;
+    height: 40px;
+    position: relative;
+    align-items: center;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+  }
+  .post_summary_thumb{
+    color:gray;
+    line-height: 40px;
+    text-align: left;
+    position: absolute;
+  }
+  .post_summary_thumb_icon{
+    color: rgb(0, 132, 255);
+    margin-right: 5px;
+    margin-left: 5px;
+  }
+  .post_summary_msg{
+    line-height: 40px;
+    color:gray;
+    margin-right: 10px;
+    text-align: right;
+  }
+  .post_summary_msg_icon{
+    color:gray;
+    margin-left: 3px;
+  }
   .post_option_box{
     width: 100%;
     height: 40px;
@@ -750,11 +789,6 @@ export default {
     width: 35px;
     height: 35px;
     border-radius: 35px;
-    overflow: hidden;
-  }
-  .viewer_inputTextBoxImg>img{
-    width: 100%;
-    height: 100%;
   }
   .viewer_textArea {
     width: 90%;
@@ -765,6 +799,7 @@ export default {
     padding-left: 20px;
     padding-right: 20px;
     margin-left: 10px;
+    margin-right: 5px;
     font-size: 14px;
     border-radius: 20px;
     border: none;

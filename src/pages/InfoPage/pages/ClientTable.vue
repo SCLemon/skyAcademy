@@ -120,7 +120,7 @@ export default {
         async stopUser(account, idx){
             try{
                 await this.$confirm(`確認是否變更用戶 (${account}) 權限?`, '提示', {
-                    confirmButtonText: '刪除',
+                    confirmButtonText: '確認',
                     cancelButtonText: '取消',
                     type: 'warning'
                 })
