@@ -51,9 +51,7 @@ export default {
         }
 
         this.initObserver();
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) {}
     },
     initObserver() {
       if (this.observer) this.observer.disconnect();
@@ -112,18 +110,15 @@ export default {
       try {
         await pageObj.renderTask.promise;
         canvas.dataset.rendered = true;
-      } catch (e) {
-        if (e?.name === 'RenderingCancelledException') {
-          // render 被取消，不是錯誤
-        } else {
-          console.error('Render error:', e);
-        }
-      } finally {
+      } 
+      catch (e) {} 
+      finally {
         pageObj.renderTask = null; // render 完成後清除
       }
     },
     handleResize() {
-      if (!this.pdf) return;
+      const container = this.$refs.pdfContainer;
+      if (!this.pdf || !container) return;
 
       this.pageCanvases.forEach(({ pageNum, canvas }) => {
         if (!canvas.dataset.rendered) return; // 沒渲染過的不用 resize

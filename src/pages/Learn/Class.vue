@@ -14,7 +14,7 @@
                 <div class="list right-list" v-for="(chapter,id) in materials" :key="id">
                     <div class="list_chapter right-list-target" @click="viewChapter(chapter,id)">Chapter {{ id+1 }}</div>
                     <div class="list_title" @click="viewChapter(chapter,id)">{{ chapter.title }}</div>
-                    <div class="edit" @click="openUpdate(chapter)"><i class="fa-regular fa-pen-to-square"></i></div>
+                    <div v-if="showUploadOption" class="edit" @click="openUpdate(chapter)"><i class="fa-regular fa-pen-to-square"></i></div>
                 </div>
             </div>
         </div>
@@ -240,7 +240,7 @@ export default {
         height: 100vh;
     }
     .pdf{
-        width: calc(100% - 325px);
+        width: calc(100% - 335px);
         height: 100vh;
         box-sizing: border-box;
         padding-left: 3px;
@@ -251,18 +251,17 @@ export default {
         align-items: center;
     }
     .column{
-        width: 325px;
+        width: 335px;
         height: 100vh;
         box-sizing: border-box;
     }
     .list_box{
         width: 100%;
-        height: 100vh;
+        height: calc(100vh - 100px);
         box-sizing: border-box;
         overflow-y: scroll;
         padding-left: 10px;
         padding-right: 10px;
-        padding-bottom: 10px;
         position: relative;
         transition: all 0.5s ease;
     }
@@ -293,9 +292,9 @@ export default {
     }
     .list{
         width: 100%;
-        height: 80px;
+        height: calc((100vh - 80px)/9);
         position: relative;
-        line-height: 80px;
+        line-height: calc((100vh - 80px)/9);
         box-sizing: border-box;
         display: flex;
         justify-content: space-around;
