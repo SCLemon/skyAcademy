@@ -1,8 +1,12 @@
 <template>
-  <div ref="pdfContainer" class="pdf-container"></div>
+  <div class="pdf-wrapper">
+    <div class="pdf-loading" v-if="isLoading"><img src="img/Loading.gif"></div>
+    <div ref="pdfContainer" class="pdf-container"></div>
+  </div>
 </template>
 
 <script>
+import jsCookie from 'js-cookie';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 import pdfWorker from 'pdfjs-dist/legacy/build/pdf.worker.entry';
 
@@ -16,6 +20,7 @@ export default {
   },
   data() {
     return {
+      isLoading: true,
       pdf: null,
       pageCanvases: [],
       observer: null,
@@ -33,12 +38,18 @@ export default {
   },
   methods: {
     async loadPdf(url) {
+      this.isLoading = true;
       const container = this.$refs.pdfContainer;
       container.innerHTML = '';
       this.pageCanvases = [];
 
       try {
-        this.pdf = await pdfjsLib.getDocument(url).promise;
+        this.pdf = await pdfjsLib.getDocument({
+          url:url,
+          httpHeaders:{
+            'x-user-token':jsCookie.get('authToken')
+          }
+        }).promise;
 
         for (let pageNum = 1; pageNum <= this.pdf.numPages; pageNum++) {
           const canvas = document.createElement('canvas');
@@ -48,10 +59,12 @@ export default {
           container.appendChild(canvas);
 
           this.pageCanvases.push({ pageNum, canvas, renderTask: null });
+          this.isLoading = false;
         }
 
         this.initObserver();
-      } catch (err) {}
+      } 
+      catch (err) {}
     },
     initObserver() {
       if (this.observer) this.observer.disconnect();
@@ -135,9 +148,25 @@ export default {
 </script>
 
 <style scoped>
-.pdf-container {
-  width: 100%;
-  height: 100vh;
-  overflow: auto;
-}
+  .pdf-wrapper{
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  .pdf-container {
+    width: 100%;
+    height: 100vh;
+    overflow: auto;
+  }
+  .pdf-loading{
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 </style>

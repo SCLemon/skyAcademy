@@ -376,7 +376,7 @@ router.get('/api/learn/deleteMaterial/:idx/:materialIdx', authMiddleware, async 
 });
 
 // pdf 文件閱覽
-router.get('/api/learn/getMaterial/:idx/:materialIdx', async (req, res) => {
+router.get('/api/learn/getMaterial/:idx/:materialIdx',authMiddleware, async (req, res) => {
     try {
         const { idx, materialIdx } = req.params;
         const course = await courseModel.findOne({ idx });
