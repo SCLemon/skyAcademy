@@ -240,7 +240,6 @@ router.post('/api/learn/createMaterial',upload.fields([{ name: 'attachments', ma
 router.post('/api/learn/modifyMaterial',upload.fields([{ name: 'attachments', maxCount: 1}]),authMiddleware,checkUsageMemory, async (req, res) => {
     
     const {idx, materialIdx, title} = req.body;
-    console.log(idx, materialIdx, title)
     const result = await courseModel.updateOne(
         { idx: idx, group: req.user.group, 'meta.idx': materialIdx }, // 查找符合條件的課程
         {
