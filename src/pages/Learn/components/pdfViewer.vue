@@ -79,6 +79,8 @@ export default {
       });
     },
     handleResize() {
+      const container = this.$refs.pdfContainer;
+      if (!container) return; // 防止 undefined
       this.renderPages(); // 容器大小變化時重新渲染
     }
   },

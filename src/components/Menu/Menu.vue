@@ -2,6 +2,7 @@
   <div class="menu">
     <div :class="{user:true,list_selected: $route.path.includes('/login') || $route.path.includes('Info')}"
          @click="isLogin?goTo(`/academic/${userInfo.typeEng}Info`):goTo('/academic/login')">
+        <div :class="{list_selected_flag:$route.path.includes('/login') || $route.path.includes('Info')}" style="height: 130px; position: absolute; box-sizing: border-box;"></div>
         <div class="img_block" @click.stop="openImgUpload()">
             <img class="img" :src="userInfo.userImgUrl?userInfo.userImgUrl:'img/user.png'" alt="">
             <div class="img_upload">變更頭像
@@ -13,8 +14,16 @@
             <div>(身份：{{userInfo.type == '教師' ? '管理員': '訂閱者'}})</div>
         </div>
     </div>
-    <div @click="goTo('/academic/post')" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/post')}"><i class="fa-solid fa-lock lock" v-if="!isLogin"></i>平台公告</div>
-    <div @click="isLogin?goTo('/academic/learn'):''" :class="{list:true,list_lock:!isLogin,list_selected: ($route.path.includes('/learn') || $route.path.includes('/class'))}"><i class="fa-solid fa-lock lock" v-if="!isLogin"></i>專欄列表</div>
+    <div @click="goTo('/academic/post')" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/post')}">
+        <div :class="{list_selected_flag:$route.path.includes('/post')}"></div>
+        <i class="fa-solid fa-lock lock" v-if="!isLogin"></i>
+        平台公告
+    </div>
+    <div @click="isLogin?goTo('/academic/learn'):''" :class="{list:true,list_lock:!isLogin,list_selected: ($route.path.includes('/learn') || $route.path.includes('/class'))}">
+        <div :class="{list_selected_flag:$route.path.includes('/learn')  || $route.path.includes('/class')}"></div>
+        <i class="fa-solid fa-lock lock" v-if="!isLogin"></i>
+        專欄列表
+    </div>
     <!-- <div @click="isLogin?goTo('/academic/practice'):''" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/practice')}"><i class="fa-solid fa-lock lock" v-if="!isLogin"></i>課後練習</div> -->
     <div v-if="isLogin" :class="{list:true}" @click="logout()">登出系統</div>
     <div class="footer"><img class="footer_img" src="img/horizontal_logo_white.png" alt="" @click="goTo('/')"> </div>
@@ -193,8 +202,15 @@ export default {
     }
     .user:hover,.list:hover,.list_selected{
         cursor: pointer;
+        background: rgba(255,255,255,0.15);
+        color: white;
+    }
+    .list_selected_flag{
+        position: absolute;
+        left: 0;
+        width: 5px;
+        height: 60px;
         background: white;
-        color: black;
     }
     .list_lock{
         cursor: not-allowed !important;

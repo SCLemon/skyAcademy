@@ -45,12 +45,13 @@ export default {
         height: 100vh;
     }
     .pdf{
-        width: 75%;
+        width: calc(100% - 250px);
         height: 100vh;
         box-sizing: border-box;
     }
     .list{
-        width: 25%;
+        width: 250px;
         height: 100vh;
+        background-color: black;
     }
 </style>
