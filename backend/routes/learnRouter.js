@@ -166,16 +166,16 @@ router.get('/api/learn/getCourseBanner/:idx/:imageName',async (req, res) => {
 
 // 教材建立
 const upload = multer();
-router.post('/api/learn/createMaterial',upload.fields([{ name: 'attachments'}]),authMiddleware,checkUsageMemory, async (req, res) => {
+router.post('/api/learn/createMaterial',upload.fields([{ name: 'attachments', maxCount: 1}]),authMiddleware,checkUsageMemory, async (req, res) => {
     
-    const {idx, title, abstract, videoSrc} = req.body;
+    const {idx, title} = req.body;
 
     const courses = await courseModel.findOne({idx:idx, group:req.user.group});
 
     if(!courses){
         return res.send({
             type:'error',
-            message:'教材上傳失敗（課程不存在）。'
+            message:'文件上傳失敗（專欄不存在）。'
         });
     }
 
@@ -184,37 +184,24 @@ router.post('/api/learn/createMaterial',upload.fields([{ name: 'attachments'}]),
     try {
         if (req.user.type === 'teacher') {
             
-            // 創建教材專屬 idx
+            // 創建文件專屬 idx
             const materialIdx = uuidv4();
             
             try{
-                // 創建教材專屬資料夾
-                const folderPath = `${databaseUrl}/${materialIdx}`
-
-                if (fs.existsSync(folderPath)){
-                    fs.rmSync(folderPath,{recursive:true})
-                    fs.mkdirSync(folderPath, { recursive: true });
-                }
-                else fs.mkdirSync(folderPath, { recursive: true });
-
-                let attachments = req.files['attachments']?req.files['attachments']:[]
-
-                attachments.forEach((file) => {
-                    const filePath = `${folderPath}/${file.originalname}`
-                    fs.writeFileSync(filePath, file.buffer);
-                });
+                // 創建文件
+                const filePath = `${databaseUrl}/${materialIdx}.pdf`
+                let file = req.files['attachments'][0];
+                if(file) fs.writeFileSync(filePath, file.buffer);
 
                 const url = `/api/learn/getMaterial/${idx}/${materialIdx}`
 
                 courses.meta.push({
                     idx: materialIdx,
                     title:title,
-                    abstract:abstract,
-                    videoSrc:videoSrc,
                     attachmentUrl:{
                         name:title,
                         url:url,
-                        original: folderPath
+                        original: filePath
                     }
                 });
 
@@ -222,7 +209,7 @@ router.post('/api/learn/createMaterial',upload.fields([{ name: 'attachments'}]),
 
                 return res.send({
                     type:'success',
-                    message:'課程教材上傳成功。'
+                    message:'文件上傳成功。'
                 });
 
             }
@@ -230,14 +217,14 @@ router.post('/api/learn/createMaterial',upload.fields([{ name: 'attachments'}]),
                 console.log(e)
                 return res.send({
                     type:'error',
-                    message:'課程教材上傳失敗。'
+                    message:'文件上傳失敗。'
                 });
             }
         } 
         else {
             return res.send({
                 type: 'error',
-                message: '您沒有權限創建課程資料。',
+                message: '您沒有權限創建文件資料。',
             });
         }
     } catch (e) {
@@ -250,17 +237,15 @@ router.post('/api/learn/createMaterial',upload.fields([{ name: 'attachments'}]),
 });
 
 // 教材更新
-router.post('/api/learn/modifyMaterial',upload.fields([{ name: 'attachments'}]),authMiddleware,checkUsageMemory, async (req, res) => {
+router.post('/api/learn/modifyMaterial',upload.fields([{ name: 'attachments', maxCount: 1}]),authMiddleware,checkUsageMemory, async (req, res) => {
     
-    const {idx, materialIdx, title, abstract, videoSrc} = req.body;
-
+    const {idx, materialIdx, title} = req.body;
+    console.log(idx, materialIdx, title)
     const result = await courseModel.updateOne(
         { idx: idx, group: req.user.group, 'meta.idx': materialIdx }, // 查找符合條件的課程
         {
             $set: {
                 'meta.$.title': title,
-                'meta.$.abstract': abstract,
-                'meta.$.videoSrc': videoSrc
             }
         }
     ,{ returnDocument: 'after' } );
@@ -268,7 +253,7 @@ router.post('/api/learn/modifyMaterial',upload.fields([{ name: 'attachments'}]),
     if(!result){
         return res.send({
             type:'error',
-            message:'教材更新失敗（教材不存在）。'
+            message:'文件更新失敗（文件不存在）。'
         });
     }
     
@@ -278,26 +263,18 @@ router.post('/api/learn/modifyMaterial',upload.fields([{ name: 'attachments'}]),
             try{
 
                 const updatedCourse = await courseModel.findOne({ idx: idx, group: req.user.group });
+                console.log(updatedCourse)
                 const updatedMaterial = updatedCourse.meta.find(item => item.idx === materialIdx);
             
-                const folderPath = updatedMaterial.attachmentUrl.original
+                const filePath = updatedMaterial.attachmentUrl.original
+                let file = req.files['attachments'][0]
+                if (fs.existsSync(filePath))fs.unlinkSync(filePath);
 
-                if (fs.existsSync(folderPath)){
-                    fs.rmSync(folderPath,{recursive:true})
-                    fs.mkdirSync(folderPath, { recursive: true });
-                }
-                else fs.mkdirSync(folderPath, { recursive: true });
-
-                let attachments = req.files['attachments']?req.files['attachments']:[]
-
-                attachments.forEach((file) => {
-                    const filePath = `${folderPath}/${file.originalname}`
-                    fs.writeFileSync(filePath, file.buffer);
-                });
+                fs.writeFileSync(filePath, file.buffer)
 
                 return res.send({
                     type:'success',
-                    message:'課程教材更新成功。'
+                    message:'文件更新成功。'
                 });
 
             }
@@ -305,14 +282,14 @@ router.post('/api/learn/modifyMaterial',upload.fields([{ name: 'attachments'}]),
                 console.log(e)
                 return res.send({
                     type:'error',
-                    message:'課程教材更新失敗。'
+                    message:'文件更新失敗。'
                 });
             }
         } 
         else {
             return res.send({
                 type: 'error',
-                message: '您沒有權限更新課程資料。',
+                message: '您沒有權限更新文件資料。',
             });
         }
     } catch (e) {
@@ -333,7 +310,7 @@ router.get('/api/learn/deleteMaterial/:idx/:materialIdx', authMiddleware, async 
     if (!courses) {
         return res.send({
             type: 'error',
-            message: '找不到課程資料。',
+            message: '找不到專欄資料。',
         });
     }
 
@@ -342,17 +319,17 @@ router.get('/api/learn/deleteMaterial/:idx/:materialIdx', authMiddleware, async 
     if (!material) {
         return res.send({
             type: 'error',
-            message: '教材未找到。',
+            message: '文件未找到。',
         });
     }
 
     try {
         if (req.user.type === 'teacher') {
             try {
-                const folderPath = material.attachmentUrl.original;
+                const filePath = material.attachmentUrl.original;
 
-                if (fs.existsSync(folderPath)) {
-                    fs.rmSync(folderPath, { recursive: true });
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath)
                 }
 
                 const result = await courseModel.findOneAndUpdate(
@@ -368,26 +345,26 @@ router.get('/api/learn/deleteMaterial/:idx/:materialIdx', authMiddleware, async 
                 if (!result) {
                     return res.send({
                         type: 'error',
-                        message: '教材刪除失敗（教材不存在）。'
+                        message: '文件刪除失敗（文件不存在）。'
                     });
                 }
 
                 return res.send({
                     type: 'success',
-                    message: '課程教材刪除成功。'
+                    message: '文件刪除成功。'
                 });
 
             } catch (e) {
                 console.log(e);
                 return res.send({
                     type: 'error',
-                    message: '課程教材刪除失敗。',
+                    message: '文件刪除失敗。',
                 });
             }
         } else {
             return res.send({
                 type: 'error',
-                message: '您沒有權限刪除課程資料。',
+                message: '您沒有權限刪除文件資料。',
             });
         }
     } catch (e) {
@@ -399,51 +376,36 @@ router.get('/api/learn/deleteMaterial/:idx/:materialIdx', authMiddleware, async 
     }
 });
 
-
-// 特定教材下載
-router.get('/api/learn/getMaterial/:idx/:materialIdx',async (req,res)=>{
-    const { idx, materialIdx } = req.params;
-
+// pdf 文件閱覽
+router.get('/api/learn/getMaterial/:idx/:materialIdx', async (req, res) => {
     try {
-        const course = await courseModel.findOne({ idx: idx });
-
-        if (!course || !course.meta) {
-            return res.send({ type: 'error', message: '找不到課程資料。' });
-        }
+        const { idx, materialIdx } = req.params;
+        const course = await courseModel.findOne({ idx });
+        if (!course) return res.status(404).send('Course not found');
 
         const material = course.meta.find(m => m.idx === materialIdx);
-        if (!material) {
-            return res.send({ type: 'error', message: '找不到指定教材。' });
-        }
+        if (!material) return res.status(404).send('Material not found');
 
-        const folderPath = material.attachmentUrl.original;
+        const filePath = material.attachmentUrl.original;
+        if (!fs.existsSync(filePath)) return res.status(404).send('PDF not found');
 
-        if (!fs.existsSync(folderPath)) {
-            return res.send({ type: 'error', message: '教材資料夾不存在。' });
-        }
+        res.setHeader('Content-Type', 'application/pdf');
 
-        res.setHeader('Content-Type', 'application/zip');
+        const stream = fs.createReadStream(filePath);
+        stream.pipe(res);
 
-        const fileName = material.title; 
-        const encodedFileName = encodeURIComponent(fileName);
-
-        res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodedFileName}.zip`);
-   
-
-        const archive = archiver('zip', { zlib: { level: 9 } });
-        archive.pipe(res);
-
-        archive.directory(folderPath, false);
-
-        archive.finalize();
-    } catch (e) {
-        console.error(e);
-        return res.send({ type: 'error', message: '伺服器錯誤，請稍後再試。' });
+        stream.on('error', (err) => {
+            console.error(err);
+            res.status(500).send('Error reading PDF');
+        });
+    } 
+    catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
     }
-})
-
+});
 // 獲取教材列表
-router.get('/api/learn/getCourserMaterial/:idx', authMiddleware, async (req, res) => {
+router.get('/api/learn/getCourseMaterial/:idx', authMiddleware, async (req, res) => {
     try {
         const idx = req.params.idx;
 
@@ -465,7 +427,7 @@ router.get('/api/learn/getCourserMaterial/:idx', authMiddleware, async (req, res
 
         return res.send({
             type: 'success',
-            material: simplifiedMaterial,
+            materials: simplifiedMaterial,
             message: '課程教材查詢成功。',
         });
     } catch (e) {
@@ -477,25 +439,5 @@ router.get('/api/learn/getCourserMaterial/:idx', authMiddleware, async (req, res
     }
 });
 
-// 獲取 PDF
-router.get('/api/learn/content', async (req, res) => {
-    try {
-        const filePath = path.join(__dirname, 'example.pdf'); // PDF 路徑
-        if (!fs.existsSync(filePath)) return res.status(404).send('PDF not found');
 
-        res.setHeader('Content-Type', 'application/pdf');
-
-        const stream = fs.createReadStream(filePath);
-        stream.pipe(res);
-
-        stream.on('error', (err) => {
-            console.error(err);
-            res.status(500).send('Error reading PDF');
-        });
-    } 
-    catch (err) {
-        console.error(err);
-        res.status(500).send('Server error');
-    }
-});
 module.exports = router;

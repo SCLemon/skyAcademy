@@ -49,8 +49,9 @@ export default {
         }
 
         this.renderPages();
-      } catch (err) {
-        console.error('PDF 加載錯誤:', err);
+      } 
+      catch (err) {
+        
       }
     },
     renderPages() {

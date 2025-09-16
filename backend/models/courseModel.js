@@ -40,8 +40,6 @@ const courseSchema = new mongoose.Schema({
         type: [{
             idx:String,
             title:String,
-            abstract:String,
-            videoSrc:String,
             attachmentUrl:{
                 name:String,
                 url:String,
