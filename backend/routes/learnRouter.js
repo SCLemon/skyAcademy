@@ -476,4 +476,26 @@ router.get('/api/learn/getCourserMaterial/:idx', authMiddleware, async (req, res
         });
     }
 });
+
+// 獲取 PDF
+router.get('/api/learn/content', async (req, res) => {
+    try {
+        const filePath = path.join(__dirname, 'example.pdf'); // PDF 路徑
+        if (!fs.existsSync(filePath)) return res.status(404).send('PDF not found');
+
+        res.setHeader('Content-Type', 'application/pdf');
+
+        const stream = fs.createReadStream(filePath);
+        stream.pipe(res);
+
+        stream.on('error', (err) => {
+            console.error(err);
+            res.status(500).send('Error reading PDF');
+        });
+    } 
+    catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
 module.exports = router;

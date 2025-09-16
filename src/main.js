@@ -23,6 +23,7 @@ Vue.directive('lazy', {
   }
 })
 
+
 new Vue({
   render: h => h(App),
   router,

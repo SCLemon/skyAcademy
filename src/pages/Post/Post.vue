@@ -551,6 +551,7 @@ export default {
     padding-right: 5px;
     padding-bottom: 10px;
     margin-top: 15px;
+    padding-top: 5px;
   }
   .postAll_student{
     height: calc(100vh - 50px);
