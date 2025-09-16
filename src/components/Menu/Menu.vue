@@ -26,7 +26,7 @@
     </div>
     <!-- <div @click="isLogin?goTo('/academic/practice'):''" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/practice')}"><i class="fa-solid fa-lock lock" v-if="!isLogin"></i>課後練習</div> -->
     <div v-if="isLogin" :class="{list:true}" @click="logout()">登出系統</div>
-    <div class="footer"><img class="footer_img" src="img/horizontal_logo_white.png" alt="" @click="goTo('/')"> </div>
+    <div class="footer" @click="goTo('/')"><img class="footer_img" src="img/horizontal_logo_white.png" alt="" > </div>
   </div>
 </template>
 
@@ -218,14 +218,14 @@ export default {
     .footer{
         width:100%;
         height: 60px;
+        position: absolute;
+        bottom: 15px;
     }
     .footer>img{
         width: 100%;
         margin: 0 auto;
-        position: absolute;
-        bottom: 15px;
     }
-    .footer_img:hover{
+    .footer:hover{
         cursor: pointer;
     }
 </style>

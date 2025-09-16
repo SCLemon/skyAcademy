@@ -28,4 +28,9 @@ export default {
   #app {
     overflow: hidden;
   }
+  img, canvas {
+    -webkit-user-drag: none;
+    user-select: none;
+    pointer-events: none; /* 如果需要完全不能操作 */
+  }
 </style>
