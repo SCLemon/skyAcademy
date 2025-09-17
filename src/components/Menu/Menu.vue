@@ -196,6 +196,7 @@ export default {
         line-height: 60px;
         text-align: center;
         color: white;
+        transition: all 1s;
     }
     .lock{
         margin-right: 20px;
