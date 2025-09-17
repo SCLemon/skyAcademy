@@ -3,21 +3,19 @@
         <div class="header">
             <div class="logo"><img class="logo_img" src="img/horizontal_logo_white.png" alt="" @click="goTo('/')"></div>
             <div class="contact">
-                <div class="contact_item" @click="scrollToSection('introduction')">平台介紹</div>
-                <div class="contact_item" @click="scrollToSection('feature')">平台特色</div>
-                <div class="contact_item" @click="scrollToSection('calculator')">價格方案</div>
-                <div class="contact_item" @click="scrollToSection('developer')">開發團隊</div>
+                <div class="contact_item" @click="scrollToSection('top')">前往探索</div>
+                <div class="contact_item" @click="scrollToSection('developer')">版主介紹</div>
                 <div class="contact_item" @click="scrollToSection('contact')">聯絡我們</div>
             </div>
         </div>
         <div class="top" ref="top">
             <div class="content">
                 <div class="title_block">
-                    <div class="title">Sky Academy</div>
+                    <div class="title">Lemon's Websites</div>
                     <div class="subTitle"><div class="subText" ref="subText">{{ subTitle }}</div></div>
                     <div class="box">
-                        <div class="btn btn-1" @click="goTo('/academic')">快速開始 <i class="fa-solid fa-arrow-right start-arrow"></i></div>
-                        <div class="btn btn-2" @click="scrollToSection('introduction')">詳細資料 <i class="fa-solid fa-chevron-right"></i></div>
+                        <div class="btn btn-1" @click="goTo('/academic')">進入基地 <i class="fa-solid fa-arrow-right start-arrow"></i></div>
+                        <div class="btn btn-2" @click="scrollToSection('developer')">版主介紹 <i class="fa-solid fa-chevron-right"></i></div>
                     </div>
                 </div>
                 <div class="carousel">
@@ -31,97 +29,16 @@
                 </div>
             </div>
         </div>
-        <div class="intro" ref="introduction">
-            <div class="intro_title_1">平台介紹</div>
-            <div class="intro_simple_box">
-                <div class="intro_simple">
-                    <div class="intro_text_title">🌐 雲端教育的全新體驗 — 為教學而生的智慧平台</div>
-                    <div class="intro_text">
-                        本平台是一款專為雲端教學量身打造的教育管理系統，適用於個人家教、補習班、以及各類教學機構，協助用戶輕鬆管理學生、課程與教材內容。
-                        我們以「簡潔直觀、快速上手」為設計核心，讓每位教育工作者都能無痛轉型數位教學，輕鬆掌握現代化教學需求。
-                    </div>
-                    <div class="intro_text_title">🎗 推動教育平權 — 我們一起努力</div>
-                    <div class="intro_text">
-                        我們相信，知識應該是無價的。
-                        因此，若您正致力於扶助弱勢、並為弱勢學子提供免費教學資源，歡迎向我們申請公益使用資格。<br>
-                        ✨ 經審核通過後，我們將全額提供平台使用額度，完全免費，與您攜手打造更有希望的未來。
-                    </div>
-                </div>
-                <div class="intro_img"><img src="img/volunteer.jpg" alt=""></div>
-            </div>
-        </div>
-        <div class="intro" ref="feature">
-            <div class="intro_title_2">平台特色</div>
-            <div class="intro_simple_box">
-                <div class="intro_img"><img src="img/lock.jpg" alt=""></div>
-                <div class="intro_simple">
-                    <div class="intro_text_title">🎯 特色一：極簡操作介面，零學習曲線上手</div>
-                    <div class="intro_text">
-                        平台採用現代化介面設計，操作邏輯直覺清晰，無需繁瑣設定與技術背景即可快速上手。
-                        不論是排課、上傳教材，還是管理學生資訊，皆可透過簡單幾步完成，大幅降低教學行政負擔。
-                    </div>
-                    <div class="intro_text_title">🔐 特色二：嚴謹的隱私與資料保護機制</div>
-                    <div class="intro_text">
-                        我們深知教育數據的敏感性，因此平台採用資料分群隔離以及嚴格的權限控管機制，保障學生與教師的個資與智慧財產權。
-                        本平台同時支援多層身份驗證機制，可以大幅降低有心人士的侵擾，使用戶與學生能夠獲得安全的教育環境。
-                    </div>
-                </div>              
-            </div>
-        </div>
-        <div class="calculator" ref="calculator">
-            <div class="calculator_title">價格方案</div>
-            <div class="calculator_box_all">
-                <div class="calculator_box">
-                    <div class="calculator_box_title">學生優惠</div>
-                    <div class="calculator_detail">
-                        <div class="detail">維護費用（每月）： NTD 59 元 / 組</div>
-                        <div class="detail">學生人數（每月）： NTD 20 元 / 人</div>
-                        <div class="detail">課程總數（每月）： NTD 20 元 / 堂</div>
-                        <div class="detail">空間用量（每月）： NTD 1 元 / GB</div>
-                    </div>
-                </div>
-                <div class="calculator_box">
-                    <div class="calculator_box_title">企業方案</div>
-                    <div class="calculator_detail">
-                        <div class="detail">維護費用（每月）： NTD 499 元 / 組</div>
-                        <div class="detail">學生人數（每月）： NTD 25 元 / 人</div>
-                        <div class="detail">課程總數（每月）： NTD 25 元 / 堂</div>
-                        <div class="detail">空間用量（每月）： NTD 1 元 / GB</div>
-                    </div>
-                </div>
-                <div class="calculator_box">
-                    <div class="calculator_box_title">社會弱勢扶助方案</div>
-                    <div class="calculator_detail">
-                        <div class="detail">維護費用（免費）： 0 元</div>
-                        <div class="detail">學生人數（免費）： 100 人</div>
-                        <div class="detail">課程總數（免費）： 10 堂</div>
-                        <div class="detail">空間用量（免費）： 10 GB</div>
-                    </div>
-                </div>
-                <div class="calculator_box">
-                    <div class="calculator_box_title">本地架設方案</div>
-                    <div class="calculator_detail">
-                        <div class="detail">授權費用（每年）： 31200 元 / 組</div>
-                        <div class="detail">學生人數（每年）： FREE</div>
-                        <div class="detail">課程總數（每年）： FREE</div>
-                        <div class="detail">空間用量（每年）： FREE</div>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="developer" ref="developer">
-            <div class="developer_title">開發團隊</div>
+            <div class="developer_title">版主介紹</div>
             <div class="developer_content">
                 <div class="developer_img"><img src="img/author.jpg" alt=""></div>
                 <div class="developer_intro_box">
-                    <div class="developer_name">專案作者：林英豪</div>
+                    <div class="developer_name">主要作者：林英豪</div>
                     <div class="developer_detail">
-                        作者目前就讀於國立清華大學工程與系統科學系，平時除學業之餘，長期投身於社會正義的實踐與推廣。
-                        談及平台的誕生初衷，作者表示：在科技飛速進展的今日，他希望能透過雲端技術的力量，為弱勢學子打造一個更平等、可及的學習環境，讓教育資源不再因地域或經濟條件而受限。
-                        儘管平台在初期建置過程中面臨重重挑戰，無論是開發技術、經費壓力，甚至平台維運皆需自行籌措資源，但他從未退縮。
-                        <br>💡 他觀察到，許多懷抱熱忱、願意投入公益教育的學生或團體，常因商業平台的高額授權費而望而卻步，最終無法實踐心中的理想。正因如此，他堅定地決定完成這個平台，並推出**「社會扶助方案」**——免費開放給所有願意為弱勢教育努力的個人與團體使用。
-                        這不僅是一個技術上的成就，更是一場理想的延續。
-                    </div>
+                  嗨，我是林英豪，也可以叫我 SCLemon。目前就讀於國立清華大學碩士學位，研究領域為「前瞻半導體二維材料元件設計」。同時，我對人工智慧、前端開發與投資研究也充滿熱情。從理論到實作，我喜歡把想法化為具體成果──無論是自行訓練 LSTM 股價預測模型、嘗試大語言模型的本地部署，還是開發 Vue.js 專案與 Chrome 擴充功能，都是我探索的旅程。
+                 </br>在學習與研究的過程中，我不僅追求技術上的突破，也重視創意與應用的延展。對我來說，科技就像「檸檬」──看似平凡，卻能激發無限可能，既能為生活增添風味，也能成為靈感的起點。這裡是我的小小天地，用來分享我的學習、作品與想法。如果你也對人工智慧、程式設計，或是創新的投資思維感興趣，歡迎一起交流，探索更廣闊的世界。
+                </div>
                 </div>
             </div>
         </div>
@@ -141,14 +58,14 @@ export default {
     data(){
         return {
             banner:['img/banner1.jpg','img/banner2.jpg','img/banner3.jpg'],
-            subTitle:'We’ve released a new and streamlined student course management interface.'
+            subTitle:'Step into Lemon’s Universe — A Journey of Curiosity, Creation, and Endless Discovery.'
         }
     },
     mounted(){
         setTimeout(() => {
             try{
                 let el = this.$refs.subText;
-                if(el) el.style = 'border-right:0'
+                if(el) el.style = 'border-right:none;'
             }
             catch(e){}
         }, 6500);
@@ -221,7 +138,7 @@ export default {
         cursor: pointer;
     }
     .contact{
-        width: 450px;
+        width: auto;
         height: 40px;
         line-height: 40px;
         font-size: 14px;
@@ -236,6 +153,9 @@ export default {
     .contact_item:hover{
         cursor: pointer;
         color: white;
+    }
+    .contact_item{
+        width: 100px;
     }
     .top {
         width: 100vw;
@@ -261,6 +181,9 @@ export default {
     .title_block{
         width: 1000px;
         margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
     }
     .title {
         font-weight: bolder;
@@ -271,7 +194,7 @@ export default {
     .subTitle {
         text-align: left;
         line-height: 17px;
-        width: 580px;
+        width: auto;
         margin: 0 auto;
     }
     .subText {

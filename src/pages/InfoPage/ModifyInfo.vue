@@ -26,15 +26,15 @@
                 <div class="id_card_forward_top"><img src="img/horizontal_logo.png" alt=""></div>
                 <div class="id_card_forward_name_title">姓名/Name</div>
                 <div class="id_card_forward_name">{{ userInfo.name }}</div>
-                <div class="id_card_forward_id_title">證號/{{ userInfo.type=='teacher'?'Admin':'User' }} ID</div>
+                <div class="id_card_forward_id_title">證號/{{ userInfo.type=='teacher'?'Admin':'Member' }} ID</div>
                 <div class="id_card_forward_id">{{userInfo.account}}</div>
                 <div class="id_card_forward_imgBox"><img :src="userInfo.userImgUrl" alt=""></div>
                 <div class="id_card_forward_barcode">
                     <svg ref="barcode"></svg>
                 </div>
                 <div class="id_card_forward_type_box">
-                    <div class="id_card_forward_type">{{userInfo.type=='teacher'?'管理員':'訂閱者'}}證</div>
-                    <div class="id_card_forward_type_eng">{{ userInfo.type=='teacher'?'Admin':'User' }}  ID Card</div>
+                    <div class="id_card_forward_type">{{userInfo.type=='teacher'?'管理員':'會員'}}證</div>
+                    <div class="id_card_forward_type_eng">{{ userInfo.type=='teacher'?'Admin':'Member' }}  ID Card</div>
                 </div>
                 <!-- <div class="id_card_foward_center_logo" ref="logo"></div> -->
             </div>
@@ -304,7 +304,7 @@ export default {
         position: absolute;
         top:10px;
         left: 7px;
-        width: 200px;
+        width: 190px;
         z-index: 1;
     }
     .id_card_forward_top>img{

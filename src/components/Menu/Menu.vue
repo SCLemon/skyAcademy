@@ -11,7 +11,7 @@
         </div>
         <div :class="`username ${isLogin?'username_login':''}`">
             {{ isLogin?`${userInfo.name}`:'登入/註冊' }}
-            <div>(身份：{{userInfo.type == '教師' ? '管理員': '訂閱者'}})</div>
+            <div>（ 身份：{{userInfo.type == '教師' ? '版主': '會員'}} ）</div>
         </div>
     </div>
     <div @click="goTo('/academic/post')" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/post')}">
@@ -216,10 +216,11 @@ export default {
         cursor: not-allowed !important;
     }
     .footer{
-        width:100%;
+        width:95%;
         height: 60px;
         position: absolute;
         bottom: 15px;
+        left:2.5%;
     }
     .footer>img{
         width: 100%;
