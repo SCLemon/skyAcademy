@@ -211,6 +211,7 @@ export default {
         width: 5px;
         height: 60px;
         background: white;
+        transition: all 1s;
     }
     .list_lock{
         cursor: not-allowed !important;
