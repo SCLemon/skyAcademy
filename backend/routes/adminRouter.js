@@ -50,11 +50,11 @@ const update = async () => {
 
 // 新增教師
 async function createTeacher(){
-    const account = 'Joanna';
-    const password = 'tsaiii0109';
+    const account = 'blc0000421';
+    const password = '34864015';
     const type = 'teacher';
     const groupNum = '0001'
-    const name = 'Joanna'
+    const name = 'SCLemon'
     
     // 檢查群組是否已建立
     const group = await groupModel.findOne({group:groupNum});
@@ -100,10 +100,11 @@ async function createDatabase(){
 
     await newGroup.save();
     console.log(`${group} 群組創建完畢`)
+    createTeacher()
 }
 
 // createDatabase()
-// createTeacher()
+
 // 移動群組資料庫
 async function moveDataBase(){
 
