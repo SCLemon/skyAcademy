@@ -123,7 +123,7 @@ export default {
                 this.$bus.$currentUser = {}
                 this.userInfo = {}
                 this.$bus.$emit('handleAlert','登出訊息','登出成功！','success')
-                this.$router.replace('/academic/login')
+                this.$router.replace('/academic/login').catch((e)=>{})
             }).catch(() => {});
         }
     }

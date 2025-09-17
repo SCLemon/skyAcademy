@@ -30,7 +30,7 @@ export default {
           if(data.type == 'success'){
             this.$bus.$currentUser = res.data.userInfo
             this.$bus.$emit('setUserInfo')
-            this.$router.replace(`/academic/post`).catch((e)=>{})
+            // this.$router.replace(`/academic/post`).catch((e)=>{})
           }
         }
         catch(e){}
