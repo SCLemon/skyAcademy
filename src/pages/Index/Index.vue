@@ -45,7 +45,7 @@
         <div class="footer" ref="contact">
             <div class="footer_item">
                 <div>聯絡方式：blc0000421@gmail.com</div>
-                <div>Copyright © 2025 Sky Academy All Rights Reserved</div>
+                <div>Copyright © 2025 Lemon's Universe All Rights Reserved</div>
             </div>
         </div>
         <div class="back" @click="scrollToSection('top')"><i class="fa-solid fa-angles-up"></i></div>
