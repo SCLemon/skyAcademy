@@ -7,7 +7,57 @@ const userModel = require('../models/userModel');
 const {format} = require('date-fns')
 
 
+// anonymous mode
+router.post('/login/anonymous', async (req, res) => {
+    const account = 'Visitor';
+    const type = 'student'
 
+    try {
+        const user = await userModel.findOne({ account, type });
+        if (!user) {
+            return res.send({
+                type:'error',
+                message:'帳號或密碼錯誤。'
+            });
+        }
+        if (!user.status){
+            return res.send({
+                type:'error',
+                message:'帳號已被凍結，請洽詢客服人員協助。'
+            });
+        }
+
+        const loginIP = req.ip;
+        const loginTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss')
+        user.lastOnline = loginTime;
+        user.loginIP = loginIP;
+        await user.save();
+
+        res.cookie('authToken',user.token,{
+            maxAge:86400 * 1000 * 3, // 3 天
+        })
+        userData = {
+            idx:user.idx,
+            account:user.account,
+            typeEng:user.type,
+            userImgUrl:user.userImgUrl.url,
+            type: user.type == 'teacher'?'教師':'學生',
+            name: user.name
+        }
+        return res.send({
+            type:'success',
+            userInfo: userData,
+            message:'登入成功！'
+        });
+        
+    } catch (e) {
+        console.log(e)
+        return res.send({
+            type:'error',
+            message:'伺服器錯誤，請洽客服人員協助。'
+        });
+    }
+});
 // 登入驗證
 router.post('/login/verify', async (req, res) => {
     const {account, password, type} = req.body;

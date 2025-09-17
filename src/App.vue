@@ -5,10 +5,13 @@
 </template>
 
 <script>
+import jsCookie from 'js-cookie'
+import axios from 'axios'
 export default {
   name: 'App',
-  mounted(){
+  async mounted(){
     this.$bus.$on('handleAlert',this.handleAlert)
+    await this.setAnonymousMode();
   },
   computed: {
   },
@@ -17,6 +20,22 @@ export default {
       // success, warning, info, error
       this.$notify({title,message,type});
     },
+    async setAnonymousMode(){
+      const authToken = jsCookie.get('authToken');
+      if(!authToken){
+        let data;
+        try{
+          const res = await axios.post('/login/anonymous')
+          data = res.data;
+          if(data.type == 'success'){
+            this.$bus.$currentUser = res.data.userInfo
+            this.$bus.$emit('setUserInfo')
+            this.$router.replace(`/academic/post`).catch((e)=>{})
+          }
+        }
+        catch(e){}
+      }
+    }
   }
 }
 </script>
