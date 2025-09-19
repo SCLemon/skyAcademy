@@ -131,7 +131,8 @@ export default {
             }
         },
         generateBarcode() {
-            JsBarcode(this.$refs.barcode, this.userInfo.idx, {
+            const token = jsCookie.get('authToken')
+            JsBarcode(this.$refs.barcode, token, {
                 format: "CODE128",
                 displayValue: true,
                 lineColor: "black",
