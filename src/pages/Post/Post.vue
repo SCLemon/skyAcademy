@@ -83,10 +83,11 @@
           <el-empty description="暫無貼文"></el-empty>
         </div>
       </div>
-      
+      <div class="column">
+        <self-intro></self-intro>
+      </div>
     </div>
-    <div class="column">
-    </div>
+
     <el-dialog title="建立貼文" :visible.sync="dialogTableVisible" v-if="showPermission">
       <div class="real_input" ref="input" contenteditable="true"></div>
       <el-upload action="#" :auto-upload="false" list-type="picture-card" :on-change="handleUpload" :on-preview="handlePictureCardPreview" :on-remove="handleRemove" :file-list="form.attachments" :multiple="true" accept="image/*"><i class="el-icon-plus"></i></el-upload>
@@ -105,8 +106,12 @@
 <script>
 import axios from 'axios'
 import jsCookie from 'js-cookie'
+import selfIntro from './components/selfIntro.vue'
 export default {
   name:'Post',
+  components:{
+    selfIntro
+  },
   data(){
     return {
       currentUser:{},
@@ -195,8 +200,17 @@ export default {
           }
         })
         if(res.data.type == 'success'){
-          this.posts = this.posts.concat(res.data.posts);
+          const newPosts = res.data.posts;
+          this.posts = this.posts.concat(newPosts);
           this.page++;
+
+          this.$nextTick(async() => {
+            const postAllDiv = this.$refs.postAll;
+            // 如果內容高度仍然 <= 容器高度，代表還不夠滾動，繼續載入
+            if (postAllDiv && postAllDiv.scrollHeight <= postAllDiv.clientHeight && newPosts.length > 0) {
+              await this.getPost();
+            }
+          });
         }
         else this.$bus.$emit('handleAlert','貼文創建通知',res.data.message,res.data.type)
       }
@@ -378,12 +392,12 @@ export default {
   .view{
     width: calc(100vw - 250px);
     height: 100vh;
-    display: flex;
-    justify-content: space-evenly;
   }
   .posterContainer{
-    width: 75%;
+    width: 100%;
     height: 100vh;
+    display: flex;
+    justify-content: space-evenly;
   }
   .inputBox{
     width: 100%;
@@ -396,6 +410,7 @@ export default {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    margin-bottom: 15px;
   }
   .inputTextBox{
     width: 95%;
@@ -462,14 +477,18 @@ export default {
     color: rgb(88, 88, 250);
   }
   .column{
-    width: 490px;
+    width: 310px;
     height: 100vh;
+    padding-top: 20px;
+    box-sizing: border-box;
   }
   .posterBox{
-    width: 80%;
-    margin: 0 auto;
+    width: 73%;
+    min-width: 623px;
+    max-width: calc((100vw - 560px) * 0.73);
     margin-top: 20px;
     height: 100vh;
+    box-sizing: border-box;
   }
   ::v-deep .el-dialog{
     width: 720px;
@@ -511,7 +530,6 @@ export default {
     padding-left: 5px;
     padding-right: 5px;
     padding-bottom: 10px;
-    margin-top: 15px;
     padding-top: 5px;
   }
   .postAll_student{
@@ -787,67 +805,7 @@ export default {
     cursor: pointer;
     background-color:rgb(240,240,240);
   }
-  .column{
-    width: calc(100% -700px);
-    height: 100vh;
-  }
-  .daily{
-    margin-top: 20px;
-    width: 100%;
-    margin-bottom: 30px;
-  }
   
-  .daily_card{
-    width: 90%;
-  }
-  ::v-deep .el-card__body{
-    min-height: 226px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .daily_content_all{
-    position: relative;
-  }
-  .daily_content_all:hover .daily_answer{
-    opacity: 1;
-  }
-  .daily_content{
-    line-height: 1.5;
-    width: 100%;
-    max-height: 200px;
-    text-align: left;
-    overflow-y: scroll;
-    margin-bottom: 35px;
-  }
-  .daily_question{
-    width: 100%;
-    margin-bottom: 10px;
-    font-size: 16px;
-  }
-  .daily_options{
-    font-size: 16px;
-  }
-  .statistic{
-    width: 100%;
-    text-align: center;
-    line-height: 1.5;
-    position: relative;
-  }
-  .statistic_title{
-    font-size: 12px;
-    color: gray;
-  }
-  .daily_answer{
-    position: absolute;
-    bottom: 0px;
-    right: 25px;
-    font-size: 32px;
-    opacity: 0;
-    color: red;
-    transition: opacity 1s;
-  }
-
   ::v-deep .el-table{
     border-radius: 0 0 4px 4px;
   }

@@ -6,7 +6,6 @@ import Academic from '../pages/Academic/Academic.vue'
 import Learn from '../pages/Learn/Learn.vue'
 import Class from '../pages/Learn/Class.vue'
 import Post from '../pages/Post/Post.vue'
-import Practice from '../pages/Practice/Practice.vue'
 import Login from '../pages/Login/Login.vue'
 import StudentInfo from '@/pages/InfoPage/StudentInfo.vue'
 import TeacherInfo from '@/pages/InfoPage/TeacherInfo.vue'
@@ -38,10 +37,6 @@ const router = new VueRouter({
                 {
                     path:'class',
                     component:Class
-                },
-                {
-                    path:'practice',
-                    component:Practice
                 },
                 {
                     path:'login',
