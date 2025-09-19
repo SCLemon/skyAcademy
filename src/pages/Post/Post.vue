@@ -86,22 +86,6 @@
       
     </div>
     <div class="column">
-      <div class="daily">
-        <el-card shadow="hover" class="daily_card">
-          <div slot="header"><span>每日練習</span><el-button style="float: right; padding: 3px 0" type="text" @click="getDailyQuestion()">隨機出題</el-button></div>
-          <div class="daily_content_all">
-            <div class="daily_content">
-              <div class="daily_question">{{dailyQuestion.question.question}}</div>
-              <div class="daily_options">{{dailyQuestion.question.options}}</div>
-            </div>
-            <div class="statistic">
-              <div class="statistic_title">距離 {{ dailyQuestion.title }}：</div>
-              <div class="statistic_num">{{ remainDay }}</div>
-              <div class="daily_answer">{{dailyQuestion.question.answer}}</div>
-            </div>
-          </div>
-        </el-card>
-      </div>
     </div>
     <el-dialog title="建立貼文" :visible.sync="dialogTableVisible" v-if="showPermission">
       <div class="real_input" ref="input" contenteditable="true"></div>
@@ -121,21 +105,11 @@
 <script>
 import axios from 'axios'
 import jsCookie from 'js-cookie'
-import { differenceInDays } from 'date-fns';
 export default {
   name:'Post',
   data(){
     return {
       currentUser:{},
-      // 每日練習
-      dailyQuestion:{
-        title:'',
-        deadline:'',
-        question:{}
-      },
-      remainDay:0,
-      // 今日專欄
-      todayCourse:[],
       // 上傳內容
       form:{
         content:'',
@@ -172,7 +146,6 @@ export default {
     })
     await this.getPost()
     await this.getUserInfo()
-    await this.getDailyQuestion()
     this.currentUser = this.$bus.$currentUser
 
   },
@@ -185,18 +158,6 @@ export default {
       if(payload.method == 'modify'){
         this.openModifyBox(payload.content,payload.idx)
       }
-    },
-    async getDailyQuestion(){
-      const res = await axios.get('/api/post/getDailyQuestion',{
-          headers:{
-              'x-user-token':jsCookie.get('authToken'),
-          }
-      })
-      if(res.data.type == 'success'){
-        this.remainDay = differenceInDays(new Date(res.data.data.deadline), Date.now());
-        this.dailyQuestion = res.data.data
-      }
-      else this.$bus.$emit('handleAlert','獲取每日一題通知',res.data.message,res.data.type)
     },
     async getUserInfo(){
       const token = jsCookie.get('authToken');
