@@ -193,7 +193,7 @@
             async stopCourse(courseId, idx){
                 try{
                     await this.$confirm(`確認是否變更專欄 (${courseId}) 權限?`, '提示', {
-                        confirmButtonText: '刪除',
+                        confirmButtonText: '確認',
                         cancelButtonText: '取消',
                         type: 'warning'
                     })

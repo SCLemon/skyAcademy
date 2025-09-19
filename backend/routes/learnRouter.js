@@ -379,14 +379,35 @@ router.get('/api/learn/deleteMaterial/:idx/:materialIdx', authMiddleware, async 
 router.get('/api/learn/getMaterial/:idx/:materialIdx',authMiddleware, async (req, res) => {
     try {
         const { idx, materialIdx } = req.params;
-        const course = await courseModel.findOne({ idx });
-        if (!course) return res.status(404).send('Course not found');
+
+        let filterCondition = null;
+        if (req.user.type == 'teacher'){
+            filterCondition = { 
+                idx:idx, 
+                group: req.user.group,
+                status: true,
+            }
+        }
+        else if (req.user.type == 'student'){
+            filterCondition = { 
+                idx:idx, 
+                group: req.user.group,
+                studentList: req.user.idx,
+                status: true,
+            }
+        }
+        
+        if(!filterCondition) return res.send({ type: 'error',message: '未找到授權，請重新登入。'});
+
+        const course = await courseModel.findOne(filterCondition);
+
+        if (!course) return res.send({ type: 'error',message: '未找到授權，請重新登入。'});
 
         const material = course.meta.find(m => m.idx === materialIdx);
-        if (!material) return res.status(404).send('Material not found');
+        if (!material) return res.send({ type: 'error',message: '專欄資源不存在。'});
 
         const filePath = material.attachmentUrl.original;
-        if (!fs.existsSync(filePath)) return res.status(404).send('PDF not found');
+        if (!fs.existsSync(filePath)) return res.send({ type: 'error',message: '專欄資源不存在（文件不存在）。'});
 
         res.setHeader('Content-Type', 'application/pdf');
 
@@ -395,12 +416,12 @@ router.get('/api/learn/getMaterial/:idx/:materialIdx',authMiddleware, async (req
 
         stream.on('error', (err) => {
             console.error(err);
-            res.status(500).send('Error reading PDF');
+            return res.send({ type: 'error',message: '專欄資源不存在（文件讀取失敗）。'});
         });
     } 
     catch (err) {
         console.error(err);
-        res.status(500).send('Server error');
+        return res.send({ type: 'error',message: '系統內部異常，請聯絡客服人員。'});
     }
 });
 // 獲取教材列表
