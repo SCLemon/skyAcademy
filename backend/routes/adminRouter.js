@@ -4,8 +4,6 @@ const router = express.Router();
 
 const fs = require('fs');
 const path = require('path');
-const {format} = require('date-fns')
-const { v4: uuidv4 } = require('uuid');
 
 const userModel = require('../models/userModel');
 const groupModel = require('../models/groupModel');
@@ -30,91 +28,6 @@ const authMiddleware = async (req, res, next) => {
     req.user = user;
     next();
 };
-
-// 下方為 admin 操作區
-
-// 額外新增欄位
-const update = async () => {
-    try {
-        const users = await userModel.find();
-
-        for (let user of users) {
-            await userModel.updateOne({ _id: user._id, type: 'teacher' }, { $set: { group: '0001' } });
-        }
-
-        console.log('所有文件的欄位已更新');
-    } catch (error) {
-        console.error('更新失敗:', error);
-    }
-};
-
-// 新增教師
-async function createTeacher(){
-    const account = 'blc0000421';
-    const password = '34864015';
-    const type = 'teacher';
-    const groupNum = '0001'
-    const name = 'SCLemon'
-    
-    // 檢查群組是否已建立
-    const group = await groupModel.findOne({group:groupNum});
-    if(!group){
-        return console.log('群組尚未建立。')
-    }
-
-    const newUser = new userModel({
-        idx: uuidv4(),
-        token:uuidv4(),
-        account: account,
-        password: password,
-        name: name,
-        group: groupNum,
-        userImgUrl:{
-            url:'img/user.png',
-        },
-        createTime: format(new Date(),'yyyy-MM-dd HH:mm:ss'),
-        type:type
-    });
-
-    await newUser.save();
-
-    console.log('教師資料創建完畢')
-}
-
-// 新增群組資料庫
-async function createDatabase(){
-    const group = '0001'
-
-    const databaseUrl = path.resolve(__dirname, `../../database/${group}`);
-    if (!fs.existsSync(databaseUrl)) fs.mkdirSync(databaseUrl, { recursive: true });
-    
-    const newGroup = new groupModel({
-        group:group,
-        databaseUrl:databaseUrl,
-        limit:{
-            memory:1024,
-            classNum:5,
-            studentNum:10,
-        }
-    })
-
-    await newGroup.save();
-    console.log(`${group} 群組創建完畢`)
-    createTeacher()
-}
-
-// createDatabase()
-
-// 移動群組資料庫
-async function moveDataBase(){
-
-}
-
-// 修改群組限制
-async function modifyDatabaseLimit(){
-
-}
-
 
 // 以下為硬體裝置 API
 // 獲取使用容量
