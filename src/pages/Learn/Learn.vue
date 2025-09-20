@@ -1,13 +1,18 @@
 <!-- 線上影音 -->
 <template>
   <div class="view">
-    <div class="header">專欄儀表板</div>
-    <div class="classList" v-if="courseList.length">
-      <div class="classItem" v-for="(courses,id) in courseList" :key="id" @click="goToClass(courses.idx)">
+    <div class="header">
+      <i class="fa-solid fa-signs-post post_icon"></i>專欄列表
+      <div class="searchBox">
+        <i class="fa-solid fa-magnifying-glass search_icon"></i><input type="text" class="search" placeholder="關鍵字查詢（主題, 代號, 作者名,...）" v-model="search">
+      </div>
+    </div>
+    <div class="classList" v-if="searchCourse.length">
+      <div class="classItem" v-for="(courses,id) in searchCourse" :key="id" @click="goToClass(courses.idx)">
         <div class="banner">
           <el-carousel class="carousel" width="100%" height="175px" :autoplay="false">
-            <el-carousel-item v-for="(item,id) in courses.bannerImg" :key="id">
-              <img :src="item.url" alt="" class="bannerImg" loading="lazy">
+            <el-carousel-item v-for="item in courses.bannerImg" :key="item.url">
+              <img src="img/Loading.gif" :data-src="item.url" alt="" v-lazy class="bannerImg" loading="lazy">
             </el-carousel-item>
           </el-carousel>
         </div>
@@ -29,12 +34,24 @@ export default {
   name:'Learn',
   data(){
     return {
-      text:'',
+      search:'',
       courseList:[]
     }
   },
   mounted(){
     this.getCourse();
+  },
+  computed:{
+    searchCourse() {
+      const keyword = this.search.trim().toLowerCase();
+      if (!keyword) return this.courseList;
+
+      return this.courseList.filter(course => {
+        return course.courseName.toLowerCase().includes(keyword) ||
+              course.courseId.toLowerCase().includes(keyword) ||
+              course.lecturer.toLowerCase().includes(keyword)
+      });
+    }
   },
   methods:{
     async getCourse(){
@@ -60,7 +77,7 @@ export default {
           idx:idx
         }
       }).catch(e=>{})
-    }
+    },
   }
 }
 </script>
@@ -77,20 +94,58 @@ export default {
     font-size: 24px;
     margin-left: 20px;
     padding-left: 10px;
-    border-bottom: 1px solid rgba(0,0,0,0.3);
+    position: relative;
+    font-weight: bolder;
+  }
+  .post_icon{
+    margin-right: 10px;
+  }
+  .searchBox{
+    height: 40px;
+    width: 400px;
+    position: absolute;
+    top:20px;
+    right: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    border: 3px solid black;
+    border-radius: 40px;
+    box-sizing: border-box;
+  }
+  .search_icon{
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    font-size: 16px;
+  }
+  .search{
+    width: 340px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 16px;
+    box-sizing: border-box;
+    border: none;
+    margin-right: 20px;
+  }
+  .search:focus{
+    outline: none;
+  }
+  .search::placeholder{
+    font-size: 14px;
   }
   .classList{
     width: 95%;
     margin: 0 auto;
     margin-left: 20px;
-    margin-top: 10px;
     height: calc(100vh - 120px);
     overflow-x: hidden;
     overflow-y: scroll;
     padding: 10px;
     /* grid */
     display: grid;
-    grid-template-columns: auto auto auto;
+    grid-template-columns: repeat(auto-fill, 350px);
     grid-auto-rows: 245px;
     gap: 25px;
     row-gap: 20px;
@@ -121,6 +176,9 @@ export default {
   }
   .bannerImg{
     width: 100%;
+    height: 100%;
+    object-position: center;
+    object-fit: cover;
   }
   .className{
     width: 100%;

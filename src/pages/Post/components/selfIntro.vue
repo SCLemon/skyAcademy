@@ -59,11 +59,10 @@ export default {
         font-size: 18px;
     }
     .userImg{
-        width: 100%;
         height: 200px;
         background-image: url(../../../../public/img/author2.jpg);
         background-position: center;
-        background-size: 70%;
+        background-size: contain;
         background-repeat: no-repeat;
     }
     .name{

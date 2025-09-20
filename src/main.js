@@ -17,7 +17,7 @@ Vue.directive('lazy', {
         el.src = el.dataset.src 
         observer.unobserve(el)
       }
-    }, { threshold: 0 })
+    }, { threshold: 0.1 })
 
     observer.observe(el)
   }
