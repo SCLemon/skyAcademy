@@ -36,9 +36,9 @@
                 <div class="post_top_name">{{ obj.creator.name }}</div>
                 <div class="post_top_date">{{obj.createTime}}</div>
               </div>
-              <div class="post_text_expand_logo" v-if="obj.content.trim()!=''" @click="expandPostText($event)"><i class="fa-solid fa-expand"></i></div>
             </div>
             <div class="post_text" v-if="obj.content.trim()!=''" v-html="obj.content"></div>
+            <div class="post_text_expand_logo" v-if="checkPostTextOverflow(obj.content)" @click="expandPostText($event)">顯示更多</div>
             <div class="post_img" v-if="obj.postImg.length">
               <el-carousel :autoplay="false" :loop="false">
                 <el-carousel-item v-for="(item,id) in obj.postImg" :key="id">
@@ -316,6 +316,28 @@ export default {
       }
       catch(e){}
     },
+    checkPostTextOverflow(htmlContent, maxHeight = 144) {
+      // 建立暫時容器
+      const temp = document.createElement('div');
+      temp.style.wordBreak = 'break-all'
+      temp.style.position = 'absolute';
+      temp.style.visibility = 'hidden';
+      temp.style.lineHeight = '1.5'
+      
+      const reference = document.querySelector('.post_text');
+      const width = reference ? reference.clientWidth + 'px' : '589px';
+      temp.style.width = width;
+
+
+      temp.innerHTML = htmlContent;
+
+      document.body.appendChild(temp);
+      const exceeds = temp.offsetHeight > maxHeight;
+ 
+      // document.body.removeChild(temp);
+
+      return exceeds;
+    },
     openDialog(){
       if(this.showPermission) this.dialogTableVisible = true;
       else this.$bus.$emit('handleAlert','創建貼文權限通知','目前平台並未開放學生進行貼文','warning')
@@ -377,10 +399,9 @@ export default {
 
     // 貼文內文展開
     expandPostText(event){
-      const postTop = event.currentTarget.closest('.post_top'); 
-      const postText = postTop.nextElementSibling;
-      event.currentTarget.querySelector('i').classList.toggle('fa-expand');
-      event.currentTarget.querySelector('i').classList.toggle('fa-compress');
+      const post = event.currentTarget.closest('.post'); 
+      const postText = post.querySelector('.post_text');
+      event.currentTarget.innerText == '顯示更多'? event.currentTarget.innerText = '顯示更少':event.currentTarget.innerText = '顯示更多'
       postText.classList.toggle('post_text_expand');
     }
 
@@ -592,9 +613,13 @@ export default {
     font-size: 10px;
   }
   .post_text_expand_logo{
-    position: absolute;
-    top: 38px;
-    right: 15px;
+    width:94.5%;
+    margin: 0 auto;
+    text-align: right;
+    font-size: 14px;
+    padding-right: 10px;
+    color: rgba(0,0,0,0.6);
+    margin-bottom: 5px;
   }
   .post_text_expand_logo:hover{
     cursor: pointer;
@@ -604,11 +629,11 @@ export default {
     margin: 0 auto;
     margin-top: 5px;
     margin-bottom: 5px;
-    max-height: 103px;
+    max-height: 144px;
     line-height: 1.5;
     font-size: 16px;
     text-align: justify;
-    overflow-y:scroll;
+    overflow-y: hidden;
     word-break: break-all;
   }
   .post_text_expand{
