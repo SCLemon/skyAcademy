@@ -11,7 +11,13 @@
             <el-table-column prop="createTime" label="創建時間"></el-table-column>
             <el-table-column prop="name" label="用戶姓名"></el-table-column>
             <el-table-column prop="lastOnline" label="上次訪問時間"></el-table-column>
-            <el-table-column prop="fingerprint" label="裝置識別碼"></el-table-column>
+            <el-table-column prop="fingerprint" label="裝置識別碼">
+                  <template #default="{ row }">
+                    <div class="fingerprint" @click="copyToClipboard(row.fingerprint)">
+                        {{ row.fingerprint }}
+                    </div>
+                </template>
+            </el-table-column>
             <el-table-column prop="status" label="狀態">
                 <template v-slot="scope">
                     <div :class="scope.row.status?'valid':'invalid'">{{ scope.row.status?'有效':'凍結' }}</div>
@@ -142,6 +148,14 @@ export default {
         },
         async editUser(idx){
             this.$router.push({ path: '/academic/modifyInfo', query: { idx:idx } }).catch(e => {})
+        },
+        copyToClipboard(text) {
+            if (!text) return;
+            navigator.clipboard.writeText(text)
+            .then(() => {
+                this.$bus.$emit('handleAlert','複製操作通知','已複製到剪貼簿','success');
+            })
+            .catch(() => {});
         }
     }
 }
@@ -192,5 +206,13 @@ export default {
     }
     .btn_link:hover{
         cursor: pointer;
+    }
+    .fingerprint {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1; /* 最多顯示兩行 */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-break: break-all; /* 長字自動換行 */
     }
 </style>

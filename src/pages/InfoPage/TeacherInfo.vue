@@ -6,7 +6,7 @@
             <div class="sum_num">{{ student_num }}</div>
         </router-link>
         <router-link :to="{ path:'teacherCourseTable' }" class="sum">
-            <div class="sum_title">專欄總數 (上限 {{ limit.classNum }} 堂)</div>
+            <div class="sum_title">專欄總數 (上限 {{ limit.classNum }} 欄)</div>
             <div class="sum_num">{{ course_num }}</div>
         </router-link>
         <router-link :to="''" class="sum">

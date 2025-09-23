@@ -109,7 +109,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: left;
-    border: 3px solid black;
+    border: 2px solid black;
     border-radius: 40px;
     box-sizing: border-box;
   }
