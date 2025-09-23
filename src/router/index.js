@@ -91,7 +91,8 @@ router.beforeEach(async (to, from, next) => {
     
     const res = await axios.post('/login/token',{save:false},{
         headers:{
-            'x-user-token':token
+            'x-user-token':token,
+            'x-user-fingerprint':localStorage.getItem('deviceFingerprint')
         }
     })
 

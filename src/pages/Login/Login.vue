@@ -46,7 +46,13 @@ export default {
           return this.$bus.$emit('handleAlert','登入訊息','登入資料不可為空。','error')
       }
       try{
-        const res = await axios.post('/login/verify',this[type])
+        const res = await axios.post('/login/verify',this[type],
+          {
+                headers: {
+                  'x-user-fingerprint': localStorage.getItem('deviceFingerprint')
+                }
+          }
+        )
         data = res.data;
         if(data.type == 'success'){
           this.$bus.$currentUser = res.data.userInfo

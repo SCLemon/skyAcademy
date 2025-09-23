@@ -238,7 +238,7 @@ router.get('/api/infoPage/getStudent',authMiddleware, async (req, res) => {
                     createTime:obj.createTime,
                     account:obj.account,
                     lastOnline:obj.lastOnline,
-                    loginIP:obj.loginIP,
+                    fingerprint:obj.fingerprint,
                     name:obj.name,
                     status:obj.status
                 }

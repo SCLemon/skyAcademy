@@ -27,10 +27,15 @@ router.post('/login/anonymous', async (req, res) => {
             });
         }
 
-        const loginIP = req.ip;
+        const fingerprint = req.headers['x-user-fingerprint'];
+
+        if (!fingerprint || !/^[a-f0-9]{64}$/.test(fingerprint)) {
+            return res.send({ type: 'error',message: '驗證失敗（參數異常錯誤）'});
+        }
+
         const loginTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss')
         user.lastOnline = loginTime;
-        user.loginIP = loginIP;
+        user.fingerprint = fingerprint;
         await user.save();
 
         res.cookie('authToken',user.token,{
@@ -83,11 +88,13 @@ router.post('/login/verify', async (req, res) => {
                 message:'帳號已被凍結，請洽詢客服人員協助。'
             });
         }
-
-        const loginIP = req.ip;
+        const fingerprint = req.headers['x-user-fingerprint'];
+        if (!fingerprint || !/^[a-f0-9]{64}$/.test(fingerprint)) {
+            return res.send({ type: 'error',message: '驗證失敗（參數異常錯誤）'});
+        }
         const loginTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss')
         user.lastOnline = loginTime;
-        user.loginIP = loginIP;
+        user.fingerprint = fingerprint;
         await user.save();
 
         res.cookie('authToken',user.token,{
@@ -137,10 +144,14 @@ router.post('/login/token', async (req, res) => {
             type: user.type == 'teacher'?'教師':'學生'
         }
 
-        const loginIP = req.ip;
+        const fingerprint = req.headers['x-user-fingerprint'];
+        if (!fingerprint || !/^[a-f0-9]{64}$/.test(fingerprint)) {
+            return res.send({ type: 'error',message: '驗證失敗（參數異常錯誤）'});
+        }
+
         const loginTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss')
         user.lastOnline = loginTime;
-        user.loginIP = loginIP;
+        user.fingerprint = fingerprint;
         if(save) await user.save();
 
         return res.send({

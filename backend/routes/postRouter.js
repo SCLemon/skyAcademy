@@ -419,11 +419,18 @@ router.post('/api/post/message', authMiddleware, async (req, res) => {
     try {
         const postIdx = req.body.postIdx;
         const message = req.body.message;
+        const fingerprint = req.headers['x-user-fingerprint'];
         const createTime = format(new Date(),'yyyy-MM-dd HH:mm:ss');
         if(!postIdx || message.trim() == ''){
             return res.send({
                 type: 'error',
                 message: '留言失敗（訊息不可為空）',
+            });
+        }
+        if (!fingerprint || !/^[a-f0-9]{64}$/.test(fingerprint)) {
+            return res.send({
+                type: 'error',
+                message: '留言失敗（參數異常錯誤）',
             });
         }
         const post = await postModel.findOneAndUpdate({idx:postIdx, group:req.user.group},
@@ -432,7 +439,7 @@ router.post('/api/post/message', authMiddleware, async (req, res) => {
                     'meta.message':{
                         idx: req.user.idx,
                         createTime: createTime,
-                        ip: req.ip,
+                        fingerprint: fingerprint,
                         message: message
                     }
                 }

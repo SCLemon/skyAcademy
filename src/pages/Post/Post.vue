@@ -170,7 +170,8 @@ export default {
       try{
         const res = await axios.post('/login/token',{save:false},{
           headers:{
-            'x-user-token':token
+            'x-user-token':token,
+            'x-user-fingerprint':localStorage.getItem('deviceFingerprint')
           }
         })
         if(res.data.type == 'success'){
@@ -353,9 +354,11 @@ export default {
         const textArea = sendButton.previousElementSibling;
         const message = textArea.value;
 
+        console.log('here')
         const res = await axios.post(`/api/post/message`,{postIdx:idx, message:message},{
           headers:{
-            'x-user-token':jsCookie.get('authToken')
+            'x-user-token':jsCookie.get('authToken'),
+            'x-user-fingerprint': localStorage.getItem('deviceFingerprint')
           }
         })
 

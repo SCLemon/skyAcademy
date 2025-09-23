@@ -63,7 +63,7 @@ const userSchema = new mongoose.Schema({
         type:String,
         default:''
     },
-    loginIP:{
+    fingerprint:{
         type:String,
         default:''
     },

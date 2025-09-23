@@ -95,7 +95,8 @@ export default {
             const token = jsCookie.get('authToken')
             const res = await axios.post('/login/token',{save:true},{
                 headers:{
-                    'x-user-token':token
+                    'x-user-token':token,
+                    'x-user-fingerprint':localStorage.getItem('deviceFingerprint')
                 }
             })
             if(res.data.type == 'success'){
