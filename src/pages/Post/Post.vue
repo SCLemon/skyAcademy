@@ -3,7 +3,7 @@
   <div class="view">
     <div class="posterContainer">
       <div class="posterBox">
-        <div class="inputBox" v-if="currentUser.typeEng == 'teacher'">
+        <div class="inputBox" v-if="!$route.query.share && currentUser.typeEng == 'teacher'">
           <div class="inputTextBox" @click="openDialog('img')">
             <div class="inputTextBoxImg"><img :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt=""></div>
             <div class="textArea">發表您的貼文和公告</div>
@@ -183,19 +183,28 @@ export default {
 
     postDivScroll(){
       const postAllDiv = this.$refs.postAll;
-      if (postAllDiv.scrollHeight - postAllDiv.scrollTop === postAllDiv.clientHeight) {
+      if (!this.$route.query.share && postAllDiv.scrollHeight - postAllDiv.scrollTop === postAllDiv.clientHeight) {
         this.getPost();
       }
     },
     async getPost(flag){
       if (this.isLoading) return;
       this.isLoading = true;
+
+      let url = `/api/post/getPost?page=${this.page}`
+      let share = this.$route.query.share;
+      
+      if(share){
+        url = `/api/post/getPost?page=${this.page}&share=${share}`
+      }
       if(flag == 'refresh'){
         this.posts = [];
         this.page = 1;
+        url = `/api/post/getPost?page=${this.page}`
       }
+
       try{
-        const res = await axios.get(`/api/post/getPost?page=${this.page}`,{
+        const res = await axios.get(url,{
           headers:{
               'x-user-token':jsCookie.get('authToken'),
           }
@@ -208,7 +217,7 @@ export default {
           this.$nextTick(async() => {
             const postAllDiv = this.$refs.postAll;
             // 如果內容高度仍然 <= 容器高度，代表還不夠滾動，繼續載入
-            if (postAllDiv && postAllDiv.scrollHeight <= postAllDiv.clientHeight && newPosts.length > 0) {
+            if (!share && postAllDiv && postAllDiv.scrollHeight <= postAllDiv.clientHeight && newPosts.length > 0) {
               await this.getPost();
             }
           });

@@ -277,8 +277,19 @@ router.get('/api/post/getPost', authMiddleware, async (req, res) => {
     const offset = (page - 1) * pageSize;
     try {
         let posts = [];
+        
+        const uuidV4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        const share = req.query.share;
 
-        if (req.user.type === 'teacher') {
+
+        if(uuidV4Regex.test(share)){
+            const post = await postModel.findOne({ group: req.user.group, idx: req.query.share });
+            if(post) posts.push(post)
+            if(posts.length == 0){
+                return res.send({type: 'error',posts: [], message: '貼文內容不存在或權限不足無法閱覽。'});
+            }
+        }
+        else if (req.user.type === 'teacher') {
             posts = (await postModel.find({ group: req.user.group }).sort({ _id: -1 }).skip(offset).limit(pageSize)).reverse();
         } 
         else if (req.user.type === 'student') {
