@@ -334,7 +334,7 @@ export default {
       document.body.appendChild(temp);
       const exceeds = temp.offsetHeight > maxHeight;
  
-      // document.body.removeChild(temp);
+      document.body.removeChild(temp);
 
       return exceeds;
     },
