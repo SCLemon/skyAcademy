@@ -213,7 +213,7 @@ export default {
             }
           });
         }
-        else this.$bus.$emit('handleAlert','貼文創建通知',res.data.message,res.data.type)
+        else this.$bus.$emit('handleAlert','貼文獲取通知',res.data.message,res.data.type)
       }
       catch(e){}
       finally{
