@@ -26,8 +26,11 @@ export default {
       if(!authToken){
         let data;
         try{
-          const res = await axios.post('/login/anonymous',null,{
-            'x-user-fingerprint':localStorage.getItem('deviceFingerprint')
+          const res = await axios.post('/login/anonymous',null,
+          {
+            headers:{
+              'x-user-fingerprint':localStorage.getItem('deviceFingerprint')
+            }
           })
           data = res.data;
           if(data.type == 'success'){

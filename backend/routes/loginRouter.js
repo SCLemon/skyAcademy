@@ -17,18 +17,18 @@ router.post('/login/anonymous', async (req, res) => {
         if (!user) {
             return res.send({
                 type:'error',
-                message:'帳號或密碼錯誤。'
+                message:'本網站暫時不開放訪客模式登入。'
             });
         }
         if (!user.status){
             return res.send({
                 type:'error',
-                message:'帳號已被凍結，請洽詢客服人員協助。'
+                message:'本網站暫時不開放訪客模式登入。'
             });
         }
 
         const fingerprint = req.headers['x-user-fingerprint'];
-
+        console.log(fingerprint)
         if (!fingerprint || !/^[a-f0-9]{64}$/.test(fingerprint)) {
             return res.send({ type: 'error',message: '驗證失敗（參數異常錯誤）'});
         }
