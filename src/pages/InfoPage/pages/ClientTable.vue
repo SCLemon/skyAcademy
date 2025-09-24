@@ -40,7 +40,7 @@
         <el-dialog title="創建用戶" :visible.sync="dialogFormVisible">
             <el-form :model="form">
                 <el-form-item label="用戶帳號">
-                    <el-input v-model="form.account" autocomplete="off" clearable></el-input>
+                    <el-input v-model="form.account"  placeholder="若要創建訪客帳號，請命名為 Visitor" autocomplete="off" clearable></el-input>
                 </el-form-item>
                 <el-form-item label="用戶名稱">
                     <el-input v-model="form.name" autocomplete="off" clearable></el-input>

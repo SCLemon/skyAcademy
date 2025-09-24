@@ -100,13 +100,33 @@ export default {
     }
   },
   async mounted(){
+    await this.setAnonymousMode(); // 確保陌生帳號亦可查看分享之內容
     await this.getPost()
     await this.getUserInfo()
     this.currentUser = this.$bus.$currentUser
-
   },
 
   methods:{
+    async setAnonymousMode(){
+      const authToken = jsCookie.get('authToken');
+      if(!authToken){
+        let data;
+        try{
+          const res = await axios.post('/login/anonymous',null,
+          {
+            headers:{
+              'x-user-fingerprint':localStorage.getItem('deviceFingerprint')
+            }
+          })
+          data = res.data;
+          if(data.type == 'success'){
+            this.$bus.$currentUser = res.data.userInfo
+            this.$bus.$emit('setUserInfo')
+          }
+        }
+        catch(e){}
+      }
+    },
     handleCommand(payload){
       if(payload.method == 'delete'){
         this.deletePost(payload.idx)
@@ -116,7 +136,7 @@ export default {
       }
     },
     async copyShareUrl(idx){
-      let text = location.host + '/#/academic/post/share?share='+idx;
+      let text = location.protocol+'//'+location.host + '/#/academic/post/share?share='+idx;
       this.$bus.$emit('copyToClipboard','分享貼文連結通知',text);
     },
     async getUserInfo(){

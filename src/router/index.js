@@ -98,7 +98,7 @@ router.beforeEach(async (to, from, next) => {
     const token = jsCookie.get('authToken')
     
     // 通用驗證
-    const allowedPaths = ['/', '/academic/login'];
+    const allowedPaths = ['/', '/academic/login','/academic/post/share'];
     if(!allowedPaths.includes(to.path) && !token) return next('/academic/login')
     
     const res = await axios.post('/login/token',{save:false},{

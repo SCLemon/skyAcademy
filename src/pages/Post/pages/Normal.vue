@@ -171,7 +171,7 @@ export default {
       catch(e){}
     },
     async copyShareUrl(idx){
-      let text = location.host + '/#/academic/post/share?share='+idx;
+      let text = location.protocol+'//'+location.host + '/#/academic/post/share?share='+idx;
       this.$bus.$emit('copyToClipboard','分享貼文連結通知' ,text);
     },
     postDivScroll(){

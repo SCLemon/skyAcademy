@@ -31,7 +31,6 @@ router.post('/login/anonymous', async (req, res) => {
         }
 
         const fingerprint = req.headers['x-user-fingerprint'];
-        console.log(fingerprint)
         if (!fingerprint || !/^[a-f0-9]{64}$/.test(fingerprint)) {
             return res.send({ type: 'error',message: '驗證失敗（參數異常錯誤）'});
         }
