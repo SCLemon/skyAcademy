@@ -46,7 +46,7 @@
 <script>
 import axios from 'axios';
 import jsCookie from 'js-cookie';
-import pdfViewer from './components/pdfViewer.vue';
+import pdfViewer from './components/PdfViewer.vue';
 export default {
     name:'Class',
     components:{

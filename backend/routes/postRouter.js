@@ -278,18 +278,7 @@ router.get('/api/post/getPost', authMiddleware, async (req, res) => {
     try {
         let posts = [];
         
-        const uuidV4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-        const share = req.query.share;
-
-
-        if(uuidV4Regex.test(share)){
-            const post = await postModel.findOne({ group: req.user.group, idx: req.query.share });
-            if(post) posts.push(post)
-            if(posts.length == 0){
-                return res.send({type: 'error',posts: [], message: '貼文內容不存在或權限不足無法閱覽。'});
-            }
-        }
-        else if (req.user.type === 'teacher') {
+        if (req.user.type === 'teacher') {
             posts = (await postModel.find({ group: req.user.group }).sort({ _id: -1 }).skip(offset).limit(pageSize)).reverse();
         } 
         else if (req.user.type === 'student') {
@@ -374,6 +363,98 @@ router.get('/api/post/getPost', authMiddleware, async (req, res) => {
     }
 });
 
+// 獲取分享貼文
+router.get('/api/post/share/:share', authMiddleware, async (req, res) => {
+    const page = req.query.page || 1;
+    const pageSize = 5;
+    const offset = (page - 1) * pageSize;
+    try {
+        let posts = [];
+        
+        const uuidV4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        const share = req.params.share;
+
+        if(uuidV4Regex.test(share)){
+            const post = await postModel.findOne({ group: req.user.group, idx: share });
+            if(post) posts.push(post)
+            if(posts.length == 0){
+                return res.send({
+                    type: 'success',
+                    posts:[],
+                    message: '用戶資料查詢成功。',
+                });
+            }
+        }
+        else {
+            return res.send({
+                type: 'error',
+                message: '貼文內容不存在或權限不足無法閱覽。',
+            })
+        }
+
+        posts = await Promise.all(
+            posts.map(async (post) => {
+                let postImg = [];
+                const databaseUrl = post.databaseUrl;
+
+                if (fs.existsSync(databaseUrl)) {
+                    postImg = fs.readdirSync(databaseUrl).map((file) => {
+                        return {
+                            name: file,
+                            url: `/api/post/image/${post.idx}/${file}`,
+                        };
+                    });
+                }
+
+                // 創建者
+                const creator = await userModel.findOne({idx:post.creator.idx})
+                let creatorInfo = {
+                    name : creator.name,
+                    userImgUrl: creator.userImgUrl.url
+                }
+
+                const isLike = post.meta.like.some((likeUser) => likeUser.idx === req.user.idx);
+
+                // 留言
+                let message = [];
+                for (const i of post.meta.message) {
+                    const user = await userModel.findOne({ idx: i.idx });
+                    if (!user) continue;
+                    message.push({
+                        name: user.name,
+                        userImgUrl: user.userImgUrl.url,
+                        createTime: i.createTime,
+                        message: i.message
+                    });
+                }
+                
+                return {
+                    idx: post.idx,
+                    createTime: post.createTime,
+                    creator: creatorInfo,
+                    content: post.content,
+                    status: post.status,
+                    message: message,
+                    postImg: postImg,
+                    isLike: isLike,
+                    likeCount:post.meta.like.length
+                };
+            })
+        );
+
+        return res.send({
+            type: 'success',
+            posts:posts.reverse(),
+            message: '用戶資料查詢成功。',
+        });
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+});
 // 按讚
 router.get('/api/post/toggleLikePost/:idx', authMiddleware, async (req, res) => {
     try {
