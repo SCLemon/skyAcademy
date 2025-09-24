@@ -6,7 +6,10 @@ const userModel = require('../models/userModel');
 
 const {format} = require('date-fns')
 
-
+const levelTitle = [
+    '新手會員','普通會員','進階會員','高級會員','鉑金會員',
+    '鑽石會員','星耀會員','頂級會員','版主','頂級版主'
+]
 // anonymous mode
 router.post('/login/anonymous', async (req, res) => {
     const account = 'Visitor';
@@ -46,6 +49,10 @@ router.post('/login/anonymous', async (req, res) => {
             account:user.account,
             typeEng:user.type,
             userImgUrl:user.userImgUrl.url,
+            level: {
+                level: user.level,
+                levelTitle: levelTitle[user.level - 1]
+            },
             type: user.type == 'teacher'?'教師':'學生',
             name: user.name
         }
@@ -105,6 +112,10 @@ router.post('/login/verify', async (req, res) => {
             account:user.account,
             typeEng:user.type,
             userImgUrl:user.userImgUrl.url,
+            level: {
+                level: user.level,
+                levelTitle: levelTitle[user.level - 1]
+            },
             type: user.type == 'teacher'?'教師':'學生',
             name: user.name
         }
@@ -140,6 +151,10 @@ router.post('/login/token', async (req, res) => {
             account:user.account,
             typeEng:user.type,
             name: user.name,
+            level: {
+                level: user.level,
+                levelTitle: levelTitle[user.level - 1]
+            },
             userImgUrl:user.userImgUrl.url,
             type: user.type == 'teacher'?'教師':'學生'
         }

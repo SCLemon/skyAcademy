@@ -55,6 +55,10 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
+    level:{
+        type: Number,
+        default: 1,
+    },
     status: {
         type: Boolean,
         default: true,

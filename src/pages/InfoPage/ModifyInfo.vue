@@ -33,7 +33,7 @@
                     <svg ref="barcode"></svg>
                 </div>
                 <div class="id_card_forward_type_box">
-                    <div class="id_card_forward_type">{{userInfo.type=='teacher'?'管理員':'會員'}}證</div>
+                    <div class="id_card_forward_type">{{userInfo.level? userInfo.level.levelTitle:''}}</div>
                     <div class="id_card_forward_type_eng">{{ userInfo.type=='teacher'?'Admin':'Member' }}  ID Card</div>
                 </div>
                 <!-- <div class="id_card_foward_center_logo" ref="logo"></div> -->
@@ -45,8 +45,14 @@
                 </div>
             </div>
             <div class="id_card_download">
-                <div><el-button type="primary" @click="downloadForward()">下載卡片正面</el-button></div>
-                <div><el-button type="primary" @click="downloadBackward()">下載卡片背面</el-button></div>
+                <div class="level">
+                    <div class="manageLevelTitle">調整會員等級</div>
+                    <el-select v-model="userInfo.level.level" placeholder="請選擇等級">
+                        <el-option v-for="(item,id) in levelTitleArray" :key="id" :label="`Lv${id+1} ${item}`" :value="id+1"></el-option>
+                    </el-select>
+                </div>
+                <div><el-button class="download_btn" type="primary" @click="downloadForward()">下載卡片正面</el-button></div>
+                <div><el-button class="download_btn" type="primary" @click="downloadBackward()">下載卡片背面</el-button></div>
             </div>
         </div>
     </div>
@@ -77,8 +83,13 @@ export default {
                 phone:'',
                 mailAddress:'',
                 address:'',
+                level:{
+                    level:1,
+                    levelTitle:'新手會員'
+                },
                 userImgUrl:''
-            }
+            },
+            levelTitleArray:[],
         }
     },
     async mounted(){
@@ -101,6 +112,7 @@ export default {
             if(res.data.type == 'success'){
                 res.data.user.userImgUrl += `?${new Date().getTime()}`
                 this.userInfo = res.data.user
+                this.levelTitleArray = res.data.levelTitleArray
                 this.$bus.$emit('updateCurrentUser')
                 this.generateBarcode()
             }
@@ -286,10 +298,11 @@ export default {
         align-items: center;
     }
     .id_card{
-        width: 412.3px;
-        height: 260px;
+        width: 412.3px !important;
+        height: 260px !important;
         background: white;
         border-radius: 15px;
+        box-sizing: border-box;
         margin-left: 25px;
         border: 1px solid rgba(0,0,0,0.1);
         position: relative;
@@ -426,12 +439,21 @@ export default {
         text-align: center;
     }
     .id_card_download{
-        width:220px;
-        height: 160px;
+        width:226.09px;
+        height: 260px;
         margin-left: 28px;
         display: flex;
         flex-direction: column;
-        justify-content: space-evenly;
         align-items: center;
+    }
+    .level{
+        height: 100px;
+    }
+    .manageLevelTitle{
+        line-height: 2;
+        margin-bottom: 5px;
+    }
+    .download_btn{
+        margin-top: 15px;
     }
 </style>

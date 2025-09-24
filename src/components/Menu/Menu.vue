@@ -11,7 +11,7 @@
         </div>
         <div :class="`username ${isLogin?'username_login':''}`">
             {{ isLogin?`${userInfo.name}`:'登入/註冊' }}
-            <div>（ 身份：{{userInfo.type == '教師' ? '版主': '會員'}} ）</div>
+            <div>Lv{{ userInfo.level? `${userInfo.level.level} ${userInfo.level.levelTitle}`:''}} </div>
         </div>
     </div>
     <div @click="goTo('/academic/post')" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/post')}">
