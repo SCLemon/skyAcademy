@@ -1,23 +1,8 @@
 <!-- 發文帖子 -->
 <template>
-  <div class="view">
-    <div class="posterContainer">
-      <div class="posterBox">
-        <div class="inputBox" v-if="currentUser.typeEng == 'teacher' && !$route.path.includes('/academic/post/share')">
-          <div class="inputTextBox" @click="openDialog('img')">
-            <div class="inputTextBoxImg"><img :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt=""></div>
-            <div class="textArea">發表您的貼文和公告</div>
-          </div>
-          <div class="iconBox">
-            <div class="icon_item" @click="openDialog('post')">
-              <i class="fa-regular fa-pen-to-square icon"></i> 建立貼文
-            </div>
-            <div class="icon_item" @click="openDialog('img')">
-              <i class="fa-regular fa-images icon"></i> 相片 / 影片
-            </div>
-          </div>
-        </div>
-        <div :class="`postAll ${currentUser.typeEng=='teacher'?'':'postAll_student'}`" ref="postAll" @scroll="postDivScroll()" v-if="posts.length">
+  <div>
+    <div class="posterBox">
+        <div :class="`postAll ${currentUser.typeEng=='teacher'?'':'postAll_student'}`" ref="postAll" v-if="posts.length">
           <div class="post" v-for="(obj,id) in posts" :key="id">
             <div class="post_more" v-if="showPermission">
               <el-dropdown @command="handleCommand">
@@ -82,20 +67,7 @@
         <div class="postAll postAll_empty" v-else>
           <el-empty description="分享之貼文不公開或已刪除"></el-empty>
         </div>
-      </div>
-      <div class="column">
-        <self-intro></self-intro>
-      </div>
     </div>
-
-    <el-dialog title="建立貼文" :visible.sync="dialogTableVisible" v-if="showPermission">
-      <div class="real_input" ref="input" contenteditable="true"></div>
-      <el-upload action="#" :auto-upload="false" list-type="picture-card" :on-change="handleUpload" :on-preview="handlePictureCardPreview" :on-remove="handleRemove" :file-list="form.attachments" :multiple="true" accept="image/*"><i class="el-icon-plus"></i></el-upload>
-      <el-dialog :visible.sync="dialogVisible">
-        <img width="100%" :src="dialogImageUrl" alt="">
-      </el-dialog>
-      <el-button type="primary" class="button" @click="create()" :loading="isSending" >建立貼文</el-button>
-    </el-dialog>
     <el-dialog title="修改貼文" :visible.sync="dialogTableVisible2" v-if="showPermission">
       <div class="real_input" ref="modifyContent" contenteditable="true"></div>
       <el-button type="primary" class="button" @click="modifyPost()" :loading="isSending" >修改貼文</el-button>
@@ -106,29 +78,13 @@
 <script>
 import axios from 'axios'
 import jsCookie from 'js-cookie'
-import selfIntro from '../components/SelfIntro.vue'
 export default {
   name:'Normal',
-  components:{
-    selfIntro
-  },
   data(){
     return {
       currentUser:{},
-      // 上傳內容
-      form:{
-        content:'',
-        attachments:[]
-      },
       isSending:false,
       showPlaceholder:true,
-      // 貼文創建
-      dialogTableVisible:false,
-      sendEnabled: false,
-      inputKeyUpfunction:{},
-      // 圖片牆
-      dialogImageUrl: '',
-      dialogVisible: false,
 
       // 顯示貼文
       posts:[],
@@ -144,11 +100,6 @@ export default {
     }
   },
   async mounted(){
-    this.inputKeyUpfunction = window.addEventListener('keyup',()=>{
-      if(this.dialogTableVisible && this.$refs.input){
-        if(this.$refs.input.innerText.trim()=='' && this.$refs.input.innerHTML.length == 4) this.$refs.input.innerHTML = ''
-      }
-    })
     await this.getPost()
     await this.getUserInfo()
     this.currentUser = this.$bus.$currentUser
@@ -181,12 +132,6 @@ export default {
       catch(e){}
     },
 
-    postDivScroll(){
-      const postAllDiv = this.$refs.postAll;
-      if (postAllDiv.scrollHeight - postAllDiv.scrollTop === postAllDiv.clientHeight) {
-        this.getPost();
-      }
-    },
     async getPost(flag){
       if (this.isLoading) return;
       this.isLoading = true;
@@ -214,35 +159,6 @@ export default {
       finally{
         this.isLoading = false;
       }
-    },
-    async create(){
-      this.isSending = true;
-      this.form.content = this.$refs.input.innerHTML;
-      const formData = new FormData();
-      formData.append('content', this.form.content);
-
-      if (this.form.attachments && this.form.attachments.length > 0) {
-          this.form.attachments.forEach((file, index) => {
-              formData.append('attachments', file.raw);
-          });
-      }
-      const res = await axios.post('/api/post/create',formData,{
-          headers:{
-              'x-user-token':jsCookie.get('authToken'),
-          }
-      })
-      if(res.data.type == 'success'){
-          this.getPost('refresh')
-          this.dialogTableVisible = false;
-          this.form = {
-              content:'',
-              attachments:[]
-          },
-          this.$refs.input.innerHTML = '';
-          this.$bus.$emit('handleAlert','貼文創建通知',res.data.message,res.data.type)
-      }
-      else this.$bus.$emit('handleAlert','貼文創建通知',res.data.message,res.data.type)
-      this.isSending = false;
     },
     async deletePost(idx){
       try{
@@ -333,21 +249,6 @@ export default {
 
       return exceeds;
     },
-    openDialog(){
-      if(this.showPermission) this.dialogTableVisible = true;
-      else this.$bus.$emit('handleAlert','創建貼文權限通知','目前平台並未開放學生進行貼文','warning')
-    },
-    // 圖片處理
-    handleUpload(file,fileList){
-      this.form.attachments = fileList
-    },
-    handleRemove(file, fileList) {
-      this.form.attachments = fileList
-    },
-    handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url;
-      this.dialogVisible = true;
-    },
 
     // 留言區
     msgScrollToBottom(event){
@@ -401,106 +302,10 @@ export default {
     }
 
   },
-  beforeDestroy(){
-    window.removeEventListener('keyup',this.inputKeyUpfunction);
-  }
 }
 </script>
 
 <style scoped>
-  .view{
-    width: calc(100vw - 250px);
-    height: 100vh;
-  }
-  .posterContainer{
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    justify-content: space-evenly;
-  }
-  .inputBox{
-    width: 100%;
-    height: auto;
-    min-height: 120px;
-    box-shadow: 0px 1px 3px gray;
-    border-radius: 5px;
-    display: flex;
-    margin-left: 5px;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 15px;
-  }
-  .inputTextBox{
-    width: 95%;
-    height: 60px;
-    margin: 0 auto;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .inputTextBoxImg{
-    width: 40px;
-    height: 40px;
-    border-radius: 40px;
-    overflow: hidden;
-  }
-  .inputTextBoxImg>img{
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .textArea {
-    width: calc(100% - 60px);
-    height: 40px;
-    line-height: 40px;
-    overflow-y: auto;
-    padding-left: 20px;
-    margin-left: 20px;
-    font-size: 14px;
-    border-radius: 20px;
-    border: none;
-    outline: none;
-    background-color: #F0F2F5;
-    box-sizing: border-box;
-    color: gray;
-  }
-  .textArea:hover{
-    cursor: pointer;
-    background-color:rgb(240,240,240);
-  }
-  .iconBox{
-    width: 95%;
-    height: 60px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-  }
-  .icon_item{
-    width: 50%;
-    height: 55px;
-    line-height: 55px;
-    text-align: center;
-    border-radius: 5px;
-  }
-  .icon_item:hover{
-    cursor: pointer;
-    background-color: rgba(240,240,240);
-  }
-  .icon{
-    margin-right: 5px;
-  }
-  .like{
-    color: rgb(88, 88, 250);
-  }
-  .column{
-    width: 310px;
-    height: 100vh;
-    padding-top: 20px;
-    box-sizing: border-box;
-  }
   .posterBox{
     width: 73%;
     min-width: 623px;
@@ -508,6 +313,9 @@ export default {
     margin-top: 20px;
     height: 100vh;
     box-sizing: border-box;
+  }
+  .like{
+    color: rgb(88, 88, 250);
   }
   ::v-deep .el-dialog{
     width: 720px;

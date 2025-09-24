@@ -1,8 +1,7 @@
 <!-- 發文帖子 -->
 <template>
-  <div class="view">
-    <div class="posterContainer">
-      <div class="posterBox">
+  <div>
+    <div class="posterBox">
         <div class="inputBox" v-if="currentUser.typeEng == 'teacher'">
           <div class="inputTextBox" @click="openDialog('img')">
             <div class="inputTextBoxImg"><img :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt=""></div>
@@ -82,12 +81,7 @@
         <div class="postAll postAll_empty" v-else>
           <el-empty description="暫無貼文"></el-empty>
         </div>
-      </div>
-      <div class="column">
-        <self-intro></self-intro>
-      </div>
     </div>
-
     <el-dialog title="建立貼文" :visible.sync="dialogTableVisible" v-if="showPermission">
       <div class="real_input" ref="input" contenteditable="true"></div>
       <el-upload action="#" :auto-upload="false" list-type="picture-card" :on-change="handleUpload" :on-preview="handlePictureCardPreview" :on-remove="handleRemove" :file-list="form.attachments" :multiple="true" accept="image/*"><i class="el-icon-plus"></i></el-upload>
@@ -106,12 +100,8 @@
 <script>
 import axios from 'axios'
 import jsCookie from 'js-cookie'
-import selfIntro from '../components/SelfIntro.vue'
 export default {
   name:'Normal',
-  components:{
-    selfIntro
-  },
   data(){
     return {
       currentUser:{},
@@ -416,15 +406,13 @@ export default {
 </script>
 
 <style scoped>
-  .view{
-    width: calc(100vw - 250px);
+  .posterBox{
+    width: 73%;
+    min-width: 623px;
+    max-width: calc((100vw - 560px) * 0.73);
+    margin-top: 20px;
     height: 100vh;
-  }
-  .posterContainer{
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    justify-content: space-evenly;
+    box-sizing: border-box;
   }
   .inputBox{
     width: 100%;
@@ -502,20 +490,6 @@ export default {
   }
   .like{
     color: rgb(88, 88, 250);
-  }
-  .column{
-    width: 310px;
-    height: 100vh;
-    padding-top: 20px;
-    box-sizing: border-box;
-  }
-  .posterBox{
-    width: 73%;
-    min-width: 623px;
-    max-width: calc((100vw - 560px) * 0.73);
-    margin-top: 20px;
-    height: 100vh;
-    box-sizing: border-box;
   }
   ::v-deep .el-dialog{
     width: 720px;
