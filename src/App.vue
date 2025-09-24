@@ -11,6 +11,7 @@ export default {
   name: 'App',
   async mounted(){
     this.$bus.$on('handleAlert',this.handleAlert)
+    this.$bus.$on('copyToClipboard',this.copyToClipboard)
     await this.setAnonymousMode();
     await this.generateFingerprint();
   },
@@ -20,6 +21,14 @@ export default {
     handleAlert(title,message,type){
       // success, warning, info, error
       this.$notify({title,message,type});
+    },
+    copyToClipboard(text) {
+      if (!text) return;
+      navigator.clipboard.writeText(text)
+      .then(() => {
+        this.$bus.$emit('handleAlert','複製操作通知','已複製到剪貼簿','success');
+      })
+      .catch(() => {});
     },
     async setAnonymousMode(){
       const authToken = jsCookie.get('authToken');

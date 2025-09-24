@@ -13,7 +13,7 @@
             <el-table-column prop="lastOnline" label="上次訪問時間"></el-table-column>
             <el-table-column prop="fingerprint" label="裝置識別碼">
                   <template #default="{ row }">
-                    <div class="fingerprint" @click="copyToClipboard(row.fingerprint)">
+                    <div class="fingerprint" @click="copyFingerPrint(row.fingerprint)">
                         {{ row.fingerprint }}
                     </div>
                 </template>
@@ -149,13 +149,8 @@ export default {
         async editUser(idx){
             this.$router.push({ path: '/academic/modifyInfo', query: { idx:idx } }).catch(e => {})
         },
-        copyToClipboard(text) {
-            if (!text) return;
-            navigator.clipboard.writeText(text)
-            .then(() => {
-                this.$bus.$emit('handleAlert','複製操作通知','已複製到剪貼簿','success');
-            })
-            .catch(() => {});
+        async copyFingerPrint(text){
+            this.$bus.$emit('copyToClipboard',text);
         }
     }
 }
