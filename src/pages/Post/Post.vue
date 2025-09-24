@@ -2,7 +2,7 @@
 <template>
   <div class="view">
     <div class="posterContainer">
-      <router-view></router-view>
+      <router-view class="router_view"></router-view>
       <div class="column">
           <self-intro></self-intro>
       </div>
@@ -24,6 +24,14 @@ export default {
   .view{
     width: calc(100vw - 250px);
     height: 100vh;
+  }
+  .router_view{
+    width: 73%;
+    min-width: 623px;
+    max-width: calc((100vw - 560px) * 0.73);
+    margin-top: 20px;
+    height: 100vh;
+    box-sizing: border-box;
   }
   .posterContainer{
     width: 100%;

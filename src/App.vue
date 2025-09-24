@@ -22,11 +22,11 @@ export default {
       // success, warning, info, error
       this.$notify({title,message,type});
     },
-    copyToClipboard(text) {
+    copyToClipboard(title, text) {
       if (!text) return;
       navigator.clipboard.writeText(text)
       .then(() => {
-        this.$bus.$emit('handleAlert','複製操作通知','已複製到剪貼簿','success');
+        this.$bus.$emit('handleAlert',title,'已複製到剪貼簿','success');
       })
       .catch(() => {});
     },

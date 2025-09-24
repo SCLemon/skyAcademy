@@ -58,7 +58,7 @@
               <div class="post_option_box">
                 <div :class="`post_option ${obj.isLike?'like':''}`" @click="toggleLikePost(obj.idx, $event, obj)"><i :class="`fa-regular fa-thumbs-up icon ${obj.isLike?'fa-solid':''}`"></i> <span>{{ obj.isLike?'收回讚':'按讚' }}</span></div>
                 <div class="post_option" @click="openUserMessageBox($event)"><i class="fa-regular fa-message icon"></i> 留言</div>
-                <div class="post_option"><i class="fa-regular fa-share-from-square icon"></i> 分享</div>
+                <div class="post_option" @click="copyShareUrl(obj.idx)"><i class="fa-regular fa-share-from-square icon"></i> 分享</div>
               </div>
               <div class="userMessageBox">
                 <div class="userMessage" style="text-align: center; color:gray; font-size: 14px;" v-if="!obj.message.length">目前暫時沒有人留言</div>
@@ -170,7 +170,10 @@ export default {
       }
       catch(e){}
     },
-
+    async copyShareUrl(idx){
+      let text = location.host + '/#/academic/post/share?share='+idx;
+      this.$bus.$emit('copyToClipboard','分享貼文連結通知' ,text);
+    },
     postDivScroll(){
       const postAllDiv = this.$refs.postAll;
       if (postAllDiv.scrollHeight - postAllDiv.scrollTop === postAllDiv.clientHeight) {
@@ -407,10 +410,7 @@ export default {
 
 <style scoped>
   .posterBox{
-    width: 73%;
-    min-width: 623px;
-    max-width: calc((100vw - 560px) * 0.73);
-    margin-top: 20px;
+    width:100%;
     height: 100vh;
     box-sizing: border-box;
   }

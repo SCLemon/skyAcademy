@@ -150,7 +150,7 @@ export default {
             this.$router.push({ path: '/academic/modifyInfo', query: { idx:idx } }).catch(e => {})
         },
         async copyFingerPrint(text){
-            this.$bus.$emit('copyToClipboard',text);
+            this.$bus.$emit('copyToClipboard','複製裝置碼通知',text);
         }
     }
 }
