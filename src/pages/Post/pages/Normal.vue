@@ -558,7 +558,7 @@ export default {
     outline: none;
   }
   .real_input:empty::before {
-    content: "請輸入您要發表的貼文內容";
+    content: "請輸入您要發表的貼文內容，超連結可善用 @href=[your url]";
     color: #aaa;
     position: absolute;
     top: 0px;

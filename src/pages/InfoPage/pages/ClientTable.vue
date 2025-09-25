@@ -14,7 +14,7 @@
                 </template>
             </el-table-column>
             <el-table-column prop="name" label="用戶姓名"></el-table-column>
-            <el-table-column prop="lastOnline" label="上次訪問時間"></el-table-column>
+            <el-table-column prop="lastOnline" label="上次訪問時間" sortable></el-table-column>
             <el-table-column prop="fingerprint" label="裝置識別碼">
                 <template #default="{ row }">
                     <div class="fingerprint" @click="copyFingerPrint(row.fingerprint)">
@@ -22,7 +22,7 @@
                     </div>
                 </template>
             </el-table-column>
-            <el-table-column prop="status" label="狀態">
+            <el-table-column prop="status" label="狀態" sortable>
                 <template v-slot="scope">
                     <div :class="scope.row.status?'valid':'invalid'">{{ scope.row.status?'有效':'凍結' }}</div>
                 </template>
