@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="classList" v-if="searchCourse.length">
-      <div class="classItem" v-for="(courses,id) in searchCourse" :key="id" @click="goToClass(courses.idx)">
+      <div class="classItem" v-for="(courses,id) in searchCourse" :key="id" @click="courses.idx?goToClass(courses.idx):handleLockMsg('若要開啟此專欄，請逕行向版主申請。')">
         <div class="banner">
           <el-carousel class="carousel" width="100%" height="175px" :autoplay="false">
             <el-carousel-item v-for="item in courses.bannerImg" :key="item.url">
@@ -16,7 +16,7 @@
             </el-carousel-item>
           </el-carousel>
         </div>
-        <div class="className">{{ courses.courseName }}</div>
+        <div class="classNameBox"><div class="className">{{ courses.courseName }}</div><i v-if="courses.lock" class="fa-solid fa-lock course_lock"></i></div>
         <div class="classNum">{{courses.courseId}}</div>
         <div class="lecturer">{{ courses.lecturer }}</div>
       </div>
@@ -54,6 +54,9 @@ export default {
     }
   },
   methods:{
+    handleLockMsg(text){
+      this.$bus.$emit('handleAlert','專欄權限通知',text, 'warning');
+    },
     async getCourse(){
       const token = jsCookie.get('authToken')
 
@@ -180,22 +183,42 @@ export default {
     object-position: center;
     object-fit: cover;
   }
-  .className{
+  .classNameBox{
     width: 100%;
+    position: relative;
+    box-sizing: border-box;
+  }
+  .className {
+    width: 80%;
     height: 30px;
     font-size: 18px;
     line-height: 30px;
-    margin-left: 10px;
+    padding-left: 10px;
     margin-top: 5px;
+    box-sizing: border-box;
+    white-space: nowrap;
     overflow: hidden;
-    color:rgb(64, 121, 170);    
+    text-overflow: ellipsis;
+    color: rgb(64, 121, 170);
+  }
+  .course_lock{
+    position: absolute;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    color: gray;
+    top:0;
+    right: 10px;
   }
   .classNum{
     position: absolute;
+    width: 40%;
+    overflow: hidden;
     left:10px;
     font-size: 14px;
     bottom: 10px;
     color: gray;
+    box-sizing: border-box;
   }
   .lecturer{
     position: absolute;
@@ -203,6 +226,10 @@ export default {
     font-size: 14px;
     bottom: 10px;
     color: gray;
+    width: 40%;
+    overflow: hidden;
+    box-sizing: border-box;
+    text-align: right;
   }
   ::v-deep .el-carousel__indicator{
     display: none;
