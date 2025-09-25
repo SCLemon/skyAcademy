@@ -51,7 +51,7 @@
                 <div class="userMessage_active" v-for="(item,id) in obj.message" :key="id">
                   <img class="userMessage_active_img" src="img/user.png" :data-src="item.userImgUrl" v-lazy alt="" loading="lazy">
                   <div class="userMessage_active_msgBox">
-                    <div class="userMessage_active_name">{{ item.name }} <span class="userMessage_active_createTime">{{ item.createTime }}</span></div>
+                    <div class="userMessage_active_name">{{ item.name }} <img class="userMessage_activ_badge" :src="item.level?`img/badge/${item.level}.png`:'img/badge/1.png'" alt=""><span class="userMessage_active_createTime">{{ item.createTime }}</span></div>
                     <div class="userMessage_active_msg">{{ item.message }}</div>
                   </div>
                 </div>
@@ -545,6 +545,14 @@ export default {
     font-size: 14px;
     font-weight: bold;
     margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+  }
+  .userMessage_activ_badge{
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    margin-left: 3px;
   }
   .userMessage_active_createTime{
     font-size: 9px;

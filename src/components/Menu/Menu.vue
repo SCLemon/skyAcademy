@@ -11,7 +11,10 @@
         </div>
         <div :class="`username ${isLogin?'username_login':''}`">
             {{ isLogin?`${userInfo.name}`:'登入/註冊' }}
-            <div>Lv{{ userInfo.level? `${userInfo.level.level} ${userInfo.level.levelTitle}`:''}} </div>
+            <div v-if="isLogin" class="menu_level_box">
+                <img class="menu_level_badge" :src="userInfo.level?`img/badge/${userInfo.level.level}.png`:'img/badge/1.png'">
+                {{ userInfo.level? `${userInfo.level.levelTitle}`:''}} 
+            </div>
         </div>
     </div>
     <div @click="goTo('/academic/post')" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/post')}">
@@ -190,6 +193,17 @@ export default {
     }
     .username_login{
         line-height: 30px;
+    }
+    .menu_level_box{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .menu_level_badge{
+        width: 30px;
+        height: 30px;
+        object-fit: contain;
+        margin-right: 5px;
     }
     .list{
         width:100%;
