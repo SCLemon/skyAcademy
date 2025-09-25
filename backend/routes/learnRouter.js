@@ -84,7 +84,6 @@ router.get('/api/learn/getCourse', authMiddleware, async (req, res) => {
         else if (req.user.type === 'student') {
             courses = await courseModel.find({
                 group: req.user.group,
-                // studentList: req.user.idx,
                 status: true,
             });
         }
@@ -121,7 +120,7 @@ router.get('/api/learn/getCourse', authMiddleware, async (req, res) => {
                 // 若無 banner
                 if(bannerImg.length == 0) bannerImg.push({name:'default_course_banner',url:'img/default_course_banner.jpg'})
                 
-                // 檢查 req.user.idx 是否在 course.studentList 中有權限閱覽該課程
+                
                 let idx,lock;
                 if(course.studentList.includes(req.user.idx) || req.user.type == 'teacher'){
                     idx = course.idx
@@ -144,9 +143,14 @@ router.get('/api/learn/getCourse', authMiddleware, async (req, res) => {
             })
         );
 
+        reorder_courses  = [
+            ...courses.filter(c => !c.lock),
+            ...courses.filter(c => c.lock)
+        ];
+
         return res.send({
             type: 'success',
-            courses: courses,
+            courses: reorder_courses,
             message: '課程資料查詢成功。',
         });
     } catch (e) {

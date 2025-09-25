@@ -395,6 +395,7 @@ export default {
         font-size: 14px;
         z-index: 1;
         line-height: 1.5;
+        font-weight: bolder;
     }
     .id_card_forward_type_eng{
         font-size: 12px;
