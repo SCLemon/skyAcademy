@@ -22,7 +22,7 @@
                 <div class="post_top_date">{{obj.createTime}}</div>
               </div>
             </div>
-            <div class="post_text" v-if="obj.content.trim()!=''" v-html="obj.content"></div>
+            <div class="post_text" v-if="obj.content.trim()!=''" v-html="linkify(obj.content)"></div>
             <div class="post_text_expand_logo" v-if="checkPostTextOverflow(obj.content)" @click="expandPostText($event)">顯示更多</div>
             <div class="post_img" v-if="obj.postImg.length">
               <el-carousel :autoplay="false" :loop="false">
@@ -44,7 +44,7 @@
               <div class="post_option_box">
                 <div :class="`post_option ${obj.isLike?'like':''}`" @click="toggleLikePost(obj.idx, $event, obj)"><i :class="`fa-regular fa-thumbs-up icon ${obj.isLike?'fa-solid':''}`"></i> <span>{{ obj.isLike?'收回讚':'按讚' }}</span></div>
                 <div class="post_option" @click="openUserMessageBox($event)"><i class="fa-regular fa-message icon"></i> 留言</div>
-                <div class="post_option" @click="copyShareUrl(obj.idx)"><i class="fa-regular fa-share-from-square icon"></i> 分享</div>
+                <div class="post_option" @click="openShare(obj.idx)"><i class="fa-regular fa-share-from-square icon"></i> 分享</div>
               </div>
               <div class="userMessageBox">
                 <div class="userMessage" style="text-align: center; color:gray; font-size: 14px;" v-if="!obj.message.length">目前暫時沒有人留言</div>
@@ -72,6 +72,12 @@
       <div class="real_input" ref="modifyContent" contenteditable="true"></div>
       <el-button type="primary" class="button" @click="modifyPost()" :loading="isSending" >修改貼文</el-button>
     </el-dialog>
+    <el-dialog title="分享貼文" :visible.sync="dialogTableVisible3">
+      <div class="shareBox">
+        <div class="shareUrl">{{ shareUrl }}</div>
+        <div class="shareButton" @click="copyShareUrl()">{{shareStatus}}</div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -96,6 +102,11 @@ export default {
       modifyIdx:'',
       modifyContent:'',
       dialogTableVisible2:false,
+
+      // 分享貼文內容
+      dialogTableVisible3: false,
+      shareUrl:'',
+      shareStatus:'Copy'
       
     }
   },
@@ -107,6 +118,36 @@ export default {
   },
 
   methods:{
+    // 轉換內文中的 @href=[url]
+    linkify(text){
+      if (!text) return "";
+
+      let result = "";
+      let remaining = text;
+
+      const marker = "@href=[";
+      let index;
+
+      while ((index = remaining.indexOf(marker)) !== -1) {
+        result += remaining.slice(0, index);
+        const start = index + marker.length;
+        const end = remaining.indexOf("]", start);
+        if (end === -1) {
+          result += remaining.slice(index);
+          remaining = "";
+          break;
+        }
+
+        const url = remaining.slice(start, end).trim();
+        result += `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+
+        remaining = remaining.slice(end + 1);
+      }
+
+      result += remaining;
+
+      return result;
+    },
     async setAnonymousMode(){
       const authToken = jsCookie.get('authToken');
       if(!authToken){
@@ -155,7 +196,16 @@ export default {
       }
       catch(e){}
     },
-
+    openShare(idx){
+      let text = location.protocol+'//'+location.host + '/#/academic/post/share?share='+idx;
+      this.shareUrl = text;
+      this.shareStatus = 'Copy';
+      this.dialogTableVisible3 = true;
+    },
+    async copyShareUrl(){
+      this.$bus.$emit('copyToClipboard','分享貼文連結通知' , this.shareUrl);
+      this.shareStatus = '✓ Copied'
+    },
     async getPost(flag){
       if (this.isLoading) return;
       this.isLoading = true;
@@ -668,5 +718,40 @@ export default {
   
   ::v-deep .el-table{
     border-radius: 0 0 4px 4px;
+  }
+
+  .shareBox{
+    width: 100%;
+    height: 40px;
+    border: 2px solid black;
+    border-radius: 40px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+  .shareUrl{
+    width: calc(100% - 110px);
+    height: 40px;
+    line-height: 40px;
+    padding-left: 5px;
+    padding-right: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .shareButton{
+    width: 80px;
+    height: 35px;
+    line-height: 35px;
+    border-radius: 35px;
+    background: rgba(0,0,0,0.9);
+    color: white;
+    text-align: center;
+    transition: 1s background ease;
+    box-sizing: border-box;
+  }
+  .shareButton:hover{
+    cursor: pointer;
+    background: rgba(0,0,0,1);
   }
 </style>
