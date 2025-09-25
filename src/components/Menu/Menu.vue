@@ -27,8 +27,10 @@
         <i class="fa-solid fa-lock lock" v-if="!isLogin"></i>
         專欄列表
     </div>
-    <!-- <div @click="isLogin?goTo('/academic/practice'):''" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/practice')}"><i class="fa-solid fa-lock lock" v-if="!isLogin"></i>課後練習</div> -->
     <div v-if="isLogin" :class="{list:true}" @click="logout()">登出系統</div>
+    <div class="version_info">
+        <div>Version 1.0.0.2 BETA</div>
+    </div>
     <div class="footer" @click="goTo('/')"><img class="footer_img" src="img/horizontal_logo_white.png" alt="" > </div>
   </div>
 </template>
@@ -231,6 +233,12 @@ export default {
     }
     .list_lock{
         cursor: not-allowed !important;
+    }
+    .version_info{
+        color: rgba(255,255,255,0.4);
+        text-align: center;
+        font-size: 12px;
+        margin-top: 40px;
     }
     .footer{
         width:95%;
