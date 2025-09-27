@@ -73,6 +73,38 @@
       <el-button type="primary" class="button" @click="modifyPost()" :loading="isSending" >修改貼文</el-button>
     </el-dialog>
     <el-dialog title="分享貼文" :visible.sync="dialogTableVisible3">
+      <div class="copyLinkTitle">Share Via</div>
+      <div class="shareViaBox">
+        <div class="shareViaItem" @click="shareVia('facebook')">
+          <img class="shareEachIcon" src="img/socialIcon/facebook.png" alt="">
+          <div class="shareEachTitle">Facebook</div>
+        </div>
+        <div class="shareViaItem" @click="shareVia('twitter')">
+          <img class="shareEachIcon" src="img/socialIcon/twitter.png" alt="">
+          <div class="shareEachTitle">Twitter</div>
+        </div>
+        <div class="shareViaItem" @click="shareVia('line')">
+          <img class="shareEachIcon" src="img/socialIcon/line.png" alt="">
+          <div class="shareEachTitle">Line</div>
+        </div>
+        <div class="shareViaItem" @click="shareVia('linkedin')">
+          <img class="shareEachIcon" src="img/socialIcon/linkedin.png" alt="">
+          <div class="shareEachTitle">LinkedIn</div>
+        </div>
+        <div class="shareViaItem" @click="shareVia('pinterest')">
+          <img class="shareEachIcon" src="img/socialIcon/pinterest.png" alt="">
+          <div class="shareEachTitle">Pinterest</div>
+        </div>
+        <div class="shareViaItem" @click="shareVia('whatsapp')">
+          <img class="shareEachIcon" src="img/socialIcon/whatsapp.png" alt="">
+          <div class="shareEachTitle">WhatsApp</div>
+        </div>
+        <div class="shareViaItem" @click="shareVia('telegram')">
+          <img class="shareEachIcon" src="img/socialIcon/telegram.png" alt="">
+          <div class="shareEachTitle">Telegram</div>
+        </div>
+      </div>
+      <div class="copyLinkTitle">Or copy link</div>
       <div class="shareBox">
         <div class="shareUrl">{{ shareUrl }}</div>
         <div class="shareButton" @click="copyShareUrl()">{{shareStatus}}</div>
@@ -199,12 +231,24 @@ export default {
     openShare(idx){
       let text = location.protocol+'//'+location.host + '/#/academic/post/share?share='+idx;
       this.shareUrl = text;
-      this.shareStatus = 'Copy';
+      this.shareStatus = 'COPY';
       this.dialogTableVisible3 = true;
+    },
+    async shareVia(target){
+      const url = {
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(this.shareUrl)}`,
+        twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(this.shareUrl)}&text=${encodeURIComponent("快來看看檸檬小天地")}`,
+        line: `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(this.shareUrl)}`,
+        linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(this.shareUrl)}`,
+        pinterest: `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(this.shareUrl)}&media=${encodeURIComponent(this.imageUrl || "")}&description=${encodeURIComponent("快來看看檸檬小天地")}`,
+        whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent("快來看看檸檬小天地 " + this.shareUrl)}`,
+        telegram:`https://t.me/share/url?url=${encodeURIComponent(this.shareUrl)}&text=${encodeURIComponent("快來看看檸檬小天地")}`
+      };
+      window.open(url[target],"_blank", "width=600,height=500")
     },
     async copyShareUrl(){
       this.$bus.$emit('copyToClipboard','分享貼文連結通知' , this.shareUrl);
-      this.shareStatus = '✓ Copied'
+      this.shareStatus = '✓ COPIED'
     },
     async getPost(flag){
       if (this.isLoading) return;
@@ -720,11 +764,46 @@ export default {
     border-radius: 0 0 4px 4px;
   }
 
+  .shareViaBox{
+    width: 100%;
+    height: 80px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+  .shareViaItem{
+    width: 80px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    transition: 0.5s box-shadow ease;
+    border-radius: 3px;
+  }
+  .shareViaItem:hover{
+    cursor: pointer;
+    box-shadow: 2px 2px 3px gray;
+  }
+  .shareEachIcon{
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    margin: 0 auto;
+  }
+  .shareEachTitle{
+    width: 100%;
+    text-align: center;
+  }
+  .copyLinkTitle{
+    margin-bottom: 10px;
+    font-weight: bolder;
+    color: black;
+  }
   .shareBox{
     width: 100%;
     height: 40px;
-    border: 2px solid black;
-    border-radius: 40px;
+    border: 1px solid rgba(0,0,0,0.3);
     display: flex;
     justify-content: space-evenly;
     align-items: center;
@@ -743,15 +822,14 @@ export default {
     width: 80px;
     height: 35px;
     line-height: 35px;
-    border-radius: 35px;
-    background: rgba(0,0,0,0.9);
-    color: white;
+    color: blue;
     text-align: center;
-    transition: 1s background ease;
+    transition: 0.5s box-shadow ease;
     box-sizing: border-box;
+    border-radius: 35px;
   }
   .shareButton:hover{
     cursor: pointer;
-    background: rgba(0,0,0,1);
+    box-shadow: 0px 1px 3px gray;
   }
 </style>
