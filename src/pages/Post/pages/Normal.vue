@@ -95,7 +95,7 @@
       <el-button type="primary" class="button" @click="modifyPost()" :loading="isSending" >修改貼文</el-button>
     </el-dialog>
     <el-dialog title="分享貼文" :visible.sync="dialogTableVisible3">
-      <div class="copyLinkTitle">Share Via</div>
+      <div class="copyLinkTitle">Share via</div>
       <div class="shareViaBox">
         <div class="shareViaItem" @click="shareVia('facebook')">
           <img class="shareEachIcon" src="img/socialIcon/facebook.png" alt="">
