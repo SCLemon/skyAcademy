@@ -54,7 +54,8 @@ export default {
         for (let pageNum = 1; pageNum <= this.pdf.numPages; pageNum++) {
           const canvas = document.createElement('canvas');
           canvas.style.display = 'block';
-          canvas.style.marginBottom = '10px';
+          canvas.style.marginTop = '5px';
+          canvas.style.marginBottom = '5px';
           canvas.dataset.pageNum = pageNum;
           container.appendChild(canvas);
 
@@ -114,7 +115,8 @@ export default {
       canvas.height = scaledViewport.height;
       canvas.style.width = `${containerWidth}px`;
       canvas.style.height = `${(scaledViewport.height / scaledViewport.width) * containerWidth}px`;
-
+      canvas.style.border = '0.5px solid rgba(0,0,0,0.2)'
+      canvas.style.boxSizing = 'border-box'
       const ctx = canvas.getContext('2d');
 
       // 建立 renderTask 並保存
