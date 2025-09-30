@@ -2,7 +2,7 @@
 <template>
   <div>
     <div class="posterBox">
-        <div :class="`postAll ${currentUser.typeEng=='teacher'?'':'postAll_student'}`" ref="postAll" v-if="posts.length">
+        <div :class="'postAll postAll_student'" ref="postAll" v-if="posts.length">
           <div class="post" v-for="(obj,id) in posts" :key="id">
             <div class="post_more" v-if="showPermission">
               <el-dropdown @command="handleCommand">
