@@ -8,7 +8,7 @@
         </div>
     </div>
         <el-table :data="tableData" border height="calc(100vh - 360px)" style="width: 100%" class="tableData" empty-text="暫無數據">
-            <el-table-column prop="level" label="會員階級" sortable>
+            <el-table-column prop="level" label="會員階級" sortable :sort-by="row => row.level?.level">
                 <template #default="{ row }">
                     Lv{{ row.level? `${row.level.level} ${row.level.levelTitle}`:''}}
                 </template>
