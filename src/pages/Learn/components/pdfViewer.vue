@@ -115,7 +115,7 @@ export default {
       canvas.height = scaledViewport.height;
       canvas.style.width = `${containerWidth}px`;
       canvas.style.height = `${(scaledViewport.height / scaledViewport.width) * containerWidth}px`;
-      canvas.style.border = '0.5px solid rgba(0,0,0,0.2)'
+      canvas.style.border = '0.5px solid rgba(0,0,0,0.15)'
       canvas.style.boxSizing = 'border-box'
       const ctx = canvas.getContext('2d');
 

@@ -29,7 +29,7 @@
     </div>
     <div v-if="isLogin" :class="{list:true}" @click="logout()">登出系統</div>
     <div class="version_info">
-        <div>General Version 1.0.0.3</div>
+        <div>General Version 1.0.0.4</div>
     </div>
     <div class="footer" @click="goTo('/')"><img class="footer_img" src="img/horizontal_logo_white.png" alt="" > </div>
   </div>
