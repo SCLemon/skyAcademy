@@ -699,7 +699,7 @@ export default {
     margin-bottom: 5px;
     max-height: 144px;
     line-height: 1.5;
-    font-size: 16px;
+    font-size: 14px;
     text-align: justify;
     overflow-y: hidden;
     word-break: break-all;

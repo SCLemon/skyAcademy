@@ -212,11 +212,13 @@ export default {
   }
   .classNum{
     position: absolute;
-    width: 40%;
+    width: 45%;
     overflow: hidden;
     left:10px;
     font-size: 14px;
-    bottom: 10px;
+    height: 18px;
+    line-height: 18px;
+    bottom: 8px;
     color: gray;
     box-sizing: border-box;
   }
@@ -224,9 +226,11 @@ export default {
     position: absolute;
     right:10px;
     font-size: 14px;
-    bottom: 10px;
+    height: 18px;
+    line-height: 18px;
+    bottom: 8px;
     color: gray;
-    width: 40%;
+    width: 45%;
     overflow: hidden;
     box-sizing: border-box;
     text-align: right;
