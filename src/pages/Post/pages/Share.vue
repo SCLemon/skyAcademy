@@ -23,7 +23,7 @@
               </div>
             </div>
             <div class="post_text" v-if="obj.content.trim()!=''" v-html="linkify(obj.content)"></div>
-            <div class="post_text_expand_logo" v-if="checkPostTextOverflow(obj.content)" @click="expandPostText($event)">顯示更多</div>
+            <div class="post_text_expand_logo" v-if="checkPostTextOverflow(obj.content)" @click="expandPostText($event)">... 顯示更多</div>
             <div class="post_img" v-if="obj.postImg.length">
               <el-carousel :autoplay="false" :loop="false">
                 <el-carousel-item v-for="(item,id) in obj.postImg" :key="id">
@@ -345,7 +345,7 @@ export default {
       }
       catch(e){}
     },
-    checkPostTextOverflow(htmlContent, maxHeight = 144) {
+    checkPostTextOverflow(htmlContent, maxHeight = 168) {
       // 建立暫時容器
       const temp = document.createElement('div');
       temp.style.wordBreak = 'break-all'
@@ -415,7 +415,7 @@ export default {
     expandPostText(event){
       const post = event.currentTarget.closest('.post'); 
       const postText = post.querySelector('.post_text');
-      event.currentTarget.innerText == '顯示更多'? event.currentTarget.innerText = '顯示更少':event.currentTarget.innerText = '顯示更多'
+      event.currentTarget.innerText == '... 顯示更多'? event.currentTarget.innerText = '顯示更少':event.currentTarget.innerText = '... 顯示更多'
       postText.classList.toggle('post_text_expand');
     }
 
@@ -536,8 +536,8 @@ export default {
     text-align: right;
     font-size: 14px;
     padding-right: 10px;
-    color: rgba(0,0,0,0.6);
     margin-bottom: 5px;
+    font-weight: bolder;
   }
   .post_text_expand_logo:hover{
     cursor: pointer;

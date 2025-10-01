@@ -403,7 +403,7 @@ export default {
       }
       catch(e){}
     },
-    checkPostTextOverflow(htmlContent, maxHeight = 144) {
+    checkPostTextOverflow(htmlContent, maxHeight = 168) {
       // 建立暫時容器
       const temp = document.createElement('div');
       temp.style.wordBreak = 'break-all'
@@ -420,7 +420,6 @@ export default {
 
       document.body.appendChild(temp);
       const exceeds = temp.offsetHeight > maxHeight;
- 
       document.body.removeChild(temp);
 
       return exceeds;
