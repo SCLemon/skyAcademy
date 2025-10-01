@@ -100,7 +100,7 @@ export default {
             });
             this.materials = res.data.materials;
             this.$nextTick(()=>{
-                document.querySelectorAll('.right-list-target')[0].click();
+                if (document.querySelectorAll('.right-list-target')[0]) document.querySelectorAll('.right-list-target')[0].click();
             })
         },
         async viewChapter(chapter,id){
@@ -292,9 +292,10 @@ export default {
     }
     .list{
         width: 100%;
+        min-height: 77.5px;
         height: calc((100vh - 80px)/9);
         position: relative;
-        line-height: calc((100vh - 80px)/9);
+        line-height: max(calc((100vh - 80px) / 9), 77.5px);
         box-sizing: border-box;
         display: flex;
         justify-content: space-around;
