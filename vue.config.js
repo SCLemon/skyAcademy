@@ -1,5 +1,9 @@
 const { defineConfig } = require('@vue/cli-service')
+const WebpackObfuscator = require('webpack-obfuscator');
+const TerserPlugin = require('terser-webpack-plugin');
+
 module.exports = defineConfig({
+    productionSourceMap: false,
     transpileDependencies: true,
     lintOnSave: false,
     publicPath: './',
@@ -14,4 +18,46 @@ module.exports = defineConfig({
             },
         }
     },
+    configureWebpack: (config) => {
+        if (process.env.NODE_ENV === 'production') {
+            // 加密與混淆
+            config.plugins.push(
+                new WebpackObfuscator(
+                {
+                    rotateUnicodeArray: true, // 混淆文字字串
+                    compact: true,            // 壓縮結構
+                    selfDefending: true       // 防止格式化與除錯
+                },
+                ['js/chunk-vendors*.js']    // 避免破壞第三方庫
+                )
+            );
+
+            // 壓縮
+            config.optimization.minimizer.push(
+                new TerserPlugin({
+                terserOptions: {
+                    extractComments: false,
+                    compress: {
+                        drop_console: true,     // 移除 console.*
+                        drop_debugger: true     // 移除 debugger
+                    }
+                }
+                })
+            );
+
+            // Tree shaking
+            config.optimization.usedExports = true;
+
+            // 拆分代碼
+            config.optimization.splitChunks = {
+                chunks: 'all',
+                minSize: 20000,
+                maxSize: 0,
+                minChunks: 1,
+                maxAsyncRequests: 30,
+                maxInitialRequests: 30,
+                automaticNameDelimiter: '~',
+            };
+        }
+    }
 })
