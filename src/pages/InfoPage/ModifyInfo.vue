@@ -36,13 +36,27 @@
                     <div class="id_card_forward_type">{{userInfo.level? userInfo.level.levelTitle:''}}</div>
                     <div class="id_card_forward_type_eng">{{ userInfo.type=='teacher'?'Admin':'Member' }}  ID Card</div>
                 </div>
-                <!-- <div class="id_card_foward_center_logo" ref="logo"></div> -->
             </div>
             <div class="id_card id_card_backward" ref="backward">
-                <div class="id_card_backward_center">
-                    <div class="id_card_backward_center_first">Knowledge lights the future</div>
-                    <div class="id_card_backward_center_first">Learning creates possibilities</div>
+                <div class="id_card_backward_top">
+                    <div class="id_card_backward_mail">管理員服務信箱：blc0000421@gmail.com</div>
+                     <div class="id_card_backward_level">{{userInfo.level? userInfo.level.levelTitle:''}}卡 ▶</div>
                 </div>
+                <div class="id_card_backward_liner"></div>
+                <div class="id_card_signature_box">
+                    <div class="id_card_signature_title">持卡人簽名：</div>
+                    <div class="id_card_signature"></div>
+                </div>
+                <div class="id_card_declaration_box">
+                    <div class="id_card_declaration_title">持卡人須知：</div>
+                    <div class="id_card_declaration">1. 會員卡為個人專屬，僅限本人使用，不得轉讓、出借或轉售。</div>
+                    <div class="id_card_declaration">2. 持卡人應妥善保管會員卡，如有遺失、被盜，請立即通知管理員辦理掛失或補發。</div>
+                    <div class="id_card_declaration">3. 本網站保留變更、暫停或終止會員制度之權利，並依實際情況公告於本網站。</div>
+                    <div class="id_card_declaration">4. 使用會員卡即表示同意本網站使用須知及相關隱私政策。</div>
+                    <div class="id_card_declaration">5. 若會員有不當使用或違反規定，本網站得取消其會員資格與相關權益。</div>
+                    <div class="id_card_declaration">6. 任何爭議依中華民國法律處理，並以本網站所在地法院為第一審管轄法院。</div>
+                </div>
+                <div class="id_card_issuer">Copyright © 2025 Lemon's Universe All Rights Reserved</div>
             </div>
             <div class="id_card_download">
                 <div class="level">
@@ -317,7 +331,7 @@ export default {
     .id_card_forward_top{
         position: absolute;
         top:10px;
-        left: 7px;
+        left: 10px;
         width: 190px;
         z-index: 1;
     }
@@ -382,7 +396,7 @@ export default {
     .id_card_forward_type_box{
         position: absolute;
         right:28px;
-        bottom: 20px;
+        bottom: 18px;
         font-size: 14px;
         z-index: 1;
         height: auto;
@@ -420,24 +434,66 @@ export default {
         border: 1px solid red;
     }
     .id_card_backward{
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Cpath d='M 0 10 L 10 0 L 20 10 L 10 20 Z' fill='none' stroke='rgba(169,169,169,0.2)' stroke-width='0.5'/%3E%3C/svg%3E");
-        background-size: 15px 15px; /* 縮小格子 */
-        background-position: center; /* 設定網格重複位置 */
-        
+        position: relative;
+        background: white;
     }
-    .id_card_backward_center{
-        position: absolute;
+    .id_card_backward_top{
+        width: 100%;
+        height: 30px;
+        line-height: 30px;
+        font-size: 10px;
+        padding-left: 9.5px;
+        display: flex;
+        justify-content: space-between;
+    }
+    .id_card_backward_level{
+        margin-right: 17.5px;
+    }
+    .id_card_backward_liner{
+        position: sticky;
         left: 0;
-        top:0;
-        right: 0;
-        bottom: 0;
-        margin: auto;
+        top: 30px;
         width: 100%;
         height: 40px;
-        font-size: 14px;
-        line-height: 20px;
-        font-weight: bolder;
+        background: #d9d9d9;
+        box-sizing: border-box;
+    }
+    .id_card_signature_box{
+        width: 100%;
+        height: 40px;
+        box-sizing: border-box;
+        font-size: 10px;
+        line-height: 40px;
+        padding-left: 10px;
+        display: flex;
+        align-items: center;
+    }
+    .id_card_signature{
+        width: 180px;
+        border-bottom: 0.5px solid rgba(0,0,0,0.3);
+        height: 24px;
+        margin-left: 5px;
+    }
+    .id_card_declaration_box{
+        width: 100%;
+        font-size: 10px;
+        margin-left: 10px;
+    }
+    .id_card_declaration_title{
+        margin-bottom: 8px;
+    }
+    .id_card_declaration{
+        line-height: 1.55;
+        margin-top: 2px;
+        margin-bottom: 2px;
+    }
+    .id_card_issuer{
+        font-size: 9px;
+        width: 100%;
         text-align: center;
+        position: absolute;
+        bottom:8.5px;
+        color: rgba(0,0,0,0.3);
     }
     .id_card_download{
         width:226.09px;
