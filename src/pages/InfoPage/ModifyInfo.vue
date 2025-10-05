@@ -188,9 +188,10 @@ export default {
                 scale: 10,
                 useCORS: true 
             }).then(canvas => {
+                const token = jsCookie.get('authToken')
                 const link = document.createElement("a");
                 link.href = canvas.toDataURL("image/png");
-                link.download = "forward.png";
+                link.download = `${token}_forward.png`;
                 link.click();
             });
         },
@@ -200,9 +201,10 @@ export default {
                 scale: 10,
                 useCORS: true
             }).then(canvas => {
+                const token = jsCookie.get('authToken')
                 const link = document.createElement("a");
                 link.href = canvas.toDataURL("image/png");
-                link.download = "backward.png";
+                link.download =`${token}_backward.png`;
                 link.click();
             });
         }

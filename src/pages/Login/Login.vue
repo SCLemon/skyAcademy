@@ -1,24 +1,31 @@
 <!-- 練習 -->
 <template>
   <div class="view">
-    <div class="box">
-      <div class="header"><i class="fa-solid fa-id-card"></i> 會員登入</div>
-      <div class="login"><div class="login_text">帳號：</div><el-input placeholder="請輸入帳號" v-model="student.account" clearable></el-input></div>
-      <div class="login"><div class="login_text">密碼：</div><el-input placeholder="請輸入密碼" v-model="student.password" clearable show-password></el-input></div>
-      <div class="btn"><el-button type="primary" @click="login('student')">會員登入</el-button></div>
+    <div class="normalForm">
+      <div class="box">
+        <div class="header"><i class="fa-solid fa-id-card"></i> 會員登入</div>
+        <div class="login"><div class="login_text">帳號：</div><el-input placeholder="請輸入帳號" v-model="student.account" clearable></el-input></div>
+        <div class="login"><div class="login_text">密碼：</div><el-input placeholder="請輸入密碼" v-model="student.password" clearable show-password></el-input></div>
+        <div class="btn"><el-button type="primary" @click="login('student')">會員登入</el-button></div>
+      </div>
+      <div class="box">
+        <div class="header"><i class="fa-solid fa-id-card"></i> 管理員登入</div>
+        <div class="login"><div class="login_text">帳號：</div><el-input placeholder="請輸入帳號" v-model="teacher.account" clearable></el-input></div>
+        <div class="login"><div class="login_text">密碼：</div><el-input placeholder="請輸入密碼" v-model="teacher.password" clearable show-password></el-input></div>
+        <div class="btn"><el-button type="primary" @click="login('teacher')">管理員登入</el-button></div>
+      </div>
     </div>
-    <div class="box">
-      <div class="header"><i class="fa-solid fa-id-card"></i> 管理員登入</div>
-      <div class="login"><div class="login_text">帳號：</div><el-input placeholder="請輸入帳號" v-model="teacher.account" clearable></el-input></div>
-      <div class="login"><div class="login_text">密碼：</div><el-input placeholder="請輸入密碼" v-model="teacher.password" clearable show-password></el-input></div>
-      <div class="btn"><el-button type="primary" @click="login('teacher')">管理員登入</el-button></div>
+    <div class="fast_header"><i class="fa-solid fa-id-card"></i> 會員卡快速通道</div>
+    <div class="fastForm">
+      <el-button type="warning" v-if="!fast_login_isOpen" @click="openInput()">上傳電子會員卡</el-button>
+      <input type="file" class="fastInput" ref="fastInput" @change="fastLogin($event)">
     </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-
+import jsCookie from 'js-cookie';
 export default {
   name:'Login',
   data(){
@@ -33,11 +40,11 @@ export default {
         account:'',
         password:'',
         type:'teacher'
-      }
+      },
+      fast_login_isOpen:false,
     }
   },
   mounted(){
-
   },
   methods:{
     async login(type){
@@ -65,6 +72,40 @@ export default {
         this.$bus.$emit('handleAlert','登入訊息',data.message,data.type)
       }
     },
+
+    // 快速登入通道
+    openInput(){
+      this.$refs.fastInput.click();
+    },
+    async fastLogin(event){
+      const file = event.target.files[0];
+      if (!file) return;
+
+      this.fast_login_isOpen = true;
+      const token = file.name.split('_')[0];
+      try{
+        const res = await axios.post('/login/token',{save:false},{
+          headers:{
+              'x-user-token':token,
+              'x-user-fingerprint':localStorage.getItem('deviceFingerprint')
+          }
+        })
+        if(res.data.type == 'success'){
+          jsCookie.set('authToken',token);
+          this.$bus.$currentUser = res.data.userInfo
+          this.$bus.$emit('setUserInfo')
+          this.$router.replace('/academic/post').catch((e)=>{})
+        }
+        this.$bus.$emit('handleAlert','登入訊息',res.data.message,res.data.type)
+      }
+      catch(e){
+        this.$bus.$emit('handleAlert','登入訊息','伺服器錯誤，請洽客服人員。','error')
+      }
+      finally{
+        this.fast_login_isOpen = false;
+      }
+    }
+
   }
 }
 </script>
@@ -73,8 +114,12 @@ export default {
   .view{
     width: calc(100vw - 250px);
     height: 100vh;
+  }
+  .normalForm{
+    width: 100%;
     display: flex;
     justify-content: space-evenly;
+    height: 338px;
   }
   .box{
     width: 45%;
@@ -92,5 +137,24 @@ export default {
   }
   .login_text{
     line-height: 3;
+  }
+
+  .fastForm{
+    width: 100%;
+    height: calc(100vh - 398px);
+    margin: 0 auto;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .fast_header{
+    height: 60px;
+    line-height: 60px;
+    font-size: 24px;
+    margin-left: 30px;
+  }
+  .fastInput{
+    display: none;
   }
 </style>
