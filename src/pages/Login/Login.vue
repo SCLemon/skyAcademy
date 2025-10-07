@@ -80,9 +80,21 @@ export default {
     async fastLogin(event){
       const file = event.target.files[0];
       if (!file) return;
+      
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      await img.decode();
 
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+
+      const token = this.readTokenFromHead(canvas);
+
+      URL.revokeObjectURL(img.src);
       this.fast_login_isOpen = true;
-      const token = file.name.split('_')[0];
       try{
         const res = await axios.post('/login/token',{save:false},{
           headers:{
@@ -104,8 +116,30 @@ export default {
       finally{
         this.fast_login_isOpen = false;
       }
-    }
+    },
+    readTokenFromHead(canvas) {
+      const ctx = canvas.getContext('2d');
+      const { width, height } = canvas;
+      const img = ctx.getImageData(0, 0, width, height);
+      const data = img.data;
 
+      const readBit = i => (data[i * 4 + 2] & 1); // Blue LSB
+
+      // 讀取 2 bytes 長度（小端）
+      let len = 0;
+      for (let i = 0; i < 16; i++) len |= (readBit(i) << i);
+
+      const totalBits = 16 + len * 8;
+      if (totalBits > width * height) throw new Error('沒有合理的隱藏資料');
+
+      const bytes = new Uint8Array(len);
+      for (let b = 0; b < len; b++) {
+        let v = 0;
+        for (let i = 0; i < 8; i++) v |= (readBit(16 + b * 8 + i) << i);
+        bytes[b] = v;
+      }
+      return new TextDecoder().decode(bytes);
+    }
   }
 }
 </script>

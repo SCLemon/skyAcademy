@@ -91,6 +91,7 @@ export default {
             userInfo:{
                 idx:'',
                 type:'',
+                token:'',
                 account:'',
                 name:'',
                 password:'',
@@ -157,7 +158,7 @@ export default {
             }
         },
         generateBarcode() {
-            const token = jsCookie.get('authToken')
+            const token = this.userInfo.token;
             JsBarcode(this.$refs.barcode, token, {
                 format: "CODE128",
                 displayValue: true,
@@ -188,10 +189,12 @@ export default {
                 scale: 10,
                 useCORS: true 
             }).then(canvas => {
-                const token = jsCookie.get('authToken')
+                const token = this.userInfo.token;
+                this.writeTokenAtHead(canvas, token);
+
                 const link = document.createElement("a");
                 link.href = canvas.toDataURL("image/png");
-                link.download = `${token}_forward.png`;
+                link.download = `${this.userInfo.name}_forward.png`;
                 link.click();
             });
         },
@@ -201,12 +204,43 @@ export default {
                 scale: 10,
                 useCORS: true
             }).then(canvas => {
-                const token = jsCookie.get('authToken')
+                const token = this.userInfo.token;
+                this.writeTokenAtHead(canvas, token);
+
                 const link = document.createElement("a");
                 link.href = canvas.toDataURL("image/png");
-                link.download =`${token}_backward.png`;
+                link.download =`${this.userInfo.name}_backward.png`;
                 link.click();
             });
+        },
+        // 添加 token 到電子識別證
+        writeTokenAtHead(canvas, token) {
+            const ctx = canvas.getContext('2d');
+            const { width, height } = canvas;
+            const img = ctx.getImageData(0, 0, width, height);
+            const data = img.data;
+
+            const enc = new TextEncoder();
+            const msg = enc.encode(token);
+
+            const payload = new Uint8Array(2 + msg.length);
+            new DataView(payload.buffer).setUint16(0, msg.length, true);
+            payload.set(msg, 2);
+
+            const needBits = payload.length * 8;
+            const capacityBits = width * height;
+            if (needBits > capacityBits) {
+                throw new Error(`圖片不夠大，容量=${Math.floor(capacityBits/8)} bytes，需=${payload.length} bytes`);
+            }
+
+            for (let bit = 0; bit < needBits; bit++) {
+                const byte = payload[bit >> 3];
+                const b = (byte >> (bit & 7)) & 1;
+                const px = bit * 4;
+                data[px + 2] = (data[px + 2] & 0xFE) | b;
+            }
+
+            ctx.putImageData(img, 0, 0);
         }
     }
 }
