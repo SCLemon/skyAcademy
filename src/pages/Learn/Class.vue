@@ -14,6 +14,7 @@
                 <div class="list right-list" v-for="(chapter,id) in materials" :key="id">
                     <div class="list_chapter right-list-target" @click="viewChapter(chapter,id)">Chapter {{ id+1 }}</div>
                     <div class="list_title" @click="viewChapter(chapter,id)">{{ chapter.title }}</div>
+                    <div class="edit" @click="downloadChapter(chapter)"><i class="fa-regular fa-file-pdf"></i></div>
                     <div v-if="showUploadOption" class="edit" @click="openUpdate(chapter)"><i class="fa-regular fa-pen-to-square"></i></div>
                 </div>
             </div>
@@ -113,7 +114,33 @@ export default {
             }
             this.pdfUrl = chapter.attachmentUrl;
         },
+        async downloadChapter(chapter){
+            try {
+                const response = await axios.get(chapter.attachmentUrl, {
+                    responseType: "blob",
+                    headers:{
+                        'x-user-token':jsCookie.get('authToken')
+                    }
+                });
 
+                const blob = new Blob([response.data]);
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+
+                const fileName = chapter.title?.replace(/\s+/g, "_") + ".pdf"
+                link.download = fileName;
+
+                document.body.appendChild(link);
+                link.click();
+
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+
+            }
+            catch (error) {
+                this.$bus.$emit('handleAlert','檔案下載通知','文件下載失敗。','error')
+            }
+        },
         // 上傳
         openUpload(){
             this.dialogTableVisible = true;
@@ -298,9 +325,8 @@ export default {
         line-height: max(calc((100vh - 80px) / 9), 77.5px);
         box-sizing: border-box;
         display: flex;
-        justify-content: space-around;
         padding-left: 10px;
-        padding-right: 10px;
+        align-items: center;
     }
     .list:hover, .list_selected{
         cursor: pointer;
@@ -313,18 +339,23 @@ export default {
         font-size: 16px;
     }
     .list_title{
-        width: 200px;
+        width: 180px;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
         font-size: 16px;
+        margin-right: 5px;
     }
     .edit{
-        height: 30px;
+        min-height: 77.5px;
+        height: calc((100vh - 80px)/9);
         width: 30px;
-        line-height: 30px;
-        text-align: center;
-        margin-right: -8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .edit:hover{
+        background: rgba(0,0,0,0.05);
     }
     .form_input{
         margin-top: 15px;
