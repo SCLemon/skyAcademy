@@ -158,7 +158,7 @@ export default {
             }
         },
         generateBarcode() {
-            const token = this.userInfo.token;
+            const token = this.userInfo.idx;
             JsBarcode(this.$refs.barcode, token, {
                 format: "CODE128",
                 displayValue: true,
