@@ -148,7 +148,7 @@ export default {
     padding: 10px;
     /* grid */
     display: grid;
-    grid-template-columns: repeat(auto-fill, 340px);
+    grid-template-columns: repeat(auto-fill, 350px);
     grid-auto-rows: 245px;
     gap: 20px;
     row-gap: 20px;
@@ -163,7 +163,7 @@ export default {
     align-items: center;
   }
   .classItem{
-    width: 340px;
+    width: 350px;
     height: 245px;
     box-shadow: 1px 2px 3px gray;
     position: relative;
