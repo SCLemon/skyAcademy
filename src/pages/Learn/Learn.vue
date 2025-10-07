@@ -148,9 +148,9 @@ export default {
     padding: 10px;
     /* grid */
     display: grid;
-    grid-template-columns: repeat(auto-fill, 350px);
+    grid-template-columns: repeat(auto-fill, 340px);
     grid-auto-rows: 245px;
-    gap: 25px;
+    gap: 20px;
     row-gap: 20px;
     align-items: start;
     justify-content: start;
@@ -163,7 +163,7 @@ export default {
     align-items: center;
   }
   .classItem{
-    width: 350px;
+    width: 340px;
     height: 245px;
     box-shadow: 1px 2px 3px gray;
     position: relative;
