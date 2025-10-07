@@ -51,11 +51,12 @@ module.exports = defineConfig({
             // 拆分代碼
             config.optimization.splitChunks = {
                 chunks: 'all',
-                minSize: 20000,
+                minSize: 80000,
                 maxSize: 0,
-                minChunks: 1,
-                maxAsyncRequests: 30,
-                maxInitialRequests: 30,
+                minChunks: 2,
+                maxAsyncRequests: 20,
+                maxInitialRequests: 8,
+                enforceSizeThreshold: 150000,
                 automaticNameDelimiter: '~',
             };
         }
