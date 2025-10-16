@@ -2,7 +2,7 @@
 <template>
   <div>
     <div class="posterBox">
-        <div class="inputBox" v-if="currentUser.typeEng == 'teacher'">
+        <div class="inputBox" v-if="currentUser && currentUser.typeEng == 'teacher'">
           <div class="inputTextBox" @click="openDialog('img')">
             <div class="inputTextBoxImg"><img :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt=""></div>
             <div class="textArea">發表您的貼文和公告</div>

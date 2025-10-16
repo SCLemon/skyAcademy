@@ -27,6 +27,11 @@
         <i class="fa-solid fa-lock lock" v-if="!isLogin"></i>
         專欄列表
     </div>
+    <div @click="isLogin?goTo('/academic/studyRoom'):''" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/studyRoom')}">
+        <div :class="{list_selected_flag:$route.path.includes('/studyRoom')}"></div>
+        <i class="fa-solid fa-lock lock" v-if="!isLogin"></i>
+        學習紀錄
+    </div>
     <div v-if="isLogin" :class="{list:true}" @click="logout()">登出系統</div>
     <div class="version_info">
         <div>General Version 1.0.0.7</div>

@@ -16,6 +16,7 @@ import TeacherCourseTable from '@/pages/InfoPage/pages/TeacherCourseTable.vue'
 import ClientTable from '@/pages/InfoPage/pages/ClientTable.vue'
 import Index from '@/pages/Index/Index.vue'
 import ModifyInfo from '@/pages/InfoPage/ModifyInfo.vue'
+import StudyRoom from '@/pages/StudyRoom/StudyRoom.vue'
 import axios from 'axios'
 Vue.use(VueRouter)
 const router = new VueRouter({
@@ -45,6 +46,10 @@ const router = new VueRouter({
                 {
                     path:'learn',
                     component:Learn
+                },
+                {
+                    path:'studyRoom',
+                    component:StudyRoom
                 },
                 {
                     path:'class',
