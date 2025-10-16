@@ -6,26 +6,55 @@
 
 <script>
 import { Chart } from 'chart.js/auto'
+import axios from 'axios';
+import jsCookie from 'js-cookie';
 export default {
     name:'Statistics',
     mounted(){
-        this.renderChart()
+        this.getData();
+        this.$bus.$on('refreshStudyRecordStatistics', this.getData)
+    },
+    data(){
+        return {
+            chartInstance :null,
+        }
     },
     methods:{
+        async getData(){
+            try{
+                const res = await axios.get('/api/studyRecord/getStatistics',{
+                    headers:{
+                    'x-user-token':jsCookie.get('authToken')
+                }
+            })
+            if(res.data.type == 'success'){
+                this.renderChart(res.data.record)
+            }
+            else this.$bus.$emit('handleAlert','資料汲取通知',res.data.message, res.data.type)
+            }
+            catch(e){
+                console.log(e)
+            }
+        },
         renderChart(userData){
             const ctx = document.getElementById('chart');
-            const labels = ['10/1', '10/2', '10/3', '10/4', '10/5', '10/6', '10/7']
+            const labels = userData.dateArr
             const data = {
                 labels: labels,
                 datasets: [{
                     label: '學習曲線圖',
-                    data: [65, 20, 50 ,40, 70 ,100, 25],
+                    data: userData.totalArr,
                     fill: false,
                     borderColor: 'rgb(75, 192, 192)',
                     tension: 0.1
                 }],
             };
-            new Chart(ctx, {
+
+            if (this.chartInstance) {
+                this.chartInstance.destroy();
+            }
+
+            this.chartInstance = new Chart(ctx, {
                 type: 'line', 
                 data: data,
                 options: {

@@ -1,11 +1,15 @@
 <template>
   <div>
     <div class="top">
-      <div class="title">每日學習紀錄簿</div>
+      <div class="title"><i class="fa-solid fa-book book_icon"></i> 學習紀錄簿</div>
       <el-button class="add" v-if="currentUser && currentUser.typeEng == 'teacher'" @click="dialogFormVisible = true">新增計畫</el-button>
     </div>
     <statistics class="statistics"></statistics>
     <div class="table">
+        <div class="clock" v-if="showClock">
+          <div class="timer">{{showTime}}</div>
+          <el-button type="warning" @click="stop()">紀錄時間</el-button>
+        </div>
         <el-table :data="tableData" border height="calc(100vh - 505px)" style="width: 100%" class="tableData" empty-text="暫無數據">
           <el-table-column prop="date" label="計畫日期" width="180px"></el-table-column>
           <el-table-column label="學習計畫概要">
@@ -15,13 +19,13 @@
           </el-table-column>
           <el-table-column prop="totalTime" label="執行時間統計" width="180px">
             <template v-slot="scope">
-                <div >{{ scope.row.record?.statistics?total : 0 }} min</div>
+                <div >{{ scope.row.statistics?.total ?? 0 }} min</div>
             </template>
           </el-table-column>
           <el-table-column label="其他操作" width="255px">
             <template v-slot="scope">
                 <template v-if="currentUser && currentUser.typeEng == 'teacher'">
-                  <el-button>執行</el-button>
+                  <el-button @click="start(scope.row.idx)">執行</el-button>
                   <el-button type="warning" @click="openUpdate(scope.row)">修改</el-button>
                   <el-button type="danger" @click="deleteProject(scope.row.idx)">刪除</el-button>
                 </template>
@@ -59,7 +63,7 @@
 import axios from 'axios';
 import Statistics from './components/Statistics.vue';
 import jsCookie from 'js-cookie';
-import {format} from 'date-fns'
+import {differenceInMilliseconds, format} from 'date-fns'
 export default {
     name:'StudyRoom',
     components:{
@@ -83,14 +87,24 @@ export default {
         updateForm:{
           date:'',
           content:''
-        }
+        },
+
+        // 計時
+        showClock : false,
+        execIdx:'',
+        startTime:'',
+        stopTime:'',
+        showTime:'00:00:00',
+        timer:-1,
       }
     },
     mounted(){
-      this.currentUser = this.$bus.$currentUser
       this.getData();
+      this.currentUser = this.$bus.$currentUser
     },
     methods:{
+
+      // CRUD
       async getData(){
         try{
           const res = await axios.get('/api/studyRecord/getRecord',{
@@ -160,15 +174,66 @@ export default {
             })
             if(res.data.type == 'success'){
               await this.getData();
+              await this.refreshStatistics();
             }
             this.$bus.$emit('handleAlert','刪除計畫通知',res.data.message, res.data.type)
           }
-            catch(e){}
-          })
+          catch(e){}
+        })
         .catch(() => {
           return
         });
+      },
+
+      // 記錄時間
+      async start(idx){
+        this.showClock = true;
+        this.execIdx = idx
+        this.startTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss')
+        this.timer = setInterval(() => {
+          let diff = differenceInMilliseconds(new Date(), this.startTime);
+          const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
+          const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
+          const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+          this.showTime = `${hours}:${minutes}:${seconds}`;
+        }, 1000);
+      },
+      async stop(){
+        clearInterval(this.timer);
+        this.stopTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss')
+        await this.record();
+      },
+      async record(){
+        try{
+          const res = await axios.put(`/api/studyRecord/recordTime/${this.execIdx}`,{
+            startTime:this.startTime, stopTime: this.stopTime,
+          },{
+            headers:{
+              'x-user-token':jsCookie.get('authToken')
+            }
+          })
+          if(res.data.type == 'success'){
+            await this.getData();
+            await this.refreshStatistics();
+            this.execIdx = '';
+            this.startTime = '';
+            this.stopTime = '';
+            this.showClock = false;
+            this.showTime ='00:00:00'
+          }
+          this.$bus.$emit('handleAlert','計畫紀錄通知',res.data.message, res.data.type)
+        }
+        catch(e){}
+      },
+      async refreshStatistics(){
+        this.$bus.$emit('refreshStudyRecordStatistics')
       }
+    },
+    async beforeDestroy(){
+      if(this.execIdx){
+        await this.stop();
+      }
+      clearInterval(this.timer)
     }
 }
 </script>
@@ -183,6 +248,9 @@ export default {
     box-sizing: border-box;
     display: flex;
     align-items: center;
+  }
+  .book_icon{
+    margin-right: 5px;
   }
   .title{
     font-size: 24px;
@@ -200,6 +268,30 @@ export default {
   .table{
     width: calc(100% - 45px);
     margin: 0 auto;
+    position: relative;
+  }
+  .clock{
+    width: 100%;
+    height: calc(100vh - 505px);
+    position: absolute;
+    top:0;
+    left:0;
+    box-sizing: border-box;
+    background: rgba(255,255,255,0.8);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .timer{
+    width: 100%;
+    text-align: center;
+    height: 100px;
+    line-height: 100px;
+    font-size: 52px;
+    margin-bottom: 10px;
+    font-weight: bolder;
   }
   .project_detail {
     width: 100%;
