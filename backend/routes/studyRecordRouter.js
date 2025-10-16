@@ -4,7 +4,7 @@ const router = express.Router();
 const studyRecordModel = require('../models/studyRecordModel');
 const userModel = require('../models/userModel')
 const { v4: uuidv4 } = require('uuid');
-const { format, differenceInMinutes, parseISO, subDays, isWithinInterval, startOfDay, endOfDay} = require('date-fns');
+const { format, differenceInMinutes, parseISO, subDays, isWithinInterval, startOfDay, endOfDay, differenceInMilliseconds} = require('date-fns');
 // 檢查身份
 const authMiddleware = async (req, res, next) => {
     const token = req.headers['x-user-token']
@@ -76,7 +76,7 @@ router.get('/api/studyRecord/getStatistics', authMiddleware, async (req, res) =>
     });
     // 拆成兩個陣列 date, total
     const dateArr = send.map(item => item.date);
-    const totalArr = send.map(item => item.total);
+    const totalArr = send.map(item => item.total / 60); // 由 sec 轉換為 min
 
     return res.send({
       type: 'success',
@@ -232,7 +232,7 @@ router.put('/api/studyRecord/recordTime/:idx',authMiddleware, async (req, res) =
         try {
             const start = parseISO(req.body.startTime);
             const end = parseISO(req.body.stopTime);
-            let diff = differenceInMinutes(end, start)
+            let diff = differenceInMilliseconds(end, start)/1000
             if (isNaN(diff) || diff < 0) diff = 0; // 防呆
 
             const record = await studyRecordModel.findOneAndUpdate(

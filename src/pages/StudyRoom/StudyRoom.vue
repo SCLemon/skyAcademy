@@ -19,7 +19,7 @@
           </el-table-column>
           <el-table-column prop="totalTime" label="執行時間統計" width="180px">
             <template v-slot="scope">
-                <div >{{ scope.row.statistics?.total ?? 0 }} min</div>
+                <div >{{ parseInt(scope.row.statistics?.total/60) ?? 0 }} min {{ scope.row.statistics?.total%60 ?? 0 }} sec</div>
             </template>
           </el-table-column>
           <el-table-column label="其他操作" width="255px">
@@ -151,6 +151,7 @@ export default {
           })
           if(res.data.type == 'success'){
             await this.getData();
+            await this.refreshStatistics();
             this.updateIdx ='';
             this.updateForm.date = '';
             this.updateForm.content = '';
