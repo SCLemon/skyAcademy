@@ -55,7 +55,7 @@ export default {
     },
     data(){
         return {
-            currentUser:{},
+            // currentUser:{},
             courseIdx:this.$route.query.idx,
             materials:[],
             pdfUrl:'',
@@ -86,8 +86,8 @@ export default {
     },
     async mounted(){
         await this.getData();
-        this.currentUser = this.$bus.$currentUser
-        if(this.currentUser && this.currentUser.typeEng == 'teacher') this.showUploadOption = true;
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if(currentUser && currentUser.typeEng == 'teacher') this.showUploadOption = true;
     },
     methods:{
         toggleList(){

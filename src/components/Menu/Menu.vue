@@ -110,7 +110,7 @@ export default {
                 }
             })
             if(res.data.type == 'success'){
-                this.$bus.$currentUser = res.data.userInfo;
+                this.$bus.$currentUser = JSON.parse(localStorage.getItem('currentUser'))
                 this.setUserInfo();
             }
         },
@@ -118,7 +118,7 @@ export default {
             this.$router.push(path).catch((e)=>{})
         },
         setUserInfo(){
-            const userInfo = this.$bus.$currentUser
+            const userInfo = JSON.parse(localStorage.getItem('currentUser'))
             if(userInfo) this.isLogin = true;
             userInfo.userImgUrl += `?${new Date().getTime()}`
             this.userInfo = userInfo
@@ -131,7 +131,7 @@ export default {
             }).then(() => {
                 jsCookie.remove('authToken')
                 this.isLogin = false;
-                this.$bus.$currentUser = {}
+                localStorage.removeItem('currentUser')
                 this.userInfo = {}
                 this.$bus.$emit('handleAlert','登出訊息','登出成功！','success')
                 this.$router.replace('/academic/login').catch((e)=>{})

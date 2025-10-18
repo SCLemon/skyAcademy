@@ -100,7 +100,7 @@ export default {
     },
     mounted(){
       this.getData();
-      this.currentUser = this.$bus.$currentUser
+      this.currentUser = JSON.parse(localStorage.getItem('currentUser'))
     },
     methods:{
 

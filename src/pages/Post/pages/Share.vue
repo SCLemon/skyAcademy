@@ -146,7 +146,7 @@ export default {
     await this.setAnonymousMode(); // 確保陌生帳號亦可查看分享之內容
     await this.getPost()
     await this.getUserInfo()
-    this.currentUser = this.$bus.$currentUser
+    this.currentUser = JSON.parse(localStorage.getItem('currentUser'))
   },
 
   methods:{
@@ -193,7 +193,7 @@ export default {
           })
           data = res.data;
           if(data.type == 'success'){
-            this.$bus.$currentUser = res.data.userInfo
+            this.$bus.$currentUser = JSON.parse(localStorage.getItem('currentUser'))
             this.$bus.$emit('setUserInfo')
           }
         }

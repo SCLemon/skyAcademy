@@ -62,7 +62,7 @@ export default {
         )
         data = res.data;
         if(data.type == 'success'){
-          this.$bus.$currentUser = res.data.userInfo
+          localStorage.setItem('currentUser', JSON.stringify(res.data.userInfo))
           this.$bus.$emit('setUserInfo')
           this.$router.replace(`/academic/${type}Info`).catch((e)=>{})
         }
@@ -104,7 +104,7 @@ export default {
         })
         if(res.data.type == 'success'){
           jsCookie.set('authToken',token);
-          this.$bus.$currentUser = res.data.userInfo
+          localStorage.setItem('currentUser', JSON.stringify(res.data.userInfo))
           this.$bus.$emit('setUserInfo')
           this.$router.replace('/academic/post').catch((e)=>{})
         }

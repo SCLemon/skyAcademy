@@ -184,7 +184,7 @@ export default {
     })
     await this.getPost()
     await this.getUserInfo()
-    this.currentUser = this.$bus.$currentUser
+    this.currentUser = JSON.parse(localStorage.getItem('currentUser'))
 
   },
 

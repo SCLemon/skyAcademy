@@ -148,7 +148,7 @@ export default {
             catch(e){}
         },
         async editSelf(){
-            this.$router.push({ path: '/academic/modifyInfo', query: { idx: this.$bus.$currentUser.idx } }).catch(e => {})
+            this.$router.push({ path: '/academic/modifyInfo', query: { idx: (JSON.parse(localStorage.getItem('currentUser'))).idx } }).catch(e => {})
         },
         async editUser(idx){
             this.$router.push({ path: '/academic/modifyInfo', query: { idx:idx } }).catch(e => {})
