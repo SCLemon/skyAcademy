@@ -81,6 +81,7 @@ export default {
       return{
         today:format(new Date(), 'yyyy-MM-dd'),
         currentUser:{},
+        beforeUnloadHandler:{},
         tableData:[],
 
         // 新增
@@ -111,12 +112,13 @@ export default {
       this.currentUser = JSON.parse(localStorage.getItem('currentUser'))
 
       // 防呆
-      window.addEventListener('beforeunload', (event) => {
+      this.beforeUnloadHandler = (event) => {
         if(this.showClock){
           event.preventDefault();
           event.returnValue = '';
         }
-      });
+      }
+      window.addEventListener('beforeunload', this.beforeUnloadHandler);
     },
     methods:{
 
@@ -279,6 +281,7 @@ export default {
         await this.stop();
       }
       clearInterval(this.timer)
+      window.removeEventListener('beforeunload', this.beforeUnloadHandler);
     }
 }
 </script>
