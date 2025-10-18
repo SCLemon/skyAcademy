@@ -8,7 +8,10 @@
     <div class="table">
         <div class="clock" v-if="showClock">
           <div class="timer">{{showTime}}</div>
-          <el-button type="warning" @click="stop()">紀錄時間</el-button>
+          <div>
+            <el-button type="warning" @click="stop(false)">紀錄時間</el-button>
+            <el-button type="success" @click="stop(true)">完成計畫</el-button>
+          </div>
         </div>
         <el-table :data="tableData" border height="calc(100vh - 505px)" style="width: 100%" class="tableData" empty-text="暫無數據">
           <el-table-column prop="date" label="計畫日期" width="180px"></el-table-column>
@@ -17,16 +20,21 @@
                 <div class="project_detail">{{scope.row.content}}</div>
             </template>
           </el-table-column>
-          <el-table-column prop="totalTime" label="執行時間統計" width="180px">
+          <el-table-column label="執行時間統計" width="180px">
             <template v-slot="scope">
                 <div >{{ parseInt(scope.row.statistics?.total/60) ?? 0 }} min {{ scope.row.statistics?.total%60 ?? 0 }} sec</div>
+            </template>
+          </el-table-column>
+          <el-table-column label="狀態" width="180px">
+            <template v-slot="scope">
+                <div><i :class="`fa-solid fa-circle statusIcon ${statusClass(scope.row.status)}`"></i>{{scope.row.status}}</div>
             </template>
           </el-table-column>
           <el-table-column label="其他操作" width="255px">
             <template v-slot="scope">
                 <template v-if="currentUser && currentUser.typeEng == 'teacher'">
-                  <el-button @click="start(scope.row.idx)">執行</el-button>
-                  <el-button type="warning" @click="openUpdate(scope.row)">修改</el-button>
+                  <el-button @click="(scope.row.status == '已完成')?'':start(scope.row.idx)" :disabled="(scope.row.status == '已完成')">執行</el-button>
+                  <el-button type="warning" @click="(scope.row.status == '已完成')?'':openUpdate(scope.row)" :disabled="(scope.row.status == '已完成')">修改</el-button>
                   <el-button type="danger" @click="deleteProject(scope.row.idx)">刪除</el-button>
                 </template>
                 <template v-else>無權限進行操作</template>
@@ -101,6 +109,14 @@ export default {
     mounted(){
       this.getData();
       this.currentUser = JSON.parse(localStorage.getItem('currentUser'))
+
+      // 防呆
+      window.addEventListener('beforeunload', (event) => {
+        if(this.showClock){
+          event.preventDefault();
+          event.returnValue = '';
+        }
+      });
     },
     methods:{
 
@@ -186,7 +202,7 @@ export default {
         });
       },
 
-      // 記錄時間
+      // ----- 記錄時間 ----- 
       async start(idx){
         this.showClock = true;
         this.execIdx = idx
@@ -198,16 +214,19 @@ export default {
           const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
           this.showTime = `${hours}:${minutes}:${seconds}`;
         }, 1000);
+        await this.startProcessing()
       },
-      async stop(){
+      // 進入點
+      async stop(flag){
         clearInterval(this.timer);
         this.stopTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss')
-        await this.record();
+        await this.record(flag);
       },
-      async record(){
+      // 非直接進入點，入口為 stop()
+      async record(flag){
         try{
           const res = await axios.put(`/api/studyRecord/recordTime/${this.execIdx}`,{
-            startTime:this.startTime, stopTime: this.stopTime,
+            startTime:this.startTime, stopTime: this.stopTime, finish: flag,
           },{
             headers:{
               'x-user-token':jsCookie.get('authToken')
@@ -226,8 +245,33 @@ export default {
         }
         catch(e){}
       },
+
+      // 非直接進入點，入口為 start() --> 變更計畫狀態為 進行中
+      async startProcessing(){
+        try{
+          const res = await axios.put(`/api/studyRecord/startProcessing/${this.execIdx}`,{},{
+            headers:{
+              'x-user-token':jsCookie.get('authToken')
+            }
+          })
+        }
+        catch(e){}
+      },
+      // ----- 記錄時間 -----
       async refreshStatistics(){
         this.$bus.$emit('refreshStudyRecordStatistics')
+      },
+
+      // 計算狀態 class
+      statusClass(status){
+        switch (status){
+          case '已完成':
+            return 'status-green'
+          case '進行中':
+            return 'status-yellow'
+          default:
+            return 'status-default'
+        }
       }
     },
     async beforeDestroy(){
@@ -303,5 +347,32 @@ export default {
   .create{
     margin-top: 10px;
     width: 100%;
+  }
+  .statusIcon{
+    margin-right: 8px;
+  }
+  .status-green {
+    color: lawngreen;
+  }
+
+  .status-yellow {
+    color: gold;
+    animation: flicker 2.5s infinite ease;
+  }
+
+  .status-default {
+    color: gray;
+  }
+
+  @keyframes flicker {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+    100% {
+      opacity: 1;
+    }
   }
 </style>
