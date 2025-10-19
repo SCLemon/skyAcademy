@@ -205,7 +205,7 @@ router.put('/api/studyRecord/update/:idx',authMiddleware, async (req, res) => {
                 }
             );
             
-            if (record.modifiedCount === 0) {
+            if (record.matchedCount === 0) {
                 return res.send({ type: 'error', message: '計畫變更失敗。'});
             }
 

@@ -6,7 +6,7 @@
         </div>
             <el-table :data="tableData" border height="calc(100vh - 360px)" style="width: 100%" class="tableData" empty-text="暫無數據">
                 <el-table-column prop="createTime" label="創建時間"></el-table-column>
-                <el-table-column prop="courseId" label="專欄代碼"></el-table-column>
+                <el-table-column prop="courseName" label="專欄名稱"></el-table-column>
                 <el-table-column prop="lecturer" label="專欄負責人"></el-table-column>
                 <el-table-column prop="status" label="狀態">
                     <template v-slot="scope">
@@ -52,8 +52,11 @@
                     <el-button type="primary" @click="create()">創建</el-button>
                 </div>
             </el-dialog>
-            <el-dialog :title="`${setStudentList.courseId} - 用戶名單`" :visible.sync="dialogFormVisible2">
+            <el-dialog :title="`${setStudentList.courseName} - 用戶名單`" :visible.sync="dialogFormVisible2">
                 <el-form :model="setStudentList">
+                    <el-form-item label="專欄名稱">
+                        <el-input v-model="setStudentList.courseName" autocomplete="off" clearable></el-input>
+                    </el-form-item>
                     <el-form-item label="專欄代碼">
                         <el-input v-model="setStudentList.courseId" autocomplete="off" clearable></el-input>
                     </el-form-item>
@@ -97,8 +100,8 @@
                 setStudentList:{
                     idx:'',
                     courseId:'',
+                    courseName:'',
                     lecturer:'',
-                    newCourseId:'',
                     studentList:[] // 呈現在右列 (存 idx)
                 },
             }
@@ -227,6 +230,7 @@
             async openStudentList(target){
                 this.setStudentList.idx = target.idx;
                 this.setStudentList.courseId = target.courseId;
+                this.setStudentList.courseName = target.courseName;
                 this.setStudentList.lecturer = target.lecturer;
 
                 // 刷新數據
@@ -242,7 +246,7 @@
             },
             async pushStudentList(){
                 try{
-                    await this.$confirm(`確認是否修改專欄 (${this.setStudentList.courseId})?`, '提示', {
+                    await this.$confirm(`確認是否修改專欄資訊?`, '提示', {
                         confirmButtonText: '確認',
                         cancelButtonText: '取消',
                         type: 'warning'
