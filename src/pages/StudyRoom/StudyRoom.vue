@@ -103,7 +103,7 @@ export default {
         // 新增
         dialogFormVisible:false,
         form:{
-          date:'',
+          date: new Date(),
           content:'',
           expectTime: 90,
         },
@@ -175,7 +175,7 @@ export default {
           if(res.data.type == 'success'){
             await this.getData();
             this.dialogFormVisible = false;
-            this.form.date = ''
+            this.form.date = new Date();
             this.form.content = ''
             this.form.expectTime = 90;
           }
