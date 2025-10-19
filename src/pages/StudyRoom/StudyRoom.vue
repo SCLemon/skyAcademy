@@ -14,7 +14,7 @@
           </div>
         </div>
         <el-table :data="tableData" border height="calc(100vh - 505px)" style="width: 100%" class="tableData" empty-text="暫無數據">
-          <el-table-column prop="date" label="計畫日期" width="140px"></el-table-column>
+          <el-table-column prop="date" label="計畫日期" width="140px" ></el-table-column>
           <el-table-column label="學習計畫概要">
             <template v-slot="scope">
                 <div class="project_detail" @click="showRecord(scope.row)">{{scope.row.content}}</div>
@@ -22,17 +22,17 @@
           </el-table-column>
           <el-table-column label="預計完成時間" width="140px">
             <template v-slot="scope">
-                <div >{{ scope.row.expectTime ?? 0 }} min</div>
+                <div @click="showRecord(scope.row)">{{ scope.row.expectTime ?? 0 }} min</div>
             </template>
           </el-table-column>
           <el-table-column label="執行時間統計" width="140px">
             <template v-slot="scope">
-                <div >{{ parseInt(scope.row.statistics?.total/60) ?? 0 }} min {{ scope.row.statistics?.total%60 ?? 0 }} sec</div>
+                <div @click="showRecord(scope.row)">{{ parseInt(scope.row.statistics?.total/60) ?? 0 }} min {{ scope.row.statistics?.total%60 ?? 0 }} sec</div>
             </template>
           </el-table-column>
           <el-table-column label="狀態" width="140px">
             <template v-slot="scope">
-                <div><i :class="`fa-solid fa-circle statusIcon ${statusClass(scope.row.status)}`"></i>{{scope.row.status}}</div>
+                <div @click="showRecord(scope.row)"><i :class="`fa-solid fa-circle statusIcon ${statusClass(scope.row.status)}`"></i>{{scope.row.status}}</div>
             </template>
           </el-table-column>
           <el-table-column label="其他操作" width="255px">
