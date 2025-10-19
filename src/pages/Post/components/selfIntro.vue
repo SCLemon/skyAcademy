@@ -41,7 +41,7 @@ export default {
     .box{
         width: 310px;
         min-height: 718px;
-        height: calc(100vh - 60px);
+        height: calc(100vh - 40px);
         box-shadow: 0px 1px 3px rgba(0,0,0,0.3);
         transition: all 1s ease;
         box-sizing: border-box;
