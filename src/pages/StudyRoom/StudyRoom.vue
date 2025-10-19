@@ -17,7 +17,7 @@
           <el-table-column prop="date" label="計畫日期" width="180px"></el-table-column>
           <el-table-column label="學習計畫概要">
             <template v-slot="scope">
-                <div class="project_detail">{{scope.row.content}}</div>
+                <div class="project_detail" @click="showRecord(scope.row)">{{scope.row.content}}</div>
             </template>
           </el-table-column>
           <el-table-column label="執行時間統計" width="180px">
@@ -64,6 +64,14 @@
       </el-form>
       <el-button type="primary" class="create" :disabled="(updateForm.date.trim() =='' ||updateForm.content.trim()=='')" @click="(updateForm.date.trim() =='' ||updateForm.content.trim()=='')?'':update()">修改計畫</el-button>
     </el-dialog>
+    <el-dialog title="計畫執行紀錄" :visible.sync="dialogFormVisible3">
+      <el-table :data="showRecordData" stripe height="auto" style="width: 100%; max-height: 400px; overflow-y: scroll;" :empty-text="'暫無數據'">
+        <el-table-column prop="idx" label="輪次" width="100px"></el-table-column>
+        <el-table-column prop="start" label="起始時間"></el-table-column>
+        <el-table-column prop="end" label="截止時間"></el-table-column>
+        <el-table-column prop="diff" label="持續時間" width="120px"></el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
@@ -105,6 +113,10 @@ export default {
         stopTime:'',
         showTime:'00:00:00',
         timer:-1,
+
+        // 顯示執行紀錄
+        dialogFormVisible3:false,
+        showRecordData:[],
       }
     },
     mounted(){
@@ -274,6 +286,20 @@ export default {
           default:
             return 'status-default'
         }
+      },
+
+      // 查看執行紀錄
+      showRecord(obj){
+        this.dialogFormVisible3 = true;
+        const records = obj?.statistics?.record ?? [];
+        this.showRecordData = records.map((item,idx)=>{
+          return {
+            idx: idx+1,
+            start: item.start,
+            end: item.end,
+            diff : `${(differenceInMilliseconds(item.end, item.start)/1000/60).toFixed(1)} min`
+          }
+        })
       }
     },
     async beforeDestroy(){
