@@ -200,11 +200,11 @@ router.put('/api/studyRecord/update/:idx',authMiddleware, async (req, res) => {
                     }
                 },
                 {
-                    arrayFilters: [{ 'elem.idx': req.params.idx }], // 選擇特定元素
+                    arrayFilters: [{"elem.idx": req.params.idx, "elem.status": { $in: ["尚未完成", "進行中"] }}]
                 }
             );
-            
-            if (record.matchedCount === 0) {
+
+            if (record.modifiedCount === 0) {
                 return res.send({ type: 'error', message: '計畫變更失敗。'});
             }
 
@@ -246,7 +246,7 @@ router.put('/api/studyRecord/recordTime/:idx',authMiddleware, async (req, res) =
                     }
                 },
                 {
-                    arrayFilters: [{ 'elem.idx': req.params.idx ,'elem.status': { $ne: '已完成' }}], // 選擇特定元素
+                    arrayFilters: [{"elem.idx": req.params.idx, "elem.status": { $in: ["尚未完成", "進行中"] }}]
                 }
             );
 
@@ -266,7 +266,7 @@ router.put('/api/studyRecord/recordTime/:idx',authMiddleware, async (req, res) =
                 // 閾值為 +- 10 min
                 const status = (target.statistics.total/60) > target.expectTime + 10 ? '延遲完成' 
                                 :(target.statistics.total/60) < target.expectTime - 10 ? '提前完成':'已完成';
-                                
+
                 updateStatusResponse = await updateStatus(req, status);
             }
             else updateStatusResponse = await updateStatus(req,'尚未完成');
