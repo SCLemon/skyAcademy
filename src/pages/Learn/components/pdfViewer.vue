@@ -29,6 +29,9 @@ export default {
   },
   mounted() {
     pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
+    pdfjsLib.disableStream = false;
+    pdfjsLib.enableWebGL = this.isWebGLAvailable(); // GPU 渲染加速
+
     this.loadPdf(this.pdfUrl);
     window.addEventListener('resize', this.handleResize);
   },
@@ -37,6 +40,18 @@ export default {
     if (this.observer) this.observer.disconnect();
   },
   methods: {
+    // 判斷瀏覽器是否支援 WebGL
+    isWebGLAvailable() {
+      try {
+        const canvas = document.createElement("canvas");
+        return !!(
+          window.WebGLRenderingContext &&
+          (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
+        );
+      } catch (e) {
+        return false;
+      }
+    },
     async loadPdf(url) {
       this.isLoading = true;
       const container = this.$refs.pdfContainer;
@@ -107,8 +122,10 @@ export default {
 
       const containerWidth = this.$refs.pdfContainer.clientWidth;
       const dpr = window.devicePixelRatio || 1;
+      const qualityFactor = 1.75;
+
       const viewport = page.getViewport({ scale: 1 });
-      const scale = (containerWidth / viewport.width) * dpr;
+      const scale = (containerWidth / viewport.width) * dpr * qualityFactor;
       const scaledViewport = page.getViewport({ scale });
 
       canvas.width = scaledViewport.width;
@@ -117,7 +134,10 @@ export default {
       canvas.style.height = `${(scaledViewport.height / scaledViewport.width) * containerWidth}px`;
       canvas.style.border = '0.5px solid rgba(0,0,0,0.15)'
       canvas.style.boxSizing = 'border-box'
+
       const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
 
       // 建立 renderTask 並保存
       pageObj.renderTask = page.render({ canvasContext: ctx, viewport: scaledViewport });
