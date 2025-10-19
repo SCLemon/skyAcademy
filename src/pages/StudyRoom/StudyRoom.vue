@@ -14,18 +14,23 @@
           </div>
         </div>
         <el-table :data="tableData" border height="calc(100vh - 505px)" style="width: 100%" class="tableData" empty-text="暫無數據">
-          <el-table-column prop="date" label="計畫日期" width="180px"></el-table-column>
+          <el-table-column prop="date" label="計畫日期" width="140px"></el-table-column>
           <el-table-column label="學習計畫概要">
             <template v-slot="scope">
                 <div class="project_detail" @click="showRecord(scope.row)">{{scope.row.content}}</div>
             </template>
           </el-table-column>
-          <el-table-column label="執行時間統計" width="180px">
+          <el-table-column label="預計完成時間" width="140px">
+            <template v-slot="scope">
+                <div >{{ scope.row.expectTime ?? 0 }} min</div>
+            </template>
+          </el-table-column>
+          <el-table-column label="執行時間統計" width="140px">
             <template v-slot="scope">
                 <div >{{ parseInt(scope.row.statistics?.total/60) ?? 0 }} min {{ scope.row.statistics?.total%60 ?? 0 }} sec</div>
             </template>
           </el-table-column>
-          <el-table-column label="狀態" width="180px">
+          <el-table-column label="狀態" width="140px">
             <template v-slot="scope">
                 <div><i :class="`fa-solid fa-circle statusIcon ${statusClass(scope.row.status)}`"></i>{{scope.row.status}}</div>
             </template>
@@ -33,8 +38,8 @@
           <el-table-column label="其他操作" width="255px">
             <template v-slot="scope">
                 <template v-if="currentUser && currentUser.typeEng == 'teacher'">
-                  <el-button @click="(scope.row.status == '已完成')?'':start(scope.row.idx)" :disabled="(scope.row.status == '已完成')">執行</el-button>
-                  <el-button type="warning" @click="(scope.row.status == '已完成')?'':openUpdate(scope.row)" :disabled="(scope.row.status == '已完成')">修改</el-button>
+                  <el-button @click="(scope.row.status != '尚未完成' && scope.row.status != '進行中')?'':start(scope.row.idx)" :disabled="(scope.row.status != '尚未完成' && scope.row.status != '進行中')">執行</el-button>
+                  <el-button type="warning" @click="(scope.row.status != '尚未完成' && scope.row.status != '進行中')?'':openUpdate(scope.row)" :disabled="(scope.row.status != '尚未完成' && scope.row.status != '進行中')">修改</el-button>
                   <el-button type="danger" @click="deleteProject(scope.row.idx)">刪除</el-button>
                 </template>
                 <template v-else>無權限進行操作</template>
@@ -44,14 +49,17 @@
     </div>
     <el-dialog title="新增計畫" :visible.sync="dialogFormVisible">
       <el-form :model="form">
-        <el-form-item label="計畫日期">
-          <el-input v-model="form.date" autocomplete="off" clearable :placeholder="`${today}`"></el-input>
+        <el-form-item label="計畫日期：">
+          <el-date-picker v-model="form.date" align="right" type="date" placeholder="選擇日期" :picker-options="pickerOptions"></el-date-picker>
         </el-form-item>
         <el-form-item label="學習計畫概要">
           <el-input v-model="form.content" autocomplete="off" clearable></el-input>
         </el-form-item>
+        <el-form-item label="預計所需時間 (分鐘)：">
+          <el-input-number v-model="form.expectTime" :min="15"></el-input-number>
+        </el-form-item>
       </el-form>
-      <el-button type="primary" class="create" :disabled="(form.date.trim() =='' ||form.content.trim()=='')" @click="(form.date.trim() =='' ||form.content.trim()=='')?'':create()">新增計畫</el-button>
+      <el-button type="primary" class="create" :disabled="(form.content.trim() =='')" @click="(form.content.trim()=='')?'':create()">新增計畫</el-button>
     </el-dialog>
     <el-dialog title="修改計畫" :visible.sync="dialogFormVisible2">
       <el-form :model="form">
@@ -96,7 +104,15 @@ export default {
         dialogFormVisible:false,
         form:{
           date:'',
-          content:''
+          content:'',
+          expectTime: 90,
+        },
+        pickerOptions: {
+          disabledDate(time) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return time.getTime() < today.getTime();
+          },
         },
         // 修改
         dialogFormVisible2:false,
@@ -161,6 +177,7 @@ export default {
             this.dialogFormVisible = false;
             this.form.date = ''
             this.form.content = ''
+            this.form.expectTime = 90;
           }
           this.$bus.$emit('handleAlert','新增計畫通知',res.data.message, res.data.type)
         }
@@ -281,6 +298,10 @@ export default {
         switch (status){
           case '已完成':
             return 'status-green'
+          case '提前完成':
+            return 'status-green'
+          case '延遲完成':
+            return 'status-red'
           case '進行中':
             return 'status-yellow'
           default:
@@ -383,7 +404,9 @@ export default {
   .status-green {
     color: lawngreen;
   }
-
+  .status-red {
+    color: lightcoral;
+  }
   .status-yellow {
     color: gold;
     animation: flicker 2.5s infinite ease;
