@@ -86,8 +86,13 @@ export default {
         padding: 20px;
         box-sizing: border-box;
         margin: 0 auto;
-        box-shadow: 0px 1px 5px gray;
+        box-shadow: 0px 1px 4px gray;
         border-radius: 1px;
+        transition: 1s box-shadow ease;
+    }
+    .canvas_wrapper:hover{
+        cursor: pointer;
+        box-shadow: 0px 5px 8px rgba(0,0,0,0.3);
     }
     canvas {
         width: 100% !important;

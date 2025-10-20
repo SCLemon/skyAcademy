@@ -34,6 +34,11 @@
                     <el-form-item label="專欄負責人">
                         <el-input v-model="form.lecturer" autocomplete="off" clearable></el-input>
                     </el-form-item>
+                    <el-form-item label="專欄類別">
+                        <el-select v-model="form.courseType" placeholder="請選擇類別">
+                            <el-option v-for="item in courseTypeOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                        </el-select>
+                    </el-form-item>
                 </el-form>
                 <div class="class_banner_title">專欄封面上傳（限制兩張，上傳後暫不提供修改，至少 350 pixel x 175 pixel）</div>
                 <el-upload  action="#" :on-change="handleUpload" list-type="picture-card" :auto-upload="false" :file-list="fileList" :limit="2" :multiple="true" accept="image/*">
@@ -63,6 +68,11 @@
                     <el-form-item label="專欄負責人">
                         <el-input v-model="setStudentList.lecturer" autocomplete="off" clearable></el-input>
                     </el-form-item>
+                    <el-form-item label="專欄類別">
+                        <el-select v-model="setStudentList.courseType" placeholder="請選擇類別">
+                            <el-option v-for="item in courseTypeOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                        </el-select>
+                    </el-form-item>
                 </el-form>
                 <el-transfer class="transfer" v-model="setStudentList.studentList" :props="{key: 'idx', label: 'name'}" :filterable="true" :filter-method="customFilter"
                 filter-placeholder="請輸入用戶姓名或帳號" :data="students" :titles="['用戶列表', '已選用戶']"></el-transfer>
@@ -82,12 +92,19 @@
         data(){
             return{
                 tableData: [],
+                courseTypeOptions:[
+                    {label:'學術筆記',value:'學術筆記'},
+                    {label:'金融時事',value:'金融時事'},
+                    {label:'程式設計',value:'程式設計'},
+                    {label:'其他類別',value:'其他類別'},
+                ],
                 // 創建專欄
                 dialogFormVisible:false, 
                 form:{
                     courseName:'',
                     courseId:'',
                     lecturer:'',
+                    courseType:'',
                 },
                 // 創建專欄的圖片上傳
                 fileList: [],
@@ -102,6 +119,7 @@
                     courseId:'',
                     courseName:'',
                     lecturer:'',
+                    courseType:'',
                     studentList:[] // 呈現在右列 (存 idx)
                 },
             }
@@ -143,6 +161,7 @@
                 formData.append('courseName', this.form.courseName);
                 formData.append('courseId', this.form.courseId);
                 formData.append('lecturer', this.form.lecturer);
+                formData.append('courseType', this.form.courseType);
 
                 if (this.fileList && this.fileList.length > 0) {
                     this.fileList.forEach((file, index) => {
@@ -162,7 +181,8 @@
                     this.form = {
                         courseName:'',
                         courseId:'',
-                        lecturer:''
+                        lecturer:'',
+                        courseType:'',
                     },
 
                     // 獲取使用容量
@@ -232,7 +252,7 @@
                 this.setStudentList.courseId = target.courseId;
                 this.setStudentList.courseName = target.courseName;
                 this.setStudentList.lecturer = target.lecturer;
-
+                this.setStudentList.courseType = target.courseType;
                 // 刷新數據
                 await this.getStudentList();
                 await this.getCourseList();
@@ -264,7 +284,8 @@
                             idx:'',
                             courseId:'',
                             lecturer:'',
-                            studentList:[]
+                            studentList:[],
+                            courseType:'',
                         },
                         this.$bus.$emit('handleAlert','專欄修改通知',res.data.message,res.data.type)
                     }

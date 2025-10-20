@@ -193,7 +193,7 @@ export default {
                 this.writeTokenAtHead(canvas, token);
 
                 const link = document.createElement("a");
-                link.href = canvas.toDataURL("image/png");
+                link.href = canvas.toDataURL("image/png",1.0);
                 link.download = `${this.userInfo.name}_forward.png`;
                 link.click();
             });
@@ -208,7 +208,7 @@ export default {
                 this.writeTokenAtHead(canvas, token);
 
                 const link = document.createElement("a");
-                link.href = canvas.toDataURL("image/png");
+                link.href = canvas.toDataURL("image/png", 1.0);
                 link.download =`${this.userInfo.name}_backward.png`;
                 link.click();
             });
