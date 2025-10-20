@@ -250,14 +250,10 @@ export default {
       this.$bus.$emit('copyToClipboard','分享貼文連結通知' , this.shareUrl);
       this.shareStatus = '✓ COPIED'
     },
-    async getPost(flag){
+    async getPost(){
       if (this.isLoading) return;
       this.isLoading = true;
       
-      if(flag == 'refresh'){
-        this.posts = [];
-        this.page = 1;
-      }
       let url = `/api/post/share/${this.$route.query.share}`
 
       try{
@@ -291,7 +287,9 @@ export default {
           }
         })
         if(res.data.type == 'success'){
-          this.getPost('refresh');
+          this.posts = [];
+          this.page = 1;
+
           this.$bus.$emit('handleAlert','貼文刪除通知',res.data.message,res.data.type)
         }
         else this.$bus.$emit('handleAlert','貼文刪除通知',res.data.message,res.data.type)
@@ -314,7 +312,13 @@ export default {
           }
         })
         if(res.data.type == 'success'){
-          this.getPost('refresh');
+          
+          // 不要刷新頁面 --> 避免修改後的貼文要重找
+          let modifyPost = this.posts.find((i)=> i.idx = this.modifyIdx);
+          if(modifyPost){
+            modifyPost.content = this.modifyContent
+          }
+
           this.dialogTableVisible2 = false;
           this.modifyContent = '';
           this.modifyIdx = '';
