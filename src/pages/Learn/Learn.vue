@@ -112,7 +112,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: left;
-    border: 2px solid black;
+    box-shadow: 0px 1px 3px gray;
     border-radius: 40px;
     box-sizing: border-box;
   }
@@ -122,6 +122,7 @@ export default {
     line-height: 40px;
     text-align: center;
     font-size: 16px;
+    color: rgba(0,0,0,0.4);
   }
   .search{
     width: 340px;
@@ -150,7 +151,7 @@ export default {
     display: grid;
     grid-template-columns: repeat(auto-fill, 350px);
     grid-auto-rows: 245px;
-    gap: 20px;
+    gap: 25px;
     row-gap: 20px;
     align-items: start;
     justify-content: start;

@@ -2,6 +2,10 @@
 <template>
   <div>
     <div class="posterBox">
+        <div class="searchBox">
+          <div class="search_input_div"><input type="text" class="search_input" v-model="q" placeholder="搜尋 Lemon's Universe 的貼文"></div>
+          <div class="search_icon_div" @click="searchPost()"><i class="fa-solid fa-magnifying-glass"></i></div>
+        </div>
         <div class="inputBox" v-if="currentUser && currentUser.typeEng == 'teacher'">
           <div class="inputTextBox" @click="openDialog('img')">
             <div class="inputTextBoxImg"><img :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt=""></div>
@@ -159,6 +163,7 @@ export default {
       dialogVisible: false,
 
       // 顯示貼文
+      q:'',
       posts:[],
       page:1,
       showPermission:false,
@@ -265,21 +270,22 @@ export default {
       this.$bus.$emit('copyToClipboard','分享貼文連結通知' , this.shareUrl);
       this.shareStatus = '✓ COPIED'
     },
-    postDivScroll(){
+    async postDivScroll(){
       const postAllDiv = this.$refs.postAll;
       if (postAllDiv.scrollHeight - postAllDiv.scrollTop === postAllDiv.clientHeight) {
-        this.getPost();
+        await this.getPost();
       }
     },
-    async getPost(flag){
+    async searchPost(){
+      this.posts = [];
+      this.page = 1;
+      await this.getPost();
+    },
+    async getPost(){
       if (this.isLoading) return;
       this.isLoading = true;
       
-      if(flag == 'refresh'){
-        this.posts = [];
-        this.page = 1;
-      }
-      let url = `/api/post/getPost?page=${this.page}`
+      let url = `/api/post/getPost?page=${this.page}&q=${this.q}`
 
       try{
         const res = await axios.get(url,{
@@ -309,6 +315,8 @@ export default {
     },
     async create(){
       this.isSending = true;
+      this.q = '';
+
       this.form.content = this.$refs.input.innerHTML;
       const formData = new FormData();
       formData.append('content', this.form.content);
@@ -324,7 +332,9 @@ export default {
           }
       })
       if(res.data.type == 'success'){
-          this.getPost('refresh')
+          this.posts = [];
+          this.page = 1;
+          await this.getPost()
           this.dialogTableVisible = false;
           this.form = {
               content:'',
@@ -349,7 +359,9 @@ export default {
           }
         })
         if(res.data.type == 'success'){
-          this.getPost('refresh');
+          this.posts = [];
+          this.page = 1;
+          await this.getPost();
           this.$bus.$emit('handleAlert','貼文刪除通知',res.data.message,res.data.type)
         }
         else this.$bus.$emit('handleAlert','貼文刪除通知',res.data.message,res.data.type)
@@ -358,6 +370,7 @@ export default {
     },
     async openModifyBox(content, idx){
       this.dialogTableVisible2 = true;
+
       this.$nextTick(()=>{
         this.$refs['modifyContent'].innerHTML = content;
       })
@@ -372,7 +385,13 @@ export default {
           }
         })
         if(res.data.type == 'success'){
-          this.getPost('refresh');
+
+          // 不要刷新頁面 --> 避免修改後的貼文要重找
+          let modifyPost = this.posts.find((i)=> i.idx = this.modifyIdx);
+          if(modifyPost){
+            modifyPost.content = this.modifyContent
+          }
+
           this.dialogTableVisible2 = false;
           this.modifyContent = '';
           this.modifyIdx = '';
@@ -504,6 +523,49 @@ export default {
     height: 100vh;
     box-sizing: border-box;
   }
+  .searchBox{
+    width: 100%;
+    height: 50px;
+    box-shadow: 0px 1px 3px gray;
+    margin-bottom: 20px;
+    border-radius: 60px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+  }
+  .search_input_div{
+    width: 87.5%;
+    height: 35px;
+    border-right: 1px solid rgba(0,0,0,0.1);
+    padding-left: 20px;
+    padding-right: 10px;
+  }
+  .search_input{
+    width: 100%;
+    height: 35px;
+    line-height: 35px;
+    box-sizing: border-box;
+    border: 0;
+    font-size: 16px;
+  }
+  .search_input:focus{
+    outline: 0;
+  }
+  .search_input::placeholder{
+    font-size: 16px;
+  }
+  .search_icon_div{
+    width: 12.5%;
+    height: 50px;
+    border-radius: 0 50px 50px 0;
+    text-align: center;
+    line-height: 50px;
+    font-size: 16px;
+  }
+  .search_icon_div:hover{
+    cursor: pointer;
+    color: rgba(0,0,0,0.7);
+  }
   .inputBox{
     width: 100%;
     height: auto;
@@ -511,7 +573,6 @@ export default {
     box-shadow: 0px 1px 3px gray;
     border-radius: 5px;
     display: flex;
-    margin-left: 5px;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -616,15 +677,16 @@ export default {
   }
   .postAll{
     width: 100%;
-    height: calc(100vh - 160px);
+    height: calc(100vh - 225px);
     overflow-y:scroll;
-    padding-left: 5px;
-    padding-right: 5px;
     padding-bottom: 10px;
     padding-top: 5px;
+    padding-left: 1px;
+    padding-right: 1px;
+    box-sizing: border-box;
   }
   .postAll_student{
-    height: calc(100vh - 50px);
+    height: calc(100vh - 90px);
   }
   .postAll_empty{
     display: flex;
@@ -639,6 +701,7 @@ export default {
     position: relative;
     margin-bottom: 15px;
     padding-top: 5px;
+    box-sizing: border-box;
   }
   .post_more{
     position: absolute;
