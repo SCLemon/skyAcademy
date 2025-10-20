@@ -82,7 +82,7 @@
             </div>
           </div>
         </div>
-        <div class="postAll postAll_empty" v-else>
+        <div :class="`postAll postAll_empty ${currentUser.typeEng=='teacher'?'':'postAll_student'}`" v-else>
           <el-empty description="暫無貼文"></el-empty>
         </div>
     </div>

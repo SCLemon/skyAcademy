@@ -64,7 +64,7 @@
             </div>
           </div>
         </div>
-        <div class="postAll postAll_empty" v-else>
+        <div :class="`postAll postAll_empty ${currentUser.typeEng=='teacher'?'':'postAll_student'}`" v-else>
           <el-empty description="分享之貼文不公開或已刪除"></el-empty>
         </div>
     </div>
@@ -467,7 +467,7 @@ export default {
   }
   .postAll{
     width: 100%;
-    height: calc(100vh - 160px);
+    height: calc(100vh - 50px);
     overflow-y:scroll;
     padding-left: 5px;
     padding-right: 5px;
