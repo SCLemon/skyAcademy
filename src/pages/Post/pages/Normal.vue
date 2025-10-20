@@ -16,7 +16,7 @@
               <i class="fa-regular fa-pen-to-square icon"></i> 建立貼文
             </div>
             <div class="icon_item" @click="openDialog('img')">
-              <i class="fa-regular fa-images icon"></i> 相片 / 影片
+              <i class="fa-regular fa-images icon"></i> 建立圖片
             </div>
           </div>
         </div>

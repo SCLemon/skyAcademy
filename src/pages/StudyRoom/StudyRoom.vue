@@ -58,6 +58,11 @@
         <el-form-item label="預計所需時間 (分鐘)：">
           <el-input-number v-model="form.expectTime" :min="15"></el-input-number>
         </el-form-item>
+        <el-form-item label="計畫類別：">
+          <el-select v-model="form.projectType" placeholder="請選擇類別">
+            <el-option v-for="item in projectTypeOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
       <el-button type="primary" class="create" :disabled="(form.content.trim() =='')" @click="(form.content.trim()=='')?'':create()">新增計畫</el-button>
     </el-dialog>
@@ -68,6 +73,11 @@
         </el-form-item>
         <el-form-item label="學習計畫概要">
           <el-input v-model="updateForm.content" autocomplete="off" clearable></el-input>
+        </el-form-item>
+        <el-form-item label="計畫類別：">
+          <el-select v-model="updateForm.projectType" placeholder="請選擇類別">
+            <el-option v-for="item in projectTypeOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <el-button type="primary" class="create" :disabled="(updateForm.date.trim() =='' ||updateForm.content.trim()=='')" @click="(updateForm.date.trim() =='' ||updateForm.content.trim()=='')?'':update()">修改計畫</el-button>
@@ -99,6 +109,13 @@ export default {
         currentUser:{},
         beforeUnloadHandler:{},
         tableData:[],
+        projectTypeOptions:[
+          {label:'學術研究',value:'學術研究'},
+          {label:'課外學習',value:'課外學習'},
+          {label:'休閒娛樂',value:'休閒娛樂'},
+          {label:'運動健身',value:'運動健身'},
+          {label:'其他',value:'其他'},
+        ],
 
         // 新增
         dialogFormVisible:false,
@@ -106,6 +123,7 @@ export default {
           date: new Date(),
           content:'',
           expectTime: 90,
+          projectType:''
         },
         pickerOptions: {
           disabledDate(time) {
@@ -119,7 +137,8 @@ export default {
         updateIdx:'',
         updateForm:{
           date:'',
-          content:''
+          content:'',
+          projectType:'',
         },
 
         // 計時
@@ -178,6 +197,7 @@ export default {
             this.form.date = new Date();
             this.form.content = ''
             this.form.expectTime = 90;
+            this.form.projectType = '';
           }
           this.$bus.$emit('handleAlert','新增計畫通知',res.data.message, res.data.type)
         }
@@ -187,6 +207,7 @@ export default {
         this.updateIdx = obj.idx;
         this.updateForm.date = obj.date;
         this.updateForm.content = obj.content;
+        this.updateForm.projectType = obj.projectType;
         this.dialogFormVisible2 = true;
       },
       async update(){
@@ -202,6 +223,7 @@ export default {
             this.updateIdx ='';
             this.updateForm.date = '';
             this.updateForm.content = '';
+            this.updateForm.projectType = '';
             this.dialogFormVisible2 = false;
           }
           this.$bus.$emit('handleAlert','變更計畫通知',res.data.message, res.data.type)
