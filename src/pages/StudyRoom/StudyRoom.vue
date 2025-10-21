@@ -140,7 +140,7 @@ export default {
           content:'',
           projectType:'',
         },
-
+        
         // 計時
         showClock : false,
         execIdx:'',
@@ -157,15 +157,6 @@ export default {
     mounted(){
       this.getData();
       this.currentUser = JSON.parse(localStorage.getItem('currentUser'))
-
-      // 防呆
-      this.beforeUnloadHandler = (event) => {
-        if(this.showClock){
-          event.preventDefault();
-          event.returnValue = '';
-        }
-      }
-      window.addEventListener('beforeunload', this.beforeUnloadHandler);
     },
     methods:{
 
@@ -179,6 +170,13 @@ export default {
           })
           if(res.data.type == 'success'){
             this.tableData = res.data.record;
+
+            // 延續前次紀錄
+            const executing = res.data.executing;
+            if(executing){
+              this.start(executing.idx, executing.startTime, executing)
+            }
+            
           }
           else this.$bus.$emit('handleAlert','資料汲取通知',res.data.message, res.data.type)
         }
@@ -256,19 +254,35 @@ export default {
       },
 
       // ----- 記錄時間 ----- 
-      async start(idx){
+      async start(idx, startTime, executing){
         this.showClock = true;
         this.execIdx = idx
-        this.startTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss')
+        this.startTime = startTime ? format(startTime, 'yyyy-MM-dd HH:mm:ss') :format(new Date(), 'yyyy-MM-dd HH:mm:ss')
         this.timer = setInterval(() => {
           let diff = differenceInMilliseconds(new Date(), this.startTime);
-          const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
-          const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
-          const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+          const hours = String(Math.floor(diff / (1000 * 60 * 60)) || 0).padStart(2, '0');
+          const minutes = String(Math.floor((diff / (1000 * 60)) % 60) || 0).padStart(2, '0');
+          const seconds = String(Math.floor((diff / 1000) % 60) || 0).padStart(2, '0');
           this.showTime = `${hours}:${minutes}:${seconds}`;
         }, 1000);
-        await this.startProcessing()
+
+        // 沒有前次延續，才執行下一次紀錄
+        if(!executing) await this.startProcessing()
+
       },
+      // 非直接進入點，入口為 start() --> 變更計畫狀態為 進行中
+      async startProcessing(){
+        try{
+          const res = await axios.put(`/api/studyRecord/startProcessing/${this.execIdx}`,{},{
+            headers:{
+              'x-user-token':jsCookie.get('authToken')
+            }
+          })
+          if(res.data.type == 'error') await this.getData();
+        }
+        catch(e){}
+      },
+
       // 進入點
       async stop(flag){
         clearInterval(this.timer);
@@ -285,7 +299,7 @@ export default {
               'x-user-token':jsCookie.get('authToken')
             }
           })
-          if(res.data.type == 'success'){
+          if(res.data.type != 'error'){
             await this.getData();
             await this.refreshStatistics();
             this.execIdx = '';
@@ -299,17 +313,6 @@ export default {
         catch(e){}
       },
 
-      // 非直接進入點，入口為 start() --> 變更計畫狀態為 進行中
-      async startProcessing(){
-        try{
-          const res = await axios.put(`/api/studyRecord/startProcessing/${this.execIdx}`,{},{
-            headers:{
-              'x-user-token':jsCookie.get('authToken')
-            }
-          })
-        }
-        catch(e){}
-      },
       // ----- 記錄時間 -----
       async refreshStatistics(){
         this.$bus.$emit('refreshStudyRecordStatistics')
@@ -346,11 +349,7 @@ export default {
       }
     },
     async beforeDestroy(){
-      if(this.execIdx){
-        await this.stop();
-      }
       clearInterval(this.timer)
-      window.removeEventListener('beforeunload', this.beforeUnloadHandler);
     }
 }
 </script>
