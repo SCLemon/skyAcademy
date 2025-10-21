@@ -259,7 +259,7 @@ router.put('/api/studyRecord/recordTime/:idx',authMiddleware, async (req, res) =
                         'detail.$[elem].statistics.total': diff
                     },
                     $push:{
-                        'detail.$[elem].statistics.record':{start: req.body.startTime, end: req.body.stopTime}
+                        'detail.$[elem].statistics.record':{start: r.tempForPreviousTask.startTime, end: req.body.stopTime}
                     }
                 },
                 {

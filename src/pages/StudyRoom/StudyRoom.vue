@@ -293,7 +293,7 @@ export default {
       async record(flag){
         try{
           const res = await axios.put(`/api/studyRecord/recordTime/${this.execIdx}`,{
-            startTime:this.startTime, stopTime: this.stopTime, finish: flag,
+            stopTime: this.stopTime, finish: flag,
           },{
             headers:{
               'x-user-token':jsCookie.get('authToken')
