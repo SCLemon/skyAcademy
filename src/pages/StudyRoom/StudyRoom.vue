@@ -6,7 +6,7 @@
     </div>
     <statistics class="statistics"></statistics>
     <div class="table">
-        <div class="clock" v-if="showClock">
+        <div class="clock" v-if="currentUser && currentUser.typeEng == 'teacher' && showClock">
           <div class="timer">{{showTime}}</div>
           <div>
             <el-button type="warning" @click="stop(false)">紀錄時間</el-button>
