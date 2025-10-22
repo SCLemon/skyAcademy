@@ -38,7 +38,7 @@
           <el-table-column label="其他操作" width="255px">
             <template v-slot="scope">
                 <template v-if="currentUser && currentUser.typeEng == 'teacher'">
-                  <el-button @click="(scope.row.status != '尚未完成' && scope.row.status != '進行中')?'':start(scope.row.idx)" :disabled="(scope.row.status != '尚未完成' && scope.row.status != '進行中')">執行</el-button>
+                  <el-button @click="(scope.row.status != '尚未完成' && scope.row.status != '進行中')?'':startProcessing(scope.row.idx)" :disabled="(scope.row.status != '尚未完成' && scope.row.status != '進行中')">執行</el-button>
                   <el-button type="warning" @click="(scope.row.status != '尚未完成' && scope.row.status != '進行中')?'':openUpdate(scope.row)" :disabled="(scope.row.status != '尚未完成' && scope.row.status != '進行中')">修改</el-button>
                   <el-button type="danger" @click="deleteProject(scope.row.idx)">刪除</el-button>
                 </template>
@@ -142,9 +142,8 @@ export default {
         },
         
         // 計時
+        executing: {},
         showClock : false,
-        execIdx:'',
-        startTime:'',
         stopTime:'',
         showTime:'00:00:00',
         timer:-1,
@@ -174,7 +173,8 @@ export default {
             // 延續前次紀錄
             const executing = res.data.executing;
             if(executing){
-              this.start(executing.idx, executing.startTime, executing)
+              this.executing = executing;
+              this.start()
             }
             
           }
@@ -215,15 +215,15 @@ export default {
               'x-user-token':jsCookie.get('authToken')
             }
           })
-          if(res.data.type == 'success'){
-            await this.getData();
-            await this.refreshStatistics();
-            this.updateIdx ='';
-            this.updateForm.date = '';
-            this.updateForm.content = '';
-            this.updateForm.projectType = '';
-            this.dialogFormVisible2 = false;
-          }
+          
+          await this.getData();
+          await this.refreshStatistics();
+          this.updateIdx ='';
+          this.updateForm.date = '';
+          this.updateForm.content = '';
+          this.updateForm.projectType = '';
+          this.dialogFormVisible2 = false;
+          
           this.$bus.$emit('handleAlert','變更計畫通知',res.data.message, res.data.type)
         }
         catch(e){}        
@@ -240,13 +240,13 @@ export default {
                 'x-user-token':jsCookie.get('authToken')
               }
             })
-            if(res.data.type == 'success'){
-              await this.getData();
-              await this.refreshStatistics();
-            }
             this.$bus.$emit('handleAlert','刪除計畫通知',res.data.message, res.data.type)
           }
           catch(e){}
+          finally{
+            await this.getData();
+            await this.refreshStatistics();
+          }
         })
         .catch(() => {
           return
@@ -254,36 +254,31 @@ export default {
       },
 
       // ----- 記錄時間 ----- 
-      async start(idx, startTime, executing){
-        this.showClock = true;
-        this.execIdx = idx
-        this.startTime = startTime ? format(startTime, 'yyyy-MM-dd HH:mm:ss') :format(new Date(), 'yyyy-MM-dd HH:mm:ss')
-        this.timer = setInterval(() => {
-          let diff = differenceInMilliseconds(new Date(), this.startTime);
-          const hours = String(Math.floor(diff / (1000 * 60 * 60)) || 0).padStart(2, '0');
-          const minutes = String(Math.floor((diff / (1000 * 60)) % 60) || 0).padStart(2, '0');
-          const seconds = String(Math.floor((diff / 1000) % 60) || 0).padStart(2, '0');
-          this.showTime = `${hours}:${minutes}:${seconds}`;
-        }, 1000);
-
-        // 沒有前次延續，才執行下一次紀錄
-        if(!executing) await this.startProcessing()
-
-      },
-      // 非直接進入點，入口為 start() --> 變更計畫狀態為 進行中
-      async startProcessing(){
+      async startProcessing(idx){
         try{
-          const res = await axios.put(`/api/studyRecord/startProcessing/${this.execIdx}`,{},{
+          const res = await axios.put(`/api/studyRecord/startProcessing/${idx}`,{},{
             headers:{
               'x-user-token':jsCookie.get('authToken')
             }
           })
-          if(res.data.type == 'error') await this.getData();
+          await this.getData();
+          this.$bus.$emit('執行計畫通知', res.data.message, res.data.type)
         }
         catch(e){}
       },
+      async start(){ // <-- 從 getData() 進入
+        this.showClock = true;
+        const startTime = format(this.executing.startTime, 'yyyy-MM-dd HH:mm:ss')
+        this.timer = setInterval(() => {
+          let diff = differenceInMilliseconds(new Date(), startTime);
+          const hours = String(Math.floor(diff / (1000 * 60 * 60)) || 0).padStart(2, '0');
+          const minutes = String(Math.floor((diff / (1000 * 60)) % 60) || 0).padStart(2, '0');
+          const seconds = String(Math.floor((diff / 1000) % 60) || 0).padStart(2, '0');
+          this.showTime = `${hours}:${minutes}:${seconds}`;
+        }, 200);
+        this.$bus.$emit('handleAlert','計畫執行通知','計畫執行開始。', 'success');
+      },
 
-      // 進入點
       async stop(flag){
         clearInterval(this.timer);
         this.stopTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss')
@@ -292,7 +287,7 @@ export default {
       // 非直接進入點，入口為 stop()
       async record(flag){
         try{
-          const res = await axios.put(`/api/studyRecord/recordTime/${this.execIdx}`,{
+          const res = await axios.put(`/api/studyRecord/recordTime/${this.executing.idx}/${this.executing.taskId}`,{
             stopTime: this.stopTime, finish: flag,
           },{
             headers:{
@@ -302,8 +297,7 @@ export default {
           if(res.data.type != 'error'){
             await this.getData();
             await this.refreshStatistics();
-            this.execIdx = '';
-            this.startTime = '';
+            this.executing = {};
             this.stopTime = '';
             this.showClock = false;
             this.showTime ='00:00:00'
