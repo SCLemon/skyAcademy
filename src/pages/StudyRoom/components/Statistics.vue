@@ -72,6 +72,9 @@ export default {
                 }
             });
         }
+    },
+    beforeDestroy(){
+        this.$bus.$off('refreshStudyRecordStatistics', this.getData);
     }
     
 }
