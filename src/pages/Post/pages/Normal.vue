@@ -3,7 +3,7 @@
   <div>
     <div class="posterBox">
         <div class="searchBox">
-          <div class="search_input_div"><input type="text" class="search_input" v-model="q" placeholder="搜尋 Lemon's Universe 的貼文"></div>
+          <div class="search_input_div"><input type="search" class="search_input" v-model="q" placeholder="搜尋 Lemon's Universe 的貼文"></div>
           <div class="search_icon_div" @click="searchPost()"><i class="fa-solid fa-magnifying-glass"></i></div>
         </div>
         <div class="inputBox" v-if="!hideCreatePostBox && currentUser && currentUser.typeEng == 'teacher'">
@@ -570,6 +570,20 @@ export default {
   }
   .search_input::placeholder{
     font-size: 16px;
+  }
+  .search_input::-webkit-search-cancel-button{
+    -webkit-appearance: none;  /* 取消預設樣式 */
+    height: 13px;
+    width: 13px;
+    margin-left: 7px;
+    background-color: rgba(0,0,0,0.2);
+    mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12"><path stroke="white" stroke-width="2" d="M2,2 L10,10 M10,2 L2,10"/></svg>') no-repeat center;
+    -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12"><path stroke="white" stroke-width="2" d="M2,2 L10,10 M10,2 L2,10"/></svg>') no-repeat center;
+    cursor: pointer;
+    transition: 0.3s background-color ease;
+  }
+  .search_input::-webkit-search-cancel-button:hover{
+    background-color: rgba(0,0,0,0.7);
   }
   .search_icon_div{
     width: 12.5%;
