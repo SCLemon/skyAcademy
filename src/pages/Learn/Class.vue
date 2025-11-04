@@ -11,11 +11,18 @@
             <div class="list_add" @click="openUpload()" v-if="showUploadOption"><i class="fa-solid fa-cloud-arrow-up upload_icon"></i>Upload Chapter</div>
             <div class="list_add" v-else @click="toggleList()"><i class="fa-solid fa-list upload_icon"></i>Chapter List</div>
             <div class="list_box" ref="list_box">
-                <div class="list right-list" v-for="(chapter,id) in materials" :key="id">
+                <div :class="{
+                        list: true, list_selected: currentChapterIdx == chapter.idx,
+                    }
+                    " v-for="(chapter,id) in materials" :key="id">
                     <div class="list_chapter right-list-target" @click="viewChapter(chapter,id)">Chapter {{ id+1 }}</div>
                     <div class="list_title" @click="viewChapter(chapter,id)">{{ chapter.title }}</div>
                     <div class="edit" @click="downloadChapter(chapter)"><i class="fa-regular fa-file-pdf"></i></div>
-                    <div v-if="showUploadOption" class="edit" @click="openUpdate(chapter)"><i class="fa-regular fa-pen-to-square"></i></div>
+                    <div class="sort" v-if="showUploadOption">
+                        <i @click="modifyIndex(chapter, 'up')" class="el-icon-arrow-up arrow"></i>
+                        <i @click="openUpdate(chapter)" class="fa-regular fa-pen-to-square pen"></i>
+                        <i @click="modifyIndex(chapter, 'down')" class="el-icon-arrow-down arrow"></i>
+                    </div>
                 </div>
             </div>
         </div>
@@ -57,6 +64,7 @@ export default {
     data(){
         return {
             // currentUser:{},
+            currentChapterIdx:'',
             courseIdx:this.$route.query.idx,
             materials:[],
             pdfUrl:'',
@@ -106,14 +114,8 @@ export default {
                 if (document.querySelectorAll('.right-list-target')[0]) document.querySelectorAll('.right-list-target')[0].click();
             })
         },
-        async viewChapter(chapter,id){
-            const lists = document.querySelectorAll('.right-list');
-            // 移除全部的 list_selected
-            lists.forEach(el => el.classList.remove('list_selected'));
-            // 幫指定 id 的加上
-            if (lists[id]) {
-                lists[id].classList.add('list_selected');
-            }
+        async viewChapter(chapter){
+            this.currentChapterIdx = chapter.idx
             this.pdfUrl = chapter.attachmentUrl;
         },
         async downloadChapter(chapter){
@@ -215,19 +217,45 @@ export default {
                     }
                 })
                 if(res.data.type == 'success'){
+
+                    this.genRefreshPDFNumber = nanoid(); // 避免 url 緩存
+                    
+                    // 更新該項目
+                    let target = this.materials.find((m)=> m.idx == res.data.material.idx);
+                    if (target) Object.assign(target, res.data.material);
+                    
                     this.dialogTableVisible2 = false;
                     this.update.title = '';
                     this.update.fileList = [];
                     this.update.materialIdx = '';
 
-                    this.genRefreshPDFNumber = nanoid(); // 避免 url 緩存
-
-                    this.$bus.$emit('handleAlert','章節更新通知',res.data.message, res.data.type)
                 }
+                this.$bus.$emit('handleAlert','章節更新通知',res.data.message, res.data.type)
             }
             catch(e){}
             finally{
                 this.isSending2 = false;
+            }
+        },
+        // 更改專欄順序
+        async modifyIndex(chapter, method){
+            // method: up, down
+            try{
+                const res = await axios.put('/api/learn/modifyIndex',{
+                    method, idx: this.courseIdx, materialIdx: chapter.idx
+                },
+                {
+                    headers:{
+                        'x-user-token': jsCookie.get('authToken')
+                    }
+                })
+                if(res.data.type == 'success'){
+                    this.materials = res.data.materials
+                }
+                else this.$bus.$emit('handleAlert','章節序列更新通知',res.data.message, res.data.type)
+            }
+            catch(e){
+
             }
         },
         // 刪除
@@ -330,9 +358,13 @@ export default {
         display: flex;
         padding-left: 10px;
         align-items: center;
+        transition: 1.2s all ease;
     }
-    .list:hover, .list_selected{
+    .list:hover{
         cursor: pointer;
+        box-shadow: 0px 2px 4px rgba(0,0,0,0.1);
+    }
+    .list_selected{
         background: rgba(0,0,0,0.05);
     }
     
@@ -359,6 +391,22 @@ export default {
     }
     .edit:hover{
         background: rgba(0,0,0,0.05);
+    }
+    .sort{
+        min-height: 77.5px;
+        height: calc((100vh - 80px)/9);
+        width: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
+    }
+    .sort:hover{
+        background: rgba(0,0,0,0.05);
+    }
+    .pen{
+        margin-top: 5px;
+        margin-bottom: 5px;
     }
     .form_input{
         margin-top: 15px;
