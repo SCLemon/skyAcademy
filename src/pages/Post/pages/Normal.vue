@@ -6,7 +6,7 @@
           <div class="search_input_div"><input type="text" class="search_input" v-model="q" placeholder="搜尋 Lemon's Universe 的貼文"></div>
           <div class="search_icon_div" @click="searchPost()"><i class="fa-solid fa-magnifying-glass"></i></div>
         </div>
-        <div class="inputBox" v-if="currentUser && currentUser.typeEng == 'teacher'">
+        <div class="inputBox" v-if="!hideCreatePostBox && currentUser && currentUser.typeEng == 'teacher'">
           <div class="inputTextBox" @click="openDialog('img')">
             <div class="inputTextBoxImg"><img :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt=""></div>
             <div class="textArea">發表您的貼文和公告</div>
@@ -20,7 +20,7 @@
             </div>
           </div>
         </div>
-        <div :class="`postAll ${currentUser.typeEng=='teacher'?'':'postAll_student'}`" ref="postAll" @scroll="postDivScroll()" v-if="posts.length">
+        <div :class="`postAll ${(!currentUser.typeEng=='teacher'|| hideCreatePostBox)?'postAll_student':''}`" ref="postAll" @scroll="postDivScroll()" v-if="posts.length">
           <div class="post" v-for="(obj,id) in posts" :key="id">
             <div class="post_more" v-if="showPermission">
               <el-dropdown @command="handleCommand">
@@ -164,9 +164,11 @@ export default {
 
       // 顯示貼文
       q:'',
+      share:'',
       posts:[],
       page:1,
       showPermission:false,
+      hideCreatePostBox: false,
       isLoading: false, // 加載狀態，避免重複請求
 
       // 修改貼文內容
@@ -249,7 +251,7 @@ export default {
       catch(e){}
     },
     openShare(idx){
-      let text = location.protocol+'//'+location.host + '/#/academic/post/share?share='+idx;
+      let text = location.protocol+'//'+location.host + '/#/academic/post?share='+idx;
       this.shareUrl = text;
       this.shareStatus = 'COPY';
       this.dialogTableVisible3 = true;
@@ -277,6 +279,7 @@ export default {
       }
     },
     async searchPost(){
+      await this.$router.replace({ query: {} }).catch((e)=>{});
       this.posts = [];
       this.page = 1;
       await this.getPost();
@@ -284,8 +287,11 @@ export default {
     async getPost(){
       if (this.isLoading) return;
       this.isLoading = true;
-      
-      let url = `/api/post/getPost?page=${this.page}&q=${this.q}`
+
+      this.share = this.$route.query.share ?? null;
+      let url =''
+      if(this.share) url = `/api/post/share/${this.share}`;
+      else url = `/api/post/getPost?page=${this.page}${this.q ? `&q=${this.q}` : ''}`;
 
       try{
         const res = await axios.get(url,{
@@ -300,11 +306,13 @@ export default {
 
           this.$nextTick(async() => {
             const postAllDiv = this.$refs.postAll;
-            // 如果內容高度仍然 <= 容器高度，代表還不夠滾動，繼續載入
-            if (postAllDiv && postAllDiv.scrollHeight <= postAllDiv.clientHeight && newPosts.length > 0) {
+            if (!this.share && postAllDiv && postAllDiv.scrollHeight <= postAllDiv.clientHeight && newPosts.length > 0) {
               await this.getPost();
             }
           });
+
+          this.hideCreatePostBox = (this.q || this.share); // 若查詢或分享狀態 --> 將貼文 Box 進行隱藏
+          
         }
         else this.$bus.$emit('handleAlert','貼文獲取通知',res.data.message,res.data.type)
       }

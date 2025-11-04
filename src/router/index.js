@@ -6,7 +6,6 @@ import Academic from '../pages/Academic/Academic.vue'
 import Learn from '../pages/Learn/Learn.vue'
 import Class from '../pages/Learn/Class.vue'
 import Post from '../pages/Post/Post.vue'
-import Share from '../pages/Post/pages/Share.vue'
 import Normal from '@/pages/Post/pages/Normal.vue'
 import Login from '../pages/Login/Login.vue'
 import StudentInfo from '@/pages/InfoPage/StudentInfo.vue'
@@ -33,10 +32,6 @@ const router = new VueRouter({
                     path:'post',
                     component:Post,
                     children:[
-                        {
-                            path:'share',
-                            component:Share
-                        },
                         {
                             path:'',
                             component:Normal
@@ -103,7 +98,7 @@ router.beforeEach(async (to, from, next) => {
     const token = jsCookie.get('authToken')
     
     // 通用驗證
-    const allowedPaths = ['/', '/academic/login','/academic/post/share'];
+    const allowedPaths = ['/', '/academic/login'];
     if(!allowedPaths.includes(to.path) && !token) return next('/academic/login')
     
     const res = await axios.post('/login/token',{save:false},{
