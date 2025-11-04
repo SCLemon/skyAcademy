@@ -283,8 +283,11 @@ export default {
       this.shareStatus = '✓ COPIED'
     },
     async postDivScroll(){
+      
       const postAllDiv = this.$refs.postAll;
-      if (postAllDiv.scrollHeight - postAllDiv.scrollTop === postAllDiv.clientHeight) {
+      this.share = this.$route.query.share ?? null;
+
+      if (!this.share && postAllDiv.scrollHeight - postAllDiv.scrollTop === postAllDiv.clientHeight) {
         await this.getPost();
       }
     },
@@ -311,8 +314,15 @@ export default {
         })
         if(res.data.type == 'success'){
           const newPosts = res.data.posts;
-          this.posts = this.posts.concat(newPosts);
-          this.page++;
+
+          if(this.share){
+             this.posts = newPosts;
+             this.page = 1;
+          }
+          else {
+            this.posts = this.posts.concat(newPosts);
+            this.page++;
+          }
 
           this.$nextTick(async() => {
             const postAllDiv = this.$refs.postAll;
