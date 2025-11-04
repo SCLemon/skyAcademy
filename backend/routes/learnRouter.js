@@ -288,15 +288,16 @@ router.post('/api/learn/modifyMaterial',upload.fields([{ name: 'attachments', ma
             try{
 
                 const updatedCourse = await courseModel.findOne({ idx: idx, group: req.user.group });
-                console.log(updatedCourse)
                 const updatedMaterial = updatedCourse.meta.find(item => item.idx === materialIdx);
             
-                const filePath = updatedMaterial.attachmentUrl.original
-                let file = req.files['attachments'][0]
-                if (fs.existsSync(filePath))fs.unlinkSync(filePath);
-
-                fs.writeFileSync(filePath, file.buffer)
-
+                // 若有新文件才覆蓋舊文件
+                let file = req.files['attachments'] ? req.files['attachments'][0]:[];
+                if(file){
+                    const filePath = updatedMaterial.attachmentUrl.original
+                    if (fs.existsSync(filePath))fs.unlinkSync(filePath);
+                    fs.writeFileSync(filePath, file.buffer)
+                }
+                
                 return res.send({
                     type:'success',
                     message:'文件更新成功。'

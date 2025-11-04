@@ -5,7 +5,7 @@
             <el-empty description="本專欄暫無資料"></el-empty>
         </div>
         <div class="pdf" v-else>
-            <pdf-viewer :pdfUrl="pdfUrl"></pdf-viewer>
+            <pdf-viewer :pdfUrl="`${pdfUrl}?${genRefreshPDFNumber}`"></pdf-viewer>
         </div>
         <div class="column">
             <div class="list_add" @click="openUpload()" v-if="showUploadOption"><i class="fa-solid fa-cloud-arrow-up upload_icon"></i>Upload Chapter</div>
@@ -38,7 +38,7 @@
             <div class="el-upload__text">將文件拖到此處，或<em>點擊上傳</em></div>
             <div class="el-upload__tip" slot="tip">只能上傳 PDF 文件</div>
         </el-upload>
-        <el-button type="primary" class="sendBtn" :loading="isSending2" :disabled="(update.title =='' || update.fileList.length == 0)" @click="(update.title =='' || update.fileList.length == 0)?'':updateChapter()">確認更新</el-button>
+        <el-button type="primary" class="sendBtn" :loading="isSending2" :disabled="(update.title =='')" @click="(update.title =='')?'':updateChapter()">確認更新</el-button>
         <el-button type="danger" class="sendBtn" :loading="isSending3" @click="removeChapter()">確認刪除</el-button>
     </el-dialog>
   </div>
@@ -48,6 +48,7 @@
 import axios from 'axios';
 import jsCookie from 'js-cookie';
 import pdfViewer from './components/PdfViewer.vue';
+import { nanoid } from 'nanoid';
 export default {
     name:'Class',
     components:{
@@ -59,6 +60,7 @@ export default {
             courseIdx:this.$route.query.idx,
             materials:[],
             pdfUrl:'',
+            genRefreshPDFNumber:'', // 避免 url 緩存
 
             // 上傳
             form:{
@@ -217,7 +219,9 @@ export default {
                     this.update.title = '';
                     this.update.fileList = [];
                     this.update.materialIdx = '';
-                    await this.getData();
+
+                    this.genRefreshPDFNumber = nanoid(); // 避免 url 緩存
+
                     this.$bus.$emit('handleAlert','章節更新通知',res.data.message, res.data.type)
                 }
             }
@@ -226,7 +230,6 @@ export default {
                 this.isSending2 = false;
             }
         },
-
         // 刪除
         async removeChapter(chapter){
             this.isSending3 = true;
