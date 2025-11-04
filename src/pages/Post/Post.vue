@@ -2,7 +2,7 @@
 <template>
   <div class="view">
     <div class="posterContainer">
-      <router-view class="router_view" :key="$route.fullPath"></router-view>
+      <router-view class="router_view"></router-view>
       <div class="column">
           <self-intro></self-intro>
       </div>

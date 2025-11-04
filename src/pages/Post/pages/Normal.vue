@@ -20,7 +20,7 @@
             </div>
           </div>
         </div>
-        <div :class="`postAll ${(!currentUser.typeEng=='teacher'|| hideCreatePostBox)?'postAll_student':''}`" ref="postAll" @scroll="postDivScroll()" v-if="posts.length">
+        <div :class="{ postAll: true, postAll_student: currentUser.typeEng !== 'teacher' || hideCreatePostBox }" ref="postAll" @scroll="postDivScroll()" v-if="posts.length">
           <div class="post" v-for="(obj,id) in posts" :key="id">
             <div class="post_more" v-if="showPermission">
               <el-dropdown @command="handleCommand">
@@ -82,7 +82,7 @@
             </div>
           </div>
         </div>
-        <div :class="`postAll postAll_empty ${currentUser.typeEng=='teacher'?'':'postAll_student'}`" v-else>
+        <div :class="{ postAll: true, postAll_student: currentUser.typeEng !== 'teacher' || hideCreatePostBox, postAll_empty: true }" v-else>
           <el-empty description="暫無貼文"></el-empty>
         </div>
     </div>
@@ -194,7 +194,17 @@ export default {
     this.currentUser = JSON.parse(localStorage.getItem('currentUser'))
 
   },
-
+  watch:{
+    '$route.query.share':{
+      deep: true,
+      async handler(){
+        this.dialogTableVisible3 = false;
+        this.posts = [];
+        this.page = 1;
+        await this.getPost();
+      }
+    }
+  },
   methods:{
     // 轉換內文中的 @href=[url]
     linkify(text){
@@ -489,7 +499,6 @@ export default {
         const textArea = sendButton.previousElementSibling;
         const message = textArea.value;
 
-        console.log('here')
         const res = await axios.post(`/api/post/message`,{postIdx:idx, message:message},{
           headers:{
             'x-user-token':jsCookie.get('authToken'),
