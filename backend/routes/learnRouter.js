@@ -291,7 +291,7 @@ router.post('/api/learn/modifyMaterial',upload.fields([{ name: 'attachments', ma
                 const updatedMaterial = updatedCourse.meta.find(item => item.idx === materialIdx);
             
                 // 若有新文件才覆蓋舊文件
-                let file = req.files['attachments'] ? req.files['attachments'][0]:[];
+                let file = req.files['attachments'] ? req.files['attachments'][0]: null;
                 if(file){
                     const filePath = updatedMaterial.attachmentUrl.original
                     if (fs.existsSync(filePath))fs.unlinkSync(filePath);
