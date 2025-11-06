@@ -1,6 +1,14 @@
 <template>
   <div class="pdf-wrapper">
-    <div class="pdf-loading" v-if="isLoading"><img src="img/Loading.gif"></div>
+    <div class="pdf-loading" ref="pdf-loading" v-if="isLoading">
+      <div>
+        <img src="img/Loading.gif">
+        <div class="loadingBar">
+          <div class="loadingLine" :style="`width: ${loadProgress}%;`"></div>
+        </div>
+        <div class="loadProgress">{{ loadProgress }}%</div>
+      </div>
+    </div>
     <div ref="pdfContainer" class="pdf-container"></div>
   </div>
 </template>
@@ -24,6 +32,8 @@ export default {
   data() {
     return {
       isLoading: true,
+      loadProgress:0,
+      loadTimer: null,
       pdf: null,
       pageCanvases: [],
       observer: null,
@@ -35,7 +45,6 @@ export default {
     pdfjsLib.disableStream = false;
     pdfjsLib.enableWebGL = this.isWebGLAvailable(); // GPU 渲染加速
 
-    this.loadPdf(this.pdfUrl);
     window.addEventListener('resize', this.handleResize);
   },
   beforeUnmount() {
@@ -55,8 +64,14 @@ export default {
         return false;
       }
     },
-    async loadPdf(url) {
+    async delay(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms))
+    },
+    async loadPdf() {
       this.isLoading = true;
+      this.$bus.$emit('toggleEnableToReadNextPDF',false);
+      if (this.pdf) this.pdf.destroy(); // 銷毀舊 PDF 解析器與 worker
+
       const container = this.$refs.pdfContainer;
       container.innerHTML = '';
       this.pageCanvases = [];
@@ -65,8 +80,22 @@ export default {
         this.pdf = await pdfjsLib.getDocument({
           url: this.pdfUrl,
           httpHeaders: this.httpHeaders,
+          verbosity: pdfjsLib.VerbosityLevel.ERRORS,
+
         }).promise;
 
+        // 載入進度條
+        this.loadTimer = setInterval(async () => {
+            const percent = parseInt(Math.random() * 12 + 1)
+            const temp = this.loadProgress + percent
+
+            if (!this.isLoading) clearInterval(this.loadTimer)
+            else if (temp > 98) {} 
+            else this.loadProgress = temp;
+
+        }, 725);
+
+        // 進行結構渲染
         for (let pageNum = 1; pageNum <= this.pdf.numPages; pageNum++) {
           const canvas = document.createElement('canvas');
           canvas.style.display = 'block';
@@ -74,12 +103,25 @@ export default {
           canvas.style.marginBottom = '5px';
           canvas.dataset.pageNum = pageNum;
           container.appendChild(canvas);
-
           this.pageCanvases.push({ pageNum, canvas, renderTask: null });
-          this.isLoading = false;
         }
 
+        // 提前渲染第一頁
+        const first = this.pageCanvases.find(p => p.pageNum === 1);
+        if (first && !first.canvas.dataset.rendered) {
+          this.safeRenderPage(first.pageNum, first.canvas);
+        }
+        
+        // 完成結構渲染
+        this.loadProgress = 100;
+        
+        await this.delay(750);
+        this.$refs['pdf-loading'].style = 'opacity:0;';
+        await this.delay(750); // 需等待 opacity 動畫的 0.75s
+
         this.initObserver();
+        this.isLoading = false;
+        this.$bus.$emit('toggleEnableToReadNextPDF',true);
       } 
       catch (err) {}
     },
@@ -163,21 +205,23 @@ export default {
     }
   },
   watch: {
-    pdfUrl(newUrl) {
+    async pdfUrl(newUrl) {
+      this.loadProgress = 0;
       this.pdfUrl = newUrl
-      this.loadPdf();
+      await this.loadPdf();
     }
   }
 };
 </script>
 
 <style scoped>
+
   .pdf-wrapper{
     width: 100%;
     height: 100%;
     position: relative;
   }
-  .pdf-container {
+  .pdf-container{
     width: 100%;
     height: 100vh;
     overflow: auto;
@@ -192,5 +236,27 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    opacity: 1;
+    transition: 0.75s opacity ease;
+  }
+  .loadingBar{
+    width: 100%;
+    height: 9.5px;
+    border: 1px solid skyblue;
+    box-sizing: border-box;
+    padding: 1px;
+  }
+  .loadingLine{
+    width: 0%;
+    height: 5.5px;
+    background: skyblue;
+    transition: 0.25s width ease;
+    box-sizing: border-box;
+  }
+  .loadProgress{
+    width: 100%;
+    margin-top: 10px;
+    text-align: center;
+    color: skyblue;
   }
 </style>

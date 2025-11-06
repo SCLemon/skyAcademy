@@ -10,13 +10,13 @@
         <div class="column">
             <div class="list_add" @click="openUpload()" v-if="showUploadOption"><i class="fa-solid fa-cloud-arrow-up upload_icon"></i>Upload Chapter</div>
             <div class="list_add" v-else @click="toggleList()"><i class="fa-solid fa-list upload_icon"></i>Chapter List</div>
-            <div class="list_box" ref="list_box">
+            <div :class="{list_box:true}" ref="list_box">
                 <div :class="{
                         list: true, list_selected: currentChapterIdx == chapter.idx,
                     }
                     " v-for="(chapter,id) in materials" :key="id">
-                    <div class="list_chapter right-list-target" @click="viewChapter(chapter,id)">Chapter {{ id+1 }}</div>
-                    <div class="list_title" @click="viewChapter(chapter,id)">{{ chapter.title }}</div>
+                    <div class="list_chapter right-list-target" @click="viewChapter(chapter)">Chapter {{ id+1 }}</div>
+                    <div class="list_title" @click="viewChapter(chapter)">{{ chapter.title }}</div>
                     <div class="edit" @click="downloadChapter(chapter)"><i class="fa-regular fa-file-pdf"></i></div>
                     <div class="sort" v-if="showUploadOption">
                         <i @click="modifyIndex(chapter, 'up')" class="el-icon-arrow-up arrow"></i>
@@ -63,12 +63,12 @@ export default {
     },
     data(){
         return {
-            // currentUser:{},
             currentChapterIdx:'',
             courseIdx:this.$route.query.idx,
             materials:[],
             pdfUrl:'',
             genRefreshPDFNumber:'', // 避免 url 緩存
+            enableToReadNextPDF: true,
 
             // 上傳
             form:{
@@ -95,6 +95,10 @@ export default {
         }
     },
     async mounted(){
+
+        // 禁止在前一頁面渲染時跳頁
+        this.$bus.$on('toggleEnableToReadNextPDF',this.toggleEnableToReadNextPDF);
+
         await this.getData();
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
         if(currentUser && currentUser.typeEng == 'teacher') this.showUploadOption = true;
@@ -105,6 +109,9 @@ export default {
         },
         toggleList(){
             this.$refs['list_box'].classList.toggle('list_box_close');
+        },
+        toggleEnableToReadNextPDF(result){
+            this.toggleEnableToReadNextPDF = result;
         },
         async getData(){
             const res = await axios.get(`/api/learn/getCourseMaterial/${this.courseIdx}`,{
@@ -118,6 +125,10 @@ export default {
             })
         },
         async viewChapter(chapter){
+            if(!this.toggleEnableToReadNextPDF){
+                this.$bus.$emit('handleAlert','專欄閱讀通知','請等待頁面渲染完畢再執行此操作。','warning')
+                return;
+            }
             this.currentChapterIdx = chapter.idx
             this.pdfUrl = chapter.attachmentUrl;
         },
