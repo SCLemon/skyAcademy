@@ -6,7 +6,6 @@
 </template>
 
 <script>
-import jsCookie from 'js-cookie';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 import pdfWorker from 'pdfjs-dist/legacy/build/pdf.worker.entry';
 
@@ -16,6 +15,10 @@ export default {
     pdfUrl: {
       type: String,
       required: true
+    },
+    httpHeaders:{
+      type: Object,
+      default: {}
     }
   },
   data() {
@@ -60,10 +63,8 @@ export default {
 
       try {
         this.pdf = await pdfjsLib.getDocument({
-          url:url,
-          httpHeaders:{
-            'x-user-token':jsCookie.get('authToken')
-          }
+          url: this.pdfUrl,
+          httpHeaders: this.httpHeaders,
         }).promise;
 
         for (let pageNum = 1; pageNum <= this.pdf.numPages; pageNum++) {
@@ -163,7 +164,8 @@ export default {
   },
   watch: {
     pdfUrl(newUrl) {
-      this.loadPdf(newUrl);
+      this.pdfUrl = newUrl
+      this.loadPdf();
     }
   }
 };

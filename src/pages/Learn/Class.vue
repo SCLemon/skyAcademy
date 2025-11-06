@@ -5,7 +5,7 @@
             <el-empty description="本專欄暫無資料"></el-empty>
         </div>
         <div class="pdf" v-else>
-            <pdf-viewer :pdfUrl="`${pdfUrl}?${genRefreshPDFNumber}`"></pdf-viewer>
+            <pdf-viewer :pdfUrl="`${pdfUrl}?${genRefreshPDFNumber}`" :httpHeaders="{'x-user-token': getToken()}"></pdf-viewer>
         </div>
         <div class="column">
             <div class="list_add" @click="openUpload()" v-if="showUploadOption"><i class="fa-solid fa-cloud-arrow-up upload_icon"></i>Upload Chapter</div>
@@ -100,13 +100,16 @@ export default {
         if(currentUser && currentUser.typeEng == 'teacher') this.showUploadOption = true;
     },
     methods:{
+        getToken(){
+            return jsCookie.get('authToken');
+        },
         toggleList(){
             this.$refs['list_box'].classList.toggle('list_box_close');
         },
         async getData(){
             const res = await axios.get(`/api/learn/getCourseMaterial/${this.courseIdx}`,{
                 headers:{
-                    'x-user-token':jsCookie.get('authToken')
+                    'x-user-token': this.getToken()
                 }
             });
             this.materials = res.data.materials;
@@ -169,7 +172,7 @@ export default {
                 }
                 const res = await axios.post('/api/learn/createMaterial', formData, {
                     headers:{
-                        'x-user-token':jsCookie.get('authToken')
+                        'x-user-token':this.getToken()
                     }
                 })
                 if(res.data.type == 'success'){
@@ -213,7 +216,7 @@ export default {
                 }
                 const res = await axios.post('/api/learn/modifyMaterial', formData, {
                     headers:{
-                        'x-user-token':jsCookie.get('authToken')
+                        'x-user-token':this.getToken()
                     }
                 })
                 if(res.data.type == 'success'){
@@ -246,7 +249,7 @@ export default {
                 },
                 {
                     headers:{
-                        'x-user-token': jsCookie.get('authToken')
+                        'x-user-token': this.getToken()
                     }
                 })
                 if(res.data.type == 'success'){
@@ -264,7 +267,7 @@ export default {
             try{
                 const res = await axios.get(`/api/learn/deleteMaterial/${this.courseIdx}/${this.update.materialIdx}`,{
                     headers:{
-                        'x-user-token':jsCookie.get('authToken')
+                        'x-user-token':this.getToken()
                     }
                 });
                 if(res.data.type == 'success'){
