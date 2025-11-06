@@ -27,6 +27,10 @@ export default {
     httpHeaders:{
       type: Object,
       default: {}
+    },
+    preloadCount:{
+      type: Number,
+      default: 1
     }
   },
   data() {
@@ -37,7 +41,6 @@ export default {
       pdf: null,
       pageCanvases: [],
       observer: null,
-      preloadCount: 1 // 預載頁數
     };
   },
   mounted() {
@@ -70,7 +73,9 @@ export default {
     async loadPdf() {
       this.isLoading = true;
       this.$bus.$emit('toggleEnableToReadNextPDF',false);
-      if (this.pdf) this.pdf.destroy(); // 銷毀舊 PDF 解析器與 worker
+      
+      // 銷毀舊 PDF 解析器與 worker
+      if (this.pdf) this.pdf.destroy();
 
       const container = this.$refs.pdfContainer;
       container.innerHTML = '';

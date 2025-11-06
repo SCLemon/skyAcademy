@@ -5,7 +5,10 @@
             <el-empty description="本專欄暫無資料"></el-empty>
         </div>
         <div class="pdf" v-else>
-            <pdf-viewer :pdfUrl="`${pdfUrl}?${genRefreshPDFNumber}`" :httpHeaders="{'x-user-token': getToken()}"></pdf-viewer>
+            <pdf-viewer :pdfUrl="`${pdfUrl}?${genRefreshPDFNumber}`" 
+                        :httpHeaders="{'x-user-token': getToken()}"
+                        :preloadCount="1"
+            ></pdf-viewer>
         </div>
         <div class="column">
             <div class="list_add" @click="openUpload()" v-if="showUploadOption"><i class="fa-solid fa-cloud-arrow-up upload_icon"></i>Upload Chapter</div>
@@ -17,7 +20,10 @@
                     " v-for="(chapter,id) in materials" :key="id">
                     <div class="list_chapter right-list-target" @click="viewChapter(chapter)">Chapter {{ id+1 }}</div>
                     <div class="list_title" @click="viewChapter(chapter)">{{ chapter.title }}</div>
-                    <div class="edit" @click="downloadChapter(chapter)"><i class="fa-regular fa-file-pdf"></i></div>
+                    <div :class="{edit: true, isDownloading:isDownloading}" @click="downloadChapter(chapter)">
+                        <i class="fa-regular fa-file-pdf" v-if="!chapter.isDownloading"></i>
+                        <div v-else class="chapter_file_download_percent">{{ chapter.downloadPercent ?? 0 }}%</div>
+                    </div>
                     <div class="sort" v-if="showUploadOption">
                         <i @click="modifyIndex(chapter, 'up')" class="el-icon-arrow-up arrow"></i>
                         <i @click="openUpdate(chapter)" class="fa-regular fa-pen-to-square pen"></i>
@@ -35,7 +41,7 @@
             <div class="el-upload__text">將文件拖到此處，或<em>點擊上傳</em></div>
             <div class="el-upload__tip" slot="tip">只能上傳 PDF 文件</div>
         </el-upload>
-        <el-button type="primary" class="sendBtn" :loading="isSending" :disabled="(form.title =='' || form.fileList.length == 0)" @click="(form.title =='' || form.fileList.length == 0)?'':create()">確認上傳</el-button>
+        <el-button type="primary" class="sendBtn" :loading="isSending" :disabled="(form.title =='' || form.fileList.length == 0)" @click="(form.title =='' || form.fileList.length == 0)?'':create()">{{ isSending? `${uploadPercent}%`:'確認上傳' }}</el-button>
     </el-dialog>
     <el-dialog title="更新文件" :visible.sync="dialogTableVisible2">
         更新章節：<el-input class="form_input" v-model="update.title" placeholder="請輸入章節名稱"></el-input>
@@ -45,7 +51,7 @@
             <div class="el-upload__text">將文件拖到此處，或<em>點擊上傳</em></div>
             <div class="el-upload__tip" slot="tip">只能上傳 PDF 文件</div>
         </el-upload>
-        <el-button type="primary" class="sendBtn" :loading="isSending2" :disabled="(update.title =='')" @click="(update.title =='')?'':updateChapter()">確認更新</el-button>
+        <el-button type="primary" class="sendBtn" :loading="isSending2" :disabled="(update.title =='')" @click="(update.title =='')?'':updateChapter()">{{isSending2? `${updatePercent}%`:'確認更新' }}</el-button>
         <el-button type="danger" class="sendBtn" :loading="isSending3" @click="removeChapter()">確認刪除</el-button>
     </el-dialog>
   </div>
@@ -71,6 +77,7 @@ export default {
             enableToReadNextPDF: true,
 
             // 上傳
+            uploadPercent:0,
             form:{
                 title:'',
                 fileList:[]
@@ -79,8 +86,12 @@ export default {
             attachment:[],
             isSending:false,
             showUploadOption:false,
-
+            
+            // 下載
+            isDownloading: false,
+            
             // 更新
+            updatePercent:0,
             update:{
                 materialIdx:'',
                 title:'',
@@ -133,14 +144,32 @@ export default {
             this.pdfUrl = chapter.attachmentUrl;
         },
         async downloadChapter(chapter){
+            
+            if(this.isDownloading){
+                this.$bus.$emit('檔案下載通知','檔案正在執行下載，請稍後再試。', 'warning');
+                return;
+            }
+
+            this.isDownloading = true;
+            chapter.isDownloading = true;
+
+            // 強制初始化綁定屬性
+            if (!('downloadPercent' in chapter)) {
+                this.$set(chapter, 'downloadPercent', 0);
+            }
+
             try {
                 const response = await axios.get(chapter.attachmentUrl, {
                     responseType: "blob",
                     headers:{
                         'x-user-token':jsCookie.get('authToken')
-                    }
+                    },
+                    onDownloadProgress: (progressEvent) => {
+                        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                        chapter.downloadPercent = percent;
+                    },
                 });
-
+                
                 const blob = new Blob([response.data]);
                 const link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
@@ -157,6 +186,11 @@ export default {
             }
             catch (error) {
                 this.$bus.$emit('handleAlert','檔案下載通知','文件下載失敗。','error')
+            }
+            finally{
+                this.isDownloading = false;
+                chapter.isDownloading = false;
+                chapter.downloadPercent = 0;
             }
         },
         // 上傳
@@ -184,7 +218,12 @@ export default {
                 const res = await axios.post('/api/learn/createMaterial', formData, {
                     headers:{
                         'x-user-token':this.getToken()
-                    }
+                    },
+                    onUploadProgress: (progressEvent) => {
+                        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                        this.uploadPercent = percent;
+                    },
+                    
                 })
                 if(res.data.type == 'success'){
                     this.dialogTableVisible = false;
@@ -197,6 +236,7 @@ export default {
             catch(e){}
             finally{
                 this.isSending = false;
+                this.uploadPercent = 0;
             }
         },
 
@@ -228,7 +268,11 @@ export default {
                 const res = await axios.post('/api/learn/modifyMaterial', formData, {
                     headers:{
                         'x-user-token':this.getToken()
-                    }
+                    },
+                    onUploadProgress: (progressEvent) => {
+                        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                        this.updatePercent = percent;
+                    },
                 })
                 if(res.data.type == 'success'){
 
@@ -249,6 +293,7 @@ export default {
             catch(e){}
             finally{
                 this.isSending2 = false;
+                this.updatePercent = 0;
             }
         },
         // 更改專欄順序
@@ -372,7 +417,7 @@ export default {
         display: flex;
         padding-left: 10px;
         align-items: center;
-        transition: 1.2s all ease;
+        transition: 1s all ease;
     }
     .list:hover{
         cursor: pointer;
@@ -405,6 +450,12 @@ export default {
     }
     .edit:hover{
         background: rgba(0,0,0,0.05);
+    }
+    .isDownloading{
+        cursor: not-allowed;
+    }
+    .chapter_file_download_percent{
+        font-size: 12px;
     }
     .sort{
         min-height: 77.5px;
