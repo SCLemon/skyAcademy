@@ -77,23 +77,21 @@ export default {
       this.pageCanvases = [];
 
       try {
-        this.pdf = await pdfjsLib.getDocument({
+
+        const loadingTask = pdfjsLib.getDocument({
           url: this.pdfUrl,
           httpHeaders: this.httpHeaders,
           verbosity: pdfjsLib.VerbosityLevel.ERRORS,
+        });
 
-        }).promise;
+        // 下載進度條
+        loadingTask.onProgress = (progressData) => {
+          const { loaded, total } = progressData;
+          const percent = Math.round((loaded / total) * 100);
+          this.loadProgress = percent;
+        };
 
-        // 載入進度條
-        this.loadTimer = setInterval(async () => {
-            const percent = parseInt(Math.random() * 12 + 1)
-            const temp = this.loadProgress + percent
-
-            if (!this.isLoading) clearInterval(this.loadTimer)
-            else if (temp > 98) {} 
-            else this.loadProgress = temp;
-
-        }, 725);
+        this.pdf = await loadingTask.promise;
 
         // 進行結構渲染
         for (let pageNum = 1; pageNum <= this.pdf.numPages; pageNum++) {
@@ -112,9 +110,7 @@ export default {
           this.safeRenderPage(first.pageNum, first.canvas);
         }
         
-        // 完成結構渲染
-        this.loadProgress = 100;
-        
+        // 後處理
         await this.delay(750);
         this.$refs['pdf-loading'].style = 'opacity:0;';
         await this.delay(750); // 需等待 opacity 動畫的 0.75s
