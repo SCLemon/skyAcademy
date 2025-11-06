@@ -51,8 +51,8 @@
             <div class="el-upload__text">將文件拖到此處，或<em>點擊上傳</em></div>
             <div class="el-upload__tip" slot="tip">只能上傳 PDF 文件</div>
         </el-upload>
-        <el-button type="primary" class="sendBtn" :loading="isSending2" :disabled="(update.title =='')" @click="(update.title =='')?'':updateChapter()">{{isSending2? `${updatePercent}%`:'確認更新' }}</el-button>
-        <el-button type="danger" class="sendBtn" :loading="isSending3" @click="removeChapter()">確認刪除</el-button>
+        <el-button type="primary" class="sendBtn" :loading="isSending2" :disabled="(update.title =='' || (isSending2 || isSending3))" @click="(update.title =='')?'':updateChapter()">{{isSending2? `${updatePercent}%`:'確認更新' }}</el-button>
+        <el-button type="danger" class="sendBtn" :loading="isSending3" :disabled="isSending2 || isSending3" @click="removeChapter()">確認刪除</el-button>
     </el-dialog>
   </div>
 </template>
@@ -205,7 +205,11 @@ export default {
         },
         async create(){
             try{
+                
+                // 防呆
+                if(this.isSending) return;
                 this.isSending = true;
+
                 let formData = new FormData();
                 formData.append('idx', this.courseIdx);
                 formData.append('title', this.form.title);
@@ -254,7 +258,11 @@ export default {
         },
         async updateChapter(){
             try{
+
+                // 防呆
+                if(this.isSending2) return;
                 this.isSending2 = true;
+
                 let formData = new FormData();
                 formData.append('idx', this.courseIdx);
                 formData.append('materialIdx',this.update.materialIdx)
@@ -319,8 +327,12 @@ export default {
         },
         // 刪除
         async removeChapter(chapter){
-            this.isSending3 = true;
             try{
+
+                // 防呆
+                if(this.isSending3) return;
+                this.isSending3 = true;
+
                 const res = await axios.get(`/api/learn/deleteMaterial/${this.courseIdx}/${this.update.materialIdx}`,{
                     headers:{
                         'x-user-token':this.getToken()
