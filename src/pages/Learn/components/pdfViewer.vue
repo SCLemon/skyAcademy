@@ -42,6 +42,7 @@ export default {
       pageCanvases: [],
       observer: null,
       resizeTimer: null,
+      memoryTimer: null,
     };
   },
   mounted() {
@@ -50,10 +51,20 @@ export default {
     pdfjsLib.enableWebGL = this.isWebGLAvailable(); // GPU 渲染加速
     
     window.addEventListener('resize', this.handleResize);
+    this.memoryTimer = setInterval(() => {
+      if (performance.memory) {
+        const mem = performance.memory;
+        console.log(
+          `[MEM] ${(mem.usedJSHeapSize / 1024 / 1024).toFixed(1)} MB / ${(mem.jsHeapSizeLimit / 1024 / 1024).toFixed(0)} MB`
+        );
+      }
+    }, 1000);
   },
-  beforeUnmount() {
+  beforeDestroy() {
     window.removeEventListener('resize', this.handleResize);
     if (this.observer) this.observer.disconnect();
+    clearInterval(this.memoryTimer)
+    this.cleanAll();
   },
   methods: {
     // 判斷瀏覽器是否支援 WebGL
@@ -68,9 +79,60 @@ export default {
         return false;
       }
     },
+
+    // 清除所有佔用資源
+    cleanAll(){
+      this.pageCanvases.forEach((p) => {     
+        if (p.renderTask) {
+          try { 
+            p.renderTask.cancel(); 
+          } 
+          catch {}
+          p.renderTask = null;
+        }
+
+        const canvas = p.canvasWrapper?.querySelector?.('canvas');
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+          canvas.width = 0;
+          canvas.height = 0;
+          p.canvasWrapper.removeChild(canvas);
+        }
+
+        const page = this.pageCache.get(p.pageNum);
+        if (page?.cleanup) {
+          try { 
+            page.cleanup(); 
+          } 
+          catch {}
+        }
+      });
+
+      this.pageCache.clear();
+      this.pageCanvases = [];
+
+      if (this.pdf) {
+        try {
+          this.pdf.cleanup?.();
+          this.pdf.destroy?.();
+        } catch (e) {
+          console.warn('PDF destroy error', e);
+        }
+        this.pdf = null;
+      }
+      const container = this.$refs.pdfContainer;
+      if (container) container.innerHTML = '';
+
+      console.log('All PDF resources released');
+
+    },
+
     async delay(ms) {
       return new Promise((resolve) => setTimeout(resolve, ms))
     },
+
+    // 下方為渲染函式區
     async loadPdf() {
       this.isLoading = true;
       this.$bus.$emit('toggleEnableToReadNextPDF',false);
@@ -169,7 +231,7 @@ export default {
         this.observer.observe(canvasWrapper);
       });
     },
-    // 釋放 Canvas 資源佔用
+    // 釋放 canvas 佔用資源
     releaseCanvasElement(pageObj) {
       const canvasWrapper = pageObj.canvasWrapper;
       if (!canvasWrapper.dataset.rendered || pageObj.renderTask) return;
@@ -199,8 +261,12 @@ export default {
         
         // 清除舊頁面資料
         if (this.pageCache.size > 20) {
-          const oldest = this.pageCache.keys().next().value;
-          this.pageCache.delete(oldest);
+            const oldest = this.pageCache.keys().next().value;
+            const oldPage = this.pageCache.get(oldest);
+            if (!pageObj.renderTask && oldPage?.cleanup) {
+              await oldPage.cleanup();
+            } 
+            this.pageCache.delete(oldest);
         }
       }
       
@@ -267,9 +333,10 @@ export default {
   },
   watch: {
     async pdfUrl(newUrl) {
+      this.cleanAll();
       this.loadProgress = 0;
       this.pageCache = new Map();
-      this.pdfUrl = newUrl
+      this.pdfUrl = newUrl;
       await this.loadPdf();
     }
   }
