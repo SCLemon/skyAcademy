@@ -270,7 +270,7 @@ export default {
         }
       }
       
-      // 💡 建立 canvas 並插入到 canvasWrapper
+      // 建立 canvas 並插入到 canvasWrapper
       const canvas = document.createElement('canvas');
       canvas.style.display = 'block';
       canvas.style.marginTop = '5px';
