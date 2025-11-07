@@ -251,7 +251,7 @@ export default {
     async safeRenderPage(pageNum, canvasWrapper) {
       
       const pageObj = this.pageCanvases.find(p => p.pageNum === pageNum);
-      if (!pageObj || !this.pdf || canvasWrapper.dataset.rendered === 'true') return 
+      if (!pageObj || !this.pdf || canvasWrapper.dataset.rendered === 'true') return
 
       // cache 緩存頁面
       let page = this.pageCache.get(pageNum);
