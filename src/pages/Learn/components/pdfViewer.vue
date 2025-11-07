@@ -53,7 +53,7 @@ export default {
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.handleResize);
-    clearInterval(this.heapWatcher)
+    if (this.observer) this.observer.disconnect();
   },
   methods: {
     // 判斷瀏覽器是否支援 WebGL
