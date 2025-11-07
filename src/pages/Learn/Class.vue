@@ -7,7 +7,7 @@
         <div class="pdf" v-else>
             <pdf-viewer :pdfUrl="`${pdfUrl}?${genRefreshPDFNumber}`" 
                         :httpHeaders="{'x-user-token': getToken()}"
-                        :preloadCount="1"
+                        :preloadCount="2"
             ></pdf-viewer>
         </div>
         <div class="column">

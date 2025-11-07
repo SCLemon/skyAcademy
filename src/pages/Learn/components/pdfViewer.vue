@@ -37,11 +37,11 @@ export default {
     return {
       isLoading: true,
       loadProgress:0,
-      loadTimer: null,
       pdf: null,
       pageCache: new Map(),
       pageCanvases: [],
       observer: null,
+      resizeTimer: null,
     };
   },
   mounted() {
@@ -101,20 +101,22 @@ export default {
 
         // 進行結構渲染 --> 利用 div 先替代 canvas 避免內存爆滿。
         for (let pageNum = 1; pageNum <= this.pdf.numPages; pageNum++) {
-          const placeholder = document.createElement('div');
-          placeholder.dataset.pageNum = pageNum;
-          placeholder.style.display = 'block';
-          placeholder.style.marginTop = '5px';
-          placeholder.style.marginBottom = '5px';
-          placeholder.style.minHeight = '100vh';
-          container.appendChild(placeholder);
-          this.pageCanvases.push({ pageNum, canvas: placeholder, renderTask: null });
+          const canvasWrapper = document.createElement('div');
+          canvasWrapper.dataset.pageNum = pageNum;
+          canvasWrapper.style.display = 'block';
+          canvasWrapper.style.marginTop = '5px';
+          canvasWrapper.style.marginBottom = '5px';
+          canvasWrapper.style.minHeight = '100vh';
+          container.appendChild(canvasWrapper);
+          this.pageCanvases.push({ pageNum, canvasWrapper, renderTask: null });
         }
 
-        // 提前渲染第一頁
-        const first = this.pageCanvases.find(p => p.pageNum === 1);
-        if (first && !first.canvas.dataset.rendered) {
-          this.safeRenderPage(first.pageNum, first.canvas);
+        // 提前渲染
+        for (let i = 1; i <= this.preloadCount; i++) {
+          const next = this.pageCanvases.find(p => p.pageNum === i);
+          if (next && !next.canvasWrapper.dataset.rendered) {
+            await this.safeRenderPage(next.pageNum, next.canvasWrapper);
+          }
         }
         
         // 後處理
@@ -128,79 +130,67 @@ export default {
       } 
       catch (err) {}
     },
-    initObserver() {
+    async initObserver() {
       if (this.observer) this.observer.disconnect();
 
       this.observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
+        async (entries) => {
+          entries.forEach(async (entry) => {
             const pageNum = parseInt(entry.target.dataset.pageNum);
             const pageObj = this.pageCanvases.find(p => p.pageNum === pageNum);
             if (!pageObj || !this.pdf) return;
 
-            // 頁面進入視窗（且還沒渲染過）
-            if (entry.isIntersecting && !entry.target.dataset.rendered) {
-              this.safeRenderPage(pageNum, entry.target);
-
-              // 🔹 預載下一頁
-              for (let i = 1; i <= this.preloadCount; i++) {
-                const next = this.pageCanvases.find(p => p.pageNum === pageNum + i);
-                if (next && !next.canvas.dataset.rendered) {
-                  this.safeRenderPage(next.pageNum, next.canvas);
-                }
-              }
-
+            // 頁面進入視窗（且還沒渲染過）   
+            if (entry.isIntersecting) { 
+              await this.safeRenderPage(pageNum, entry.target);
+              
               // 釋放資源
               this.pageCanvases.forEach((p) => {
-                if (p.canvas.dataset.rendered && Math.abs(p.pageNum - pageNum) > (this.preloadCount + 1)) {
+                if (Math.abs(p.pageNum - pageNum) > (this.preloadCount + 1)) {
                   this.releaseCanvasElement(p);
                 }
               });
+
+              // 預載鄰近頁面
+              for (let i = 1; i <= this.preloadCount; i++) {
+                const next = this.pageCanvases.find(p => p.pageNum === pageNum + i);
+                if (next) await this.safeRenderPage(next.pageNum, next.canvasWrapper);
+                const previous = this.pageCanvases.find(p => p.pageNum === pageNum - i);
+                if (previous) await this.safeRenderPage(previous.pageNum, previous.canvasWrapper);
+              }
+             
             }
           });
         },
-        { root: this.$refs.pdfContainer, threshold: 0.01 }
+        { root: this.$refs.pdfContainer, threshold: 0.1 }
       );
 
-      this.pageCanvases.forEach(({ canvas }) => {
-        this.observer.observe(canvas);
+      this.pageCanvases.forEach(({ canvasWrapper }) => {
+        this.observer.observe(canvasWrapper);
       });
     },
     // 釋放 Canvas 資源佔用
     releaseCanvasElement(pageObj) {
-      const oldCanvas = pageObj.canvas;
+      const canvasWrapper = pageObj.canvasWrapper;
+      if (!canvasWrapper.dataset.rendered || pageObj.renderTask) return;
 
-      // 清除畫面內容
-      const ctx = oldCanvas.getContext('2d');
-      if (ctx) ctx.clearRect(0, 0, oldCanvas.width, oldCanvas.height);
+      const canvas = canvasWrapper.querySelector('canvas');
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.width = 0;
+        canvas.height = 0;
+        pageObj.canvasWrapper.removeChild(canvas);
+      }
 
-      oldCanvas.width = 0;
-      oldCanvas.height = 0;
-
-      const placeholder = document.createElement('div');
-      placeholder.dataset.pageNum = pageObj.pageNum;
-      placeholder.style.display = 'block';
-      placeholder.style.marginTop = '5px';
-      placeholder.style.marginBottom = '5px';
-      placeholder.style.minHeight = '100vh';
-      placeholder.style.boxSizing = 'border-box';
-
-      oldCanvas.replaceWith(placeholder);
-
-      pageObj.canvas = placeholder;
-      delete placeholder.dataset.rendered;
-
-      this.observer.observe(placeholder);
+      pageObj.canvasWrapper.dataset.rendered = false;
     },
     // 進行頁面渲染
-    async safeRenderPage(pageNum, placeholderEl) {
+    async safeRenderPage(pageNum, canvasWrapper) {
+      
       const pageObj = this.pageCanvases.find(p => p.pageNum === pageNum);
-      
-      if (!pageObj || !this.pdf) return;
-      if (pageObj.renderTask) {
-        pageObj.renderTask.cancel();
-      }
-      
+      if (!pageObj || !this.pdf || canvasWrapper.dataset.rendered === 'true') return 
+
       // cache 緩存頁面
       let page = this.pageCache.get(pageNum);
       if (!page) {
@@ -214,14 +204,12 @@ export default {
         }
       }
       
-      // 💡 建立 canvas 並替換 placeholder
+      // 💡 建立 canvas 並插入到 canvasWrapper
       const canvas = document.createElement('canvas');
       canvas.style.display = 'block';
       canvas.style.marginTop = '5px';
       canvas.style.marginBottom = '5px';
       canvas.dataset.pageNum = pageNum;
-      placeholderEl.replaceWith(canvas);
-      pageObj.canvas = canvas;
     
       // 開始繪圖
       const containerWidth = this.$refs.pdfContainer.clientWidth;
@@ -248,21 +236,33 @@ export default {
 
       try {
         await pageObj.renderTask.promise;
-        canvas.dataset.rendered = true;
+        
+        canvasWrapper.innerHTML = '';
+        canvasWrapper.appendChild(canvas);
+        canvasWrapper.dataset.rendered = true;
+        pageObj.canvasWrapper = canvasWrapper;
       } 
-      catch (e) {} 
+      catch (e) {
+        console.log(e)
+      } 
       finally {
         pageObj.renderTask = null; // render 完成後清除
       }
     },
-    handleResize() {
-      const container = this.$refs.pdfContainer;
-      if (!this.pdf || !container) return;
+    async handleResize() {
 
-      this.pageCanvases.forEach(({ pageNum, canvas }) => {
-        if (!canvas.dataset.rendered) return; 
-        this.safeRenderPage(pageNum, canvas);
-      });
+      if (this.resizeTimer) clearTimeout(this.resizeTimer);
+      this.resizeTimer = setTimeout(async () => {
+        const container = this.$refs.pdfContainer;
+        if (!this.pdf || !container) return;
+
+        for (const p of this.pageCanvases) {
+          if (p.canvasWrapper.dataset.rendered === 'true') {
+            this.releaseCanvasElement(p);
+            await this.safeRenderPage(p.pageNum, p.canvasWrapper);
+          }
+        }
+      }, 500);
     }
   },
   watch: {
