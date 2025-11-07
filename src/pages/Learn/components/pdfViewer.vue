@@ -39,6 +39,7 @@ export default {
       loadProgress:0,
       loadTimer: null,
       pdf: null,
+      pageCache: new Map(),
       pageCanvases: [],
       observer: null,
     };
@@ -47,7 +48,7 @@ export default {
     pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
     pdfjsLib.disableStream = false;
     pdfjsLib.enableWebGL = this.isWebGLAvailable(); // GPU 渲染加速
-
+    
     window.addEventListener('resize', this.handleResize);
   },
   beforeUnmount() {
@@ -161,9 +162,21 @@ export default {
       if (pageObj.renderTask) {
         pageObj.renderTask.cancel();
       }
-
-      const page = await this.pdf.getPage(pageNum);
-
+      
+      // cache 緩存頁面
+      let page = this.pageCache.get(pageNum);
+      if (!page) {
+        page = await this.pdf.getPage(pageNum);
+        this.pageCache.set(pageNum, page);
+        
+        // 清除舊頁面資料
+        if (this.pageCache.size > 20) {
+          const oldest = this.pageCache.keys().next().value;
+          this.pageCache.delete(oldest);
+        }
+      }
+      
+    
       const containerWidth = this.$refs.pdfContainer.clientWidth;
       const dpr = window.devicePixelRatio || 1;
       const qualityFactor = 1.75;
@@ -208,6 +221,7 @@ export default {
   watch: {
     async pdfUrl(newUrl) {
       this.loadProgress = 0;
+      this.pageCache = new Map();
       this.pdfUrl = newUrl
       await this.loadPdf();
     }
