@@ -53,7 +53,7 @@ export default {
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.handleResize);
-    if (this.observer) this.observer.disconnect();
+    clearInterval(this.heapWatcher)
   },
   methods: {
     // 判斷瀏覽器是否支援 WebGL
@@ -99,15 +99,16 @@ export default {
 
         this.pdf = await loadingTask.promise;
 
-        // 進行結構渲染
+        // 進行結構渲染 --> 利用 div 先替代 canvas 避免內存爆滿。
         for (let pageNum = 1; pageNum <= this.pdf.numPages; pageNum++) {
-          const canvas = document.createElement('canvas');
-          canvas.style.display = 'block';
-          canvas.style.marginTop = '5px';
-          canvas.style.marginBottom = '5px';
-          canvas.dataset.pageNum = pageNum;
-          container.appendChild(canvas);
-          this.pageCanvases.push({ pageNum, canvas, renderTask: null });
+          const placeholder = document.createElement('div');
+          placeholder.dataset.pageNum = pageNum;
+          placeholder.style.display = 'block';
+          placeholder.style.marginTop = '5px';
+          placeholder.style.marginBottom = '5px';
+          placeholder.style.minHeight = '100vh';
+          container.appendChild(placeholder);
+          this.pageCanvases.push({ pageNum, canvas: placeholder, renderTask: null });
         }
 
         // 提前渲染第一頁
@@ -133,32 +134,69 @@ export default {
       this.observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const pageNum = parseInt(entry.target.dataset.pageNum);
+            const pageNum = parseInt(entry.target.dataset.pageNum);
+            const pageObj = this.pageCanvases.find(p => p.pageNum === pageNum);
+            if (!pageObj || !this.pdf) return;
+
+            // 頁面進入視窗（且還沒渲染過）
+            if (entry.isIntersecting && !entry.target.dataset.rendered) {
               this.safeRenderPage(pageNum, entry.target);
 
-              // 預載下一頁
+              // 🔹 預載下一頁
               for (let i = 1; i <= this.preloadCount; i++) {
                 const next = this.pageCanvases.find(p => p.pageNum === pageNum + i);
                 if (next && !next.canvas.dataset.rendered) {
                   this.safeRenderPage(next.pageNum, next.canvas);
                 }
               }
+
+              // 釋放資源
+              this.pageCanvases.forEach((p) => {
+                if (p.canvas.dataset.rendered && Math.abs(p.pageNum - pageNum) > (this.preloadCount + 1)) {
+                  this.releaseCanvasElement(p);
+                }
+              });
             }
           });
         },
-        { root: this.$refs.pdfContainer, threshold: 0.1 }
+        { root: this.$refs.pdfContainer, threshold: 0.01 }
       );
 
       this.pageCanvases.forEach(({ canvas }) => {
         this.observer.observe(canvas);
       });
     },
-    async safeRenderPage(pageNum, canvas) {
-      const pageObj = this.pageCanvases.find(p => p.pageNum === pageNum);
-      if (!pageObj || !this.pdf) return;
+    // 釋放 Canvas 資源佔用
+    releaseCanvasElement(pageObj) {
+      const oldCanvas = pageObj.canvas;
 
-      // 如果還有舊的 renderTask，在開始新渲染前取消
+      // 清除畫面內容
+      const ctx = oldCanvas.getContext('2d');
+      if (ctx) ctx.clearRect(0, 0, oldCanvas.width, oldCanvas.height);
+
+      oldCanvas.width = 0;
+      oldCanvas.height = 0;
+
+      const placeholder = document.createElement('div');
+      placeholder.dataset.pageNum = pageObj.pageNum;
+      placeholder.style.display = 'block';
+      placeholder.style.marginTop = '5px';
+      placeholder.style.marginBottom = '5px';
+      placeholder.style.minHeight = '100vh';
+      placeholder.style.boxSizing = 'border-box';
+
+      oldCanvas.replaceWith(placeholder);
+
+      pageObj.canvas = placeholder;
+      delete placeholder.dataset.rendered;
+
+      this.observer.observe(placeholder);
+    },
+    // 進行頁面渲染
+    async safeRenderPage(pageNum, placeholderEl) {
+      const pageObj = this.pageCanvases.find(p => p.pageNum === pageNum);
+      
+      if (!pageObj || !this.pdf) return;
       if (pageObj.renderTask) {
         pageObj.renderTask.cancel();
       }
@@ -176,7 +214,16 @@ export default {
         }
       }
       
+      // 💡 建立 canvas 並替換 placeholder
+      const canvas = document.createElement('canvas');
+      canvas.style.display = 'block';
+      canvas.style.marginTop = '5px';
+      canvas.style.marginBottom = '5px';
+      canvas.dataset.pageNum = pageNum;
+      placeholderEl.replaceWith(canvas);
+      pageObj.canvas = canvas;
     
+      // 開始繪圖
       const containerWidth = this.$refs.pdfContainer.clientWidth;
       const dpr = window.devicePixelRatio || 1;
       const qualityFactor = 1.75;
@@ -213,8 +260,8 @@ export default {
       if (!this.pdf || !container) return;
 
       this.pageCanvases.forEach(({ pageNum, canvas }) => {
-        if (!canvas.dataset.rendered) return; // 沒渲染過的不用 resize
-        this.safeRenderPage(pageNum, canvas); // 重渲染
+        if (!canvas.dataset.rendered) return; 
+        this.safeRenderPage(pageNum, canvas);
       });
     }
   },
