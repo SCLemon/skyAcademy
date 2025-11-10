@@ -6,8 +6,8 @@ const courseModel = require('../models/courseModel');
 const groupModel = require('../models/groupModel');
 const fs = require('fs');
 const path = require('path');
-const archiver = require('archiver');
-const multer = require('multer')
+const upload = require('../config/multer.config.js')
+
 const { v4: uuidv4 } = require('uuid');
 
 // 檢查身份
@@ -191,7 +191,6 @@ router.get('/api/learn/getCourseBanner/:idx/:imageName',async (req, res) => {
 
 
 // 教材建立
-const upload = multer();
 router.post('/api/learn/createMaterial',upload.fields([{ name: 'attachments', maxCount: 1}]),authMiddleware,checkUsageMemory, async (req, res) => {
     
     const {idx, title} = req.body;

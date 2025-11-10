@@ -2,7 +2,9 @@
   <div>
     <div class="top">
       <div class="title"><i class="fa-solid fa-book book_icon"></i> 學習紀錄簿</div>
-      <el-button class="add" v-if="currentUser && currentUser.typeEng == 'teacher'" @click="dialogFormVisible = true">新增計畫</el-button>
+      <input type="file" ref="importFile" class="importFile" @change="importRecord($event)" accept=".json">
+      <el-button class="add" v-if="currentUser && currentUser.typeEng == 'teacher' && !showClock" @click="handleImport()">匯入紀錄</el-button>
+      <el-button class="add" v-if="currentUser && currentUser.typeEng == 'teacher' && !showClock" @click="dialogFormVisible = true">新增計畫</el-button>
     </div>
     <statistics class="statistics"></statistics>
     <div class="table">
@@ -38,7 +40,8 @@
           <el-table-column label="其他操作" width="255px">
             <template v-slot="scope">
                 <template v-if="currentUser && currentUser.typeEng == 'teacher'">
-                  <el-button @click="(scope.row.status != '尚未完成' && scope.row.status != '進行中')?'':startProcessing(scope.row.idx)" :disabled="(scope.row.status != '尚未完成' && scope.row.status != '進行中')">執行</el-button>
+                  <el-button v-if="!(scope.row.status != '尚未完成' && scope.row.status != '進行中')" @click="(scope.row.status != '尚未完成' && scope.row.status != '進行中')?'':startProcessing(scope.row.idx)" :disabled="(scope.row.status != '尚未完成' && scope.row.status != '進行中')">執行</el-button>
+                  <el-button v-else @click="scope.row.status != '進行中'?exportRecord(scope.row.idx):''" :disabled="(scope.row.status == '進行中')">匯出</el-button>
                   <el-button type="warning" @click="(scope.row.status != '尚未完成' && scope.row.status != '進行中')?'':openUpdate(scope.row)" :disabled="(scope.row.status != '尚未完成' && scope.row.status != '進行中')">修改</el-button>
                   <el-button type="danger" @click="deleteProject(scope.row.idx)">刪除</el-button>
                 </template>
@@ -340,6 +343,71 @@ export default {
             diff : `${(differenceInMilliseconds(item.end, item.start)/1000/60).toFixed(1)} min`
           }
         })
+      },
+      // 匯出單筆紀錄
+      async exportRecord(idx){
+        try{
+          const res = await axios.get(`/api/studyRecord/export/${idx}`,{
+            headers:{
+              'x-user-token':jsCookie.get('authToken')
+            },
+            responseType: 'blob'
+          })
+          const contentDisposition = res.headers['content-disposition'];
+          let filename = 'record.json';
+          if (contentDisposition) {
+            const match = contentDisposition.match(/filename="?([^"]+)"?/);
+            if (match && match[1]) filename = match[1];
+          }
+
+          // 建立 blob 物件並觸發下載
+          const blob = new Blob([res.data], { type: 'application/json' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+
+          this.$bus.$emit('handleAlert', '計畫紀錄通知', '匯出成功！', 'success');
+        }
+        catch(e){
+          console.error(e);
+          this.$bus.$emit('handleAlert', '計畫紀錄通知', '匯出失敗或伺服器錯誤', 'error');
+        }
+      },
+      // 匯入單筆紀錄
+      handleImport(){
+        this.$refs['importFile'].click();
+      },
+      async importRecord(e){
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+          const res = await axios.post('/api/studyRecord/import', formData, {
+            headers: {
+              'x-user-token': jsCookie.get('authToken'),
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          if(res.data.type == 'success'){
+            await this.getData();
+            await this.refreshStatistics();
+          }
+          this.$bus.$emit('handleAlert', '計畫紀錄通知', res.data.message, res.data.type);
+        } 
+        catch (err) {
+          this.$bus.$emit('handleAlert', '計畫紀錄通知', '匯入失敗或伺服器錯誤', 'error');
+        }
+        finally{
+          e.target.value = '';
+        }
       }
     },
     async beforeDestroy(){
@@ -374,6 +442,9 @@ export default {
   .add{
     margin-left: auto;
     height: 42px;
+  }
+  .importFile{
+    display: none;
   }
   .table{
     width: calc(100% - 45px);

@@ -7,7 +7,7 @@ const groupModel = require('../models/groupModel')
 const fs = require('fs');
 const {format} = require('date-fns')
 const { v4: uuidv4 } = require('uuid');
-const multer = require('multer')
+const upload = require('../config/multer.config.js')
 const path = require('path')
 
 // 檢查身份
@@ -115,7 +115,6 @@ const checkClassNum = async(req,res,next)=>{
 }
 
 // 創建課程
-const upload = multer();
 router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', maxCount: 2}]),authMiddleware,checkClassNum,checkUsageMemory, async (req, res) => {
     
     const {courseId,courseName, courseType,lecturer} = req.body;
