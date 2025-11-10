@@ -6,13 +6,13 @@ const fs = require('fs');
 // 跨平台基準路徑
 let tmpDir;
 if (process.platform === 'win32') {
-    tmpDir = 'D:/sky_tmp';
+    tmpDir = 'D:/sky_database/sky_tmp';
 } 
 else if (process.platform === 'darwin') {
-    tmpDir = '/Volumes/sky_tmp';
+    tmpDir = '/Volumes/sky_database/sky_tmp';
 } 
 else {
-    tmpDir = '/mnt/sky_tmp';
+    tmpDir = '/mnt/sky_database/sky_tmp';
 }
 
 if (!fs.existsSync(tmpDir)) {
