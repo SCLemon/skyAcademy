@@ -1,13 +1,8 @@
-//配置文件
+
+const isProd = process.env.NODE_ENV === 'production';
+
 module.exports = {
-  DBHOST: '127.0.0.1',
+  DBHOST: isProd ? 'sky_mongo' : '127.0.0.1',
   DBPORT: 27017,
   DBNAME: 'SkyAcademy'
-}
-
-// docker network
-// module.exports = {
-//   DBHOST: 'sky_mongo',
-//   DBPORT: 27017,
-//   DBNAME: 'SkyAcademy'
-// }
+};
