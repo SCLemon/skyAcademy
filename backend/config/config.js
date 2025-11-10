@@ -1,5 +1,5 @@
 
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = false;
 
 module.exports = {
   DBHOST: isProd ? 'sky_mongo' : '127.0.0.1',
