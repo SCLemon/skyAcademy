@@ -216,7 +216,7 @@ router.post('/api/learn/createMaterial',upload.fields([{ name: 'attachments', ma
                 // 創建文件
                 const filePath = `${databaseUrl}/${materialIdx}.pdf`
                 let file = req.files['attachments'][0];
-                if(file) fs.writeFileSync(filePath, file.buffer);
+                if(file) fs.renameSync(file.path, filePath);
 
                 const url = `/api/learn/getMaterial/${idx}/${materialIdx}`
 
@@ -294,7 +294,7 @@ router.post('/api/learn/modifyMaterial',upload.fields([{ name: 'attachments', ma
                 if(file){
                     const filePath = updatedMaterial.attachmentUrl.original
                     if (fs.existsSync(filePath))fs.unlinkSync(filePath);
-                    fs.writeFileSync(filePath, file.buffer)
+                    fs.renameSync(file.path, filePath);
                 }
 
                 // 返回更新項

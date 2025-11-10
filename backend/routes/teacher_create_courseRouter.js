@@ -165,7 +165,7 @@ router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', m
                 let attachments = req.files['attachments']?req.files['attachments']:[]
                 attachments.forEach((file) => {
                     const filePath = `${bannerFolderPath}/${file.originalname}`
-                    fs.writeFileSync(filePath, file.buffer);
+                    fs.renameSync(file.path, filePath);
                 });
 
                 return res.send({

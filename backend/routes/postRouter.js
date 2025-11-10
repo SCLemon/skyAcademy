@@ -137,7 +137,7 @@ router.post('/api/post/create',upload.fields([{ name: 'attachments'}]),authMiddl
 
                 attachments.forEach((file) => {
                     const filePath = `${folderPath}/${file.originalname}`
-                    fs.writeFileSync(filePath, file.buffer);
+                    fs.renameSync(file.path, filePath);
                 });
 
                 return res.send({

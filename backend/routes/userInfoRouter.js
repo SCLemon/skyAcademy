@@ -118,8 +118,7 @@ router.post('/api/userInfo/updateIcon', upload.fields([{ name: 'attachments', ma
             }
 
             const realPath = path.join(folderPath, attachments.originalname);
-            fs.writeFileSync(realPath, attachments.buffer);
-
+            fs.renameSync(attachments.path, realPath);
 
             const user = await userModel.findOneAndUpdate(
                 { token: token },  // 查找條件
@@ -265,7 +264,8 @@ router.post('/api/userInfo/modifyUserInfo/:idx',upload.fields([{ name: 'attachme
         
                     realPath = path.join(folderPath, attachments.originalname);
                     userImgUrl = `/api/userInfo/getPhotoStickers/${idx}`
-                    fs.writeFileSync(realPath, attachments.buffer);
+                    fs.renameSync(attachments.path, realPath);
+                    
                 }
     
                 const updateData = {

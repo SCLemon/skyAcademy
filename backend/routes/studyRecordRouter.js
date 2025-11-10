@@ -6,6 +6,7 @@ const userModel = require('../models/userModel')
 const { v4: uuidv4 } = require('uuid');
 const { format, parseISO, subDays, isWithinInterval, startOfDay, endOfDay, differenceInMilliseconds} = require('date-fns');
 const upload = require('../config/multer.config.js')
+const fs = require('fs')
 
 // 檢查身份
 const authMiddleware = async (req, res, next) => {
@@ -374,7 +375,9 @@ router.post('/api/studyRecord/import', authMiddleware, upload.single('file'), as
 
     if (!req.file) return res.send({ type: 'error',  message: '未上傳檔案。'});
 
-    const fileBuffer = req.file.buffer.toString('utf-8');
+
+    const filePath = req.file.path;
+    const fileBuffer = fs.readFileSync(filePath, 'utf-8');
     const importedData = JSON.parse(fileBuffer);
 
     if (!importedData.idx || !importedData.date || !importedData.projectType || !importedData.expectTime || !importedData.status || !importedData.content || !importedData.statistics) 
@@ -399,6 +402,7 @@ router.post('/api/studyRecord/import', authMiddleware, upload.single('file'), as
     
   } 
   catch (err) {
+    console.log(err)
     res.send({ type: 'error', message: '伺服器錯誤，請洽客服人員協助。'});
   }
 });
