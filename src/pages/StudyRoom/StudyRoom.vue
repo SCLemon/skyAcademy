@@ -40,8 +40,7 @@
           <el-table-column label="其他操作" width="255px">
             <template v-slot="scope">
                 <template v-if="currentUser && currentUser.typeEng == 'teacher'">
-                  <el-button v-if="!(scope.row.status != '尚未完成' && scope.row.status != '進行中')" @click="(scope.row.status != '尚未完成' && scope.row.status != '進行中')?'':startProcessing(scope.row.idx)" :disabled="(scope.row.status != '尚未完成' && scope.row.status != '進行中')">執行</el-button>
-                  <el-button v-else @click="scope.row.status != '進行中'?exportRecord(scope.row.idx):''" :disabled="(scope.row.status == '進行中')">匯出</el-button>
+                  <el-button @click="(scope.row.status != '尚未完成' && scope.row.status != '進行中')?'':startProcessing(scope.row.idx)" :disabled="(scope.row.status != '尚未完成' && scope.row.status != '進行中')">執行</el-button>
                   <el-button type="warning" @click="(scope.row.status != '尚未完成' && scope.row.status != '進行中')?'':openUpdate(scope.row)" :disabled="(scope.row.status != '尚未完成' && scope.row.status != '進行中')">修改</el-button>
                   <el-button type="danger" @click="deleteProject(scope.row.idx)">刪除</el-button>
                 </template>
@@ -92,6 +91,7 @@
         <el-table-column prop="end" label="截止時間"></el-table-column>
         <el-table-column prop="diff" label="持續時間" width="120px"></el-table-column>
       </el-table>
+      <div class="export_button_wrapper"><el-button class="export_button" @click="exportRecord(showRecordIdx)">匯出紀錄</el-button></div>
     </el-dialog>
   </div>
 </template>
@@ -154,6 +154,7 @@ export default {
         // 顯示執行紀錄
         dialogFormVisible3:false,
         showRecordData:[],
+        showRecordIdx:'',
       }
     },
     mounted(){
@@ -343,6 +344,7 @@ export default {
             diff : `${(differenceInMilliseconds(item.end, item.start)/1000/60).toFixed(1)} min`
           }
         })
+        this.showRecordIdx = obj.idx;
       },
       // 匯出單筆紀錄
       async exportRecord(idx){
@@ -370,7 +372,6 @@ export default {
           a.click();
           a.remove();
           window.URL.revokeObjectURL(url);
-
           this.$bus.$emit('handleAlert', '計畫紀錄通知', '匯出成功！', 'success');
         }
         catch(e){
@@ -438,6 +439,14 @@ export default {
     width: calc(100% - 60px);
     margin: 0 auto;
     margin-bottom: 30px;
+  }
+  .export_button_wrapper{
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+  }
+  .export_button{
+    margin-left: auto;
   }
   .add{
     margin-left: auto;
