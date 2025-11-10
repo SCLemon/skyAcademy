@@ -502,6 +502,15 @@ export default {
       icon.classList.toggle('fa-solid');
       const userMessageBox = postOption.closest('.post_option_box').nextElementSibling;
       userMessageBox.classList.toggle('userMessageBox_open');
+      
+      this.$nextTick(()=>{
+        if (userMessageBox) {
+          const rect = userMessageBox.getBoundingClientRect();
+          if (rect.bottom > window.innerHeight) {
+            userMessageBox.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
+        }
+      })
     },
     async sendUserMessage(idx, event){
       try{
@@ -521,6 +530,17 @@ export default {
           post.message.push(res.data.data)
           textArea.value = '';
           this.msgScrollToBottom(event);
+          
+          const userMessageBox = event.target.closest('.userMessageBox')
+          this.$nextTick(()=>{
+            const post_viewer_input_box = userMessageBox.querySelector('.post_viewer_input_box');
+            if (post_viewer_input_box) {
+              const rect = post_viewer_input_box.getBoundingClientRect();
+              if (rect.bottom > window.innerHeight) {
+                post_viewer_input_box.scrollIntoView({ behavior: 'smooth', block: 'end' });
+              }
+            }
+          })
         }
         else this.$bus.$emit('handleAlert','貼文留言通知',res.data.message,res.data.type)
       }
