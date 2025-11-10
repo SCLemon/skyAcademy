@@ -30,7 +30,7 @@ const storage = multer.diskStorage({
 });
 
 
-// 限制檔案大小 (例如 10MB)
+// 限制檔案大小
 const upload = multer({
   storage,
 //   limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
