@@ -71,7 +71,7 @@
     <el-dialog title="修改計畫" :visible.sync="dialogFormVisible2">
       <el-form :model="form">
         <el-form-item label="計畫日期">
-          <el-input v-model="updateForm.date" autocomplete="off" clearable :placeholder="`${today}`"></el-input>
+          <el-date-picker v-model="updateForm.date" align="right" type="date" placeholder="選擇日期" :picker-options="pickerOptions2"></el-date-picker>
         </el-form-item>
         <el-form-item label="學習計畫概要">
           <el-input v-model="updateForm.content" autocomplete="off" clearable></el-input>
@@ -82,7 +82,7 @@
           </el-select>
         </el-form-item>
       </el-form>
-      <el-button type="primary" class="create" :disabled="(updateForm.date.trim() =='' ||updateForm.content.trim()=='')" @click="(updateForm.date.trim() =='' ||updateForm.content.trim()=='')?'':update()">修改計畫</el-button>
+      <el-button type="primary" class="create" :disabled="(!updateForm.date ||updateForm.content.trim()=='')" @click="(!updateForm.date ||updateForm.content.trim()=='')?'':update()">修改計畫</el-button>
     </el-dialog>
     <el-dialog title="計畫執行紀錄" :visible.sync="dialogFormVisible3">
       <el-table :data="showRecordData" stripe height="auto" style="width: 100%; max-height: 400px; overflow-y: scroll;" :empty-text="'暫無數據'">
@@ -130,11 +130,12 @@ export default {
         },
         pickerOptions: {
           disabledDate(time) {
-            const today = new Date();
+            let today = new Date();
             today.setHours(0, 0, 0, 0);
             return time.getTime() < today.getTime();
           },
         },
+        
         // 修改
         dialogFormVisible2:false,
         updateIdx:'',
@@ -142,6 +143,9 @@ export default {
           date:'',
           content:'',
           projectType:'',
+        },
+        pickerOptions2: {
+          disabledDate: () => {} 
         },
         
         // 計時
@@ -160,8 +164,23 @@ export default {
     mounted(){
       this.getData();
       this.currentUser = JSON.parse(localStorage.getItem('currentUser'))
+      this.pickerOptions2.disabledDate = this.disabledDate2;
     },
     methods:{
+
+      // 修改過程 - 時間
+      disabledDate2(time) {
+        let limit = new Date(this.updateForm.date);
+        let today = new Date();
+        today.setHours(0, 0, 0, 0);
+        limit.setHours(0, 0, 0, 0);
+
+        // 取 today or limit 最小者為邊界
+        if(today.getTime() < limit.getTime()){
+          return time.getTime() < today.getTime()
+        }
+        return time.getTime() < limit.getTime();
+      },
 
       // CRUD
       async getData(){
@@ -207,7 +226,7 @@ export default {
       },
       openUpdate(obj){
         this.updateIdx = obj.idx;
-        this.updateForm.date = obj.date;
+        this.updateForm.date = new Date(obj.date);
         this.updateForm.content = obj.content;
         this.updateForm.projectType = obj.projectType;
         this.dialogFormVisible2 = true;
