@@ -124,7 +124,7 @@ export default {
         toggleEnableToReadNextPDF(result){
             this.toggleEnableToReadNextPDF = result;
         },
-        async getData(){
+        async getData(method){
             const res = await axios.get(`/api/learn/getCourseMaterial/${this.courseIdx}`,{
                 headers:{
                     'x-user-token': this.getToken()
@@ -132,7 +132,9 @@ export default {
             });
             this.materials = res.data.materials;
             this.$nextTick(()=>{
-                if (document.querySelectorAll('.right-list-target')[0]) document.querySelectorAll('.right-list-target')[0].click();
+                const list = document.querySelectorAll('.right-list-target');
+                if(!method && list[0]) list[0].click();
+                else if(method == 'create') list[list.length - 1].click();
             })
         },
         async viewChapter(chapter){
@@ -233,7 +235,7 @@ export default {
                     this.dialogTableVisible = false;
                     this.form.title = '';
                     this.form.fileList = [];
-                    await this.getData();
+                    await this.getData('create');
                     this.$bus.$emit('handleAlert','章節創建通知',res.data.message, res.data.type)
                 }
             }
