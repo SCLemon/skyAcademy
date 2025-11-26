@@ -162,7 +162,7 @@ router.delete('/api/studyRecord/delete/:idx',authMiddleware, async (req, res) =>
                 return res.send({ type: 'error', message: '計畫刪除失敗。'});
             }
 
-            return res.send({ type: 'success', message: '計畫新增成功。'});
+            return res.send({ type: 'success', message: '計畫刪除成功。'});
         } catch (e) {
             console.log(e);
             return res.send({
