@@ -91,7 +91,7 @@
         <el-table-column prop="end" label="截止時間"></el-table-column>
         <el-table-column prop="diff" label="持續時間" width="120px"></el-table-column>
       </el-table>
-      <div class="export_button_wrapper"><el-button class="export_button" @click="exportRecord(showRecordIdx)">匯出紀錄</el-button></div>
+      <div class="export_button_wrapper" v-if="currentUser && currentUser.typeEng == 'teacher'"><el-button class="export_button" @click="exportRecord(showRecordIdx)">匯出紀錄</el-button></div>
     </el-dialog>
   </div>
 </template>
