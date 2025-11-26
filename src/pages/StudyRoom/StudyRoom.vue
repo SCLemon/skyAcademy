@@ -41,7 +41,7 @@
             <template v-slot="scope">
                 <template v-if="currentUser && currentUser.typeEng == 'teacher'">
                   <el-button @click="(scope.row.status != '尚未完成' && scope.row.status != '進行中')?'':startProcessing(scope.row.idx)" :disabled="(scope.row.status != '尚未完成' && scope.row.status != '進行中')">執行</el-button>
-                  <el-button type="warning" @click="(scope.row.status != '尚未完成' && scope.row.status != '進行中')?'':openUpdate(scope.row)" :disabled="(scope.row.status != '尚未完成' && scope.row.status != '進行中')">修改</el-button>
+                  <el-button type="warning" @click="(scope.row.status == '進行中')?'':openUpdate(scope.row)" :disabled="(scope.row.status == '進行中')">修改</el-button>
                   <el-button type="danger" @click="deleteProject(scope.row.idx)">刪除</el-button>
                 </template>
                 <template v-else>無權限進行操作</template>
