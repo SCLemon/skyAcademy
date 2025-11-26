@@ -279,7 +279,7 @@ router.put('/api/learn/modifyIndex',authMiddleware, async (req, res) => {
             const index = meta.findIndex(m => m.idx === materialIdx);
             if (index === -1) return res.send({ type:'error', message: '找不到指定的專欄資料' });
 
-            if (method === 'up' && index > 0) {
+            if (method === 'up' && index > 1) {
                 // 往上移一位
                 [meta[index - 1], meta[index]] = [meta[index], meta[index - 1]];
             } 
