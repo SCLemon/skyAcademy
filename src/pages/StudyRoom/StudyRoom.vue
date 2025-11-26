@@ -19,7 +19,7 @@
           <el-table-column prop="date" label="計畫日期" width="140px" ></el-table-column>
           <el-table-column label="學習計畫概要">
             <template v-slot="scope">
-                <div class="project_detail" @click="showRecord(scope.row)">{{scope.row.content}}</div>
+                <div class="project_detail">{{scope.row.content}}</div>
             </template>
           </el-table-column>
           <el-table-column label="預計完成時間" width="140px">
@@ -34,7 +34,7 @@
           </el-table-column>
           <el-table-column label="狀態" width="140px">
             <template v-slot="scope">
-                <div @click="showRecord(scope.row)"><i :class="`fa-solid fa-circle statusIcon ${statusClass(scope.row.status)}`"></i>{{scope.row.status}}</div>
+                <div><i :class="`fa-solid fa-circle statusIcon ${statusClass(scope.row.status)}`"></i>{{scope.row.status}}</div>
             </template>
           </el-table-column>
           <el-table-column label="其他操作" width="255px">
