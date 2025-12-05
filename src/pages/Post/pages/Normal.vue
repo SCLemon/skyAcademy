@@ -45,7 +45,7 @@
             <div class="post_img" v-if="obj.postImg.length">
               <el-carousel :autoplay="false" :loop="false">
                 <el-carousel-item v-for="(item,id) in obj.postImg" :key="id">
-                  <div class="carousel_img"><img src="img/Loading.gif" :data-src="item.url" v-lazy alt=""></div>
+                  <div class="carousel_img" @click="showPostImgDetail(item.url)"><img src="img/Loading.gif" :data-src="item.url" v-lazy alt=""></div>
                 </el-carousel-item>
               </el-carousel>
             </div>
@@ -192,7 +192,6 @@ export default {
     await this.getPost()
     await this.getUserInfo()
     this.currentUser = JSON.parse(localStorage.getItem('currentUser'))
-
   },
   watch:{
     '$route.query.share':{
@@ -486,7 +485,6 @@ export default {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
-
     // 留言區
     msgScrollToBottom(event){
       this.$nextTick(() => {
@@ -555,6 +553,13 @@ export default {
       const postText = post.querySelector('.post_text');
       event.currentTarget.innerText == '... 顯示更多'? event.currentTarget.innerText = '顯示更少':event.currentTarget.innerText = '... 顯示更多'
       postText.classList.toggle('post_text_expand');
+    },
+    // 貼文圖片展開
+    showPostImgDetail(imgUrl){
+      //
+      let url = location.protocol+'//'+location.host + '/'+ imgUrl;
+      window.open(url, '_blank')
+
     }
 
   },
@@ -809,7 +814,7 @@ export default {
     text-align: right;
     font-size: 14px;
     padding-right: 10px;
-    margin-bottom: 5px;
+    margin-bottom: 7.5px;
     font-weight: bolder;
   }
   .post_text_expand_logo:hover{
@@ -846,9 +851,11 @@ export default {
     justify-content: center;
     align-items: center;
   }
+  .carousel_img:hover{
+    cursor: pointer;
+  }
   .carousel_img>img{
     max-width: 100%;
-    max-height: 100%;
     object-fit: contain;
   }
   ::v-deep .el-carousel__container{
