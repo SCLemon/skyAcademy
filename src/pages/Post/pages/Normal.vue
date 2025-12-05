@@ -557,7 +557,7 @@ export default {
     // 貼文圖片展開
     showPostImgDetail(imgUrl){
       //
-      let url = location.protocol+'//'+location.host + '/'+ imgUrl;
+      let url = location.protocol+'//'+location.host + imgUrl;
       window.open(url, '_blank')
 
     }
