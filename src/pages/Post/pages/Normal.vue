@@ -95,7 +95,7 @@
       <el-button type="primary" class="button" @click="create()" :loading="isSending" >建立貼文</el-button>
     </el-dialog>
     <el-dialog title="修改貼文" :visible.sync="dialogTableVisible2" v-if="showPermission">
-      <div class="real_input" ref="modifyContent" contenteditable="true"></div>
+      <div class="real_input2" ref="modifyContent" contenteditable="true"></div>
       <el-button type="primary" class="button" @click="modifyPost()" :loading="isSending" >修改貼文</el-button>
     </el-dialog>
     <el-dialog title="分享貼文" :visible.sync="dialogTableVisible3">
@@ -724,7 +724,18 @@ export default {
     box-sizing: border-box;
     position: relative;
   }
-  .real_input:focus{
+  .real_input2{
+    width: 100%;
+    height: auto;
+    min-height: 100px;
+    max-height: 300px;
+    overflow-y: scroll;
+    line-height: 1.5;
+    margin: 0 auto;
+    box-sizing: border-box;
+    position: relative;
+  }
+  .real_input:focus, .real_input2:focus{
     outline: none;
   }
   .real_input:empty::before {
@@ -824,7 +835,7 @@ export default {
     width: 94.5%;
     margin: 0 auto;
     margin-top: 5px;
-    margin-bottom: 5px;
+    margin-bottom: 7.5px;
     max-height: 144px;
     line-height: 1.5;
     font-size: 14px;
