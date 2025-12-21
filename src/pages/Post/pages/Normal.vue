@@ -6,94 +6,75 @@
           <div class="search_input_div"><input type="search" class="search_input" v-model="q" placeholder="搜尋 Lemon's Universe 的貼文"></div>
           <div class="search_icon_div" @click="searchPost()"><i class="fa-solid fa-magnifying-glass"></i></div>
         </div>
-        <div class="inputBox" v-if="!hideCreatePostBox && currentUser && currentUser.typeEng == 'teacher'">
-          <div class="inputTextBox" @click="openDialog('img')">
-            <div class="inputTextBoxImg"><img :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt=""></div>
-            <div class="textArea">發表您的貼文和公告</div>
-          </div>
-          <div class="iconBox">
-            <div class="icon_item" @click="openDialog('post')">
-              <i class="fa-regular fa-pen-to-square icon"></i> 建立貼文
-            </div>
-            <div class="icon_item" @click="openDialog('img')">
-              <i class="fa-regular fa-images icon"></i> 建立圖片
-            </div>
-          </div>
-        </div>
-        <div :class="{ postAll: true, postAll_student: currentUser.typeEng !== 'teacher' || hideCreatePostBox }" ref="postAll" @scroll="postDivScroll()" v-if="posts.length">
-          <div class="post" v-for="(obj,id) in posts" :key="id">
-            <div class="post_more" v-if="showPermission">
-              <el-dropdown @command="handleCommand">
-                <span class="el-dropdown-link">
-                  操作<i class="el-icon-arrow-down el-icon--right"></i>
-                </span>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item :command="{ method:'modify',content: obj.content, idx: obj.idx}">編輯</el-dropdown-item>
-                  <el-dropdown-item :command="{ method:'delete', idx: obj.idx}">刪除</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </div>
-            <div class="post_top">
-              <div class="post_top_img"><img :src="obj.creator.userImgUrl?obj.creator.userImgUrl:'img/user.png'" alt=""></div>
-              <div class="post_top_detail">
-                <div class="post_top_name">{{ obj.creator.name }}</div>
-                <div class="post_top_date">{{obj.createTime}}</div>
+        <div class="postAll_wrapper">
+          <add-post v-if="!hideCreatePostBox && currentUser && currentUser.typeEng == 'teacher'" :currentUser="currentUser"></add-post>
+          <div :class="{ postAll: true }" ref="postAll" @scroll="postDivScroll()" v-if="posts.length">
+            <div class="post" v-for="(obj,id) in posts" :key="id">
+              <div class="post_more" v-if="showPermission">
+                <el-dropdown @command="handleCommand">
+                  <span class="el-dropdown-link">
+                    操作<i class="el-icon-arrow-down el-icon--right"></i>
+                  </span>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item :command="{ method:'modify',content: obj.content, idx: obj.idx}">編輯</el-dropdown-item>
+                    <el-dropdown-item :command="{ method:'delete', idx: obj.idx}">刪除</el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
               </div>
-            </div>
-            <div class="post_text" v-if="obj.content.trim()!=''" v-html="linkify(obj.content)"></div>
-            <div class="post_text_expand_logo" v-if="checkPostTextOverflow(obj.content)" @click="expandPostText($event)">... 顯示更多</div>
-            <div class="post_img" v-if="obj.postImg.length">
-              <el-carousel :autoplay="false" :loop="false">
-                <el-carousel-item v-for="(item,id) in obj.postImg" :key="id">
-                  <div class="carousel_img" @click="showPostImgDetail(item.url)"><img src="img/Loading.gif" :data-src="item.url" v-lazy alt=""></div>
-                </el-carousel-item>
-              </el-carousel>
-            </div>
-            <div class="post_footer">
-              <div class="post_summary" v-if="obj.likeCount || obj.message.length">
-                <div class="post_summary_thumb" v-if="obj.likeCount || obj.isLike">
-                  <i class="fa-solid fa-thumbs-up post_summary_thumb_icon"></i>
-                  <span v-if="obj.isLike && obj.likeCount != 1">你和其他 {{obj.likeCount - 1}} 人</span>
-                  <span v-else-if="obj.isLike">你</span>
-                  <span v-else>{{obj.likeCount}}</span>
+              <div class="post_top">
+                <div class="post_top_img"><img :src="obj.creator.userImgUrl?obj.creator.userImgUrl:'img/user.png'" alt=""></div>
+                <div class="post_top_detail">
+                  <div class="post_top_name">{{ obj.creator.name }}</div>
+                  <div class="post_top_date">{{obj.createTime}}</div>
                 </div>
-                <div class="post_summary_msg" v-if="obj.message.length">{{obj.message.length}} <i class="fa-solid fa-message post_summary_msg_icon"></i></div>
               </div>
-              <div class="post_option_box">
-                <div :class="`post_option ${obj.isLike?'like':''}`" @click="toggleLikePost(obj.idx, $event, obj)"><i :class="`fa-regular fa-thumbs-up icon ${obj.isLike?'fa-solid':''}`"></i> <span>{{ obj.isLike?'收回讚':'按讚' }}</span></div>
-                <div class="post_option" @click="openUserMessageBox($event)"><i class="fa-regular fa-message icon"></i> 留言</div>
-                <div class="post_option" @click="openShare(obj.idx)"><i class="fa-regular fa-share-from-square icon"></i> 分享</div>
+              <div class="post_text" v-if="obj.content.trim()!=''" v-html="linkify(obj.content)"></div>
+              <div class="post_text_expand_logo" v-if="checkPostTextOverflow(obj.content)" @click="expandPostText($event)">... 顯示更多</div>
+              <div class="post_img" v-if="obj.postImg.length">
+                <el-carousel :autoplay="false" :loop="false">
+                  <el-carousel-item v-for="(item,id) in obj.postImg" :key="id">
+                    <div class="carousel_img" @click="showPostImgDetail(item.url)"><img src="img/Loading.gif" :data-src="item.url" v-lazy alt=""></div>
+                  </el-carousel-item>
+                </el-carousel>
               </div>
-              <div class="userMessageBox">
-                <div class="userMessage" style="text-align: center; color:gray; font-size: 14px;" v-if="!obj.message.length">目前暫時沒有人留言</div>
-                <div class="userMessage_active" v-for="(item,id) in obj.message" :key="id">
-                  <img class="userMessage_active_img" src="img/user.png" :data-src="item.userImgUrl" v-lazy alt="" loading="lazy">
-                  <div class="userMessage_active_msgBox">
-                    <div class="userMessage_active_name">{{ item.name }} <img class="userMessage_activ_badge" :src="item.level?`img/badge/${item.level}.png`:'img/badge/1.png'" alt=""><span class="userMessage_active_createTime">{{ item.createTime }}</span></div>
-                    <div class="userMessage_active_msg">{{ item.message }}</div>
+              <div class="post_footer">
+                <div class="post_summary" v-if="obj.likeCount || obj.message.length">
+                  <div class="post_summary_thumb" v-if="obj.likeCount || obj.isLike">
+                    <i class="fa-solid fa-thumbs-up post_summary_thumb_icon"></i>
+                    <span v-if="obj.isLike && obj.likeCount != 1">你和其他 {{obj.likeCount - 1}} 人</span>
+                    <span v-else-if="obj.isLike">你</span>
+                    <span v-else>{{obj.likeCount}}</span>
+                  </div>
+                  <div class="post_summary_msg" v-if="obj.message.length">{{obj.message.length}} <i class="fa-solid fa-message post_summary_msg_icon"></i></div>
+                </div>
+                <div class="post_option_box">
+                  <div :class="`post_option ${obj.isLike?'like':''}`" @click="toggleLikePost(obj.idx, $event, obj)"><i :class="`fa-regular fa-thumbs-up icon ${obj.isLike?'fa-solid':''}`"></i> <span>{{ obj.isLike?'收回讚':'按讚' }}</span></div>
+                  <div class="post_option" @click="openUserMessageBox($event)"><i class="fa-regular fa-message icon"></i> 留言</div>
+                  <div class="post_option" @click="openShare(obj.idx)"><i class="fa-regular fa-share-from-square icon"></i> 分享</div>
+                </div>
+                <div class="userMessageBox">
+                  <div class="userMessage" style="text-align: center; color:gray; font-size: 14px;" v-if="!obj.message.length">目前暫時沒有人留言</div>
+                  <div class="userMessage_active" v-for="(item,id) in obj.message" :key="id">
+                    <img class="userMessage_active_img" src="img/user.png" :data-src="item.userImgUrl" v-lazy alt="" loading="lazy">
+                    <div class="userMessage_active_msgBox">
+                      <div class="userMessage_active_name">{{ item.name }} <img class="userMessage_activ_badge" :src="item.level?`img/badge/${item.level}.png`:'img/badge/1.png'" alt=""><span class="userMessage_active_createTime">{{ item.createTime }}</span></div>
+                      <div class="userMessage_active_msg">{{ item.message }}</div>
+                    </div>
+                  </div>
+                  <div class="post_viewer_input_box">
+                    <img class="viewer_inputTextBoxImg" :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt="">
+                    <textarea class="viewer_textArea" placeholder="在此貼文下進行留言"></textarea>
+                    <div class="viewer_send" @click="sendUserMessage(obj.idx, $event)"><i class="fa-solid fa-feather"></i></div>
                   </div>
                 </div>
-                <div class="post_viewer_input_box">
-                  <img class="viewer_inputTextBoxImg" :src="currentUser.userImgUrl?currentUser.userImgUrl:'img/user.png'" alt="">
-                  <textarea class="viewer_textArea" placeholder="在此貼文下進行留言"></textarea>
-                  <div class="viewer_send" @click="sendUserMessage(obj.idx, $event)"><i class="fa-solid fa-feather"></i></div>
-                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div :class="{ postAll: true, postAll_student: currentUser.typeEng !== 'teacher' || hideCreatePostBox, postAll_empty: true }" v-else>
-          <el-empty description="暫無貼文"></el-empty>
+          <div :class="{ postAll: true, postAll_empty: true }" v-else>
+            <el-empty description="暫無貼文"></el-empty>
+          </div>
         </div>
     </div>
-    <el-dialog title="建立貼文" :visible.sync="dialogTableVisible" v-if="showPermission">
-      <div class="real_input" ref="input" contenteditable="true"></div>
-      <el-upload action="#" :auto-upload="false" list-type="picture-card" :on-change="handleUpload" :on-preview="handlePictureCardPreview" :on-remove="handleRemove" :file-list="form.attachments" :multiple="true" accept="image/*"><i class="el-icon-plus"></i></el-upload>
-      <el-dialog :visible.sync="dialogVisible">
-        <img width="100%" :src="dialogImageUrl" alt="">
-      </el-dialog>
-      <el-button type="primary" class="button" @click="create()" :loading="isSending" >建立貼文</el-button>
-    </el-dialog>
     <el-dialog title="修改貼文" :visible.sync="dialogTableVisible2" v-if="showPermission">
       <div class="real_input2" ref="modifyContent" contenteditable="true"></div>
       <el-button type="primary" class="button" @click="modifyPost()" :loading="isSending" >修改貼文</el-button>
@@ -142,26 +123,16 @@
 <script>
 import axios from 'axios'
 import jsCookie from 'js-cookie'
+import AddPost from '../components/AddPost.vue';
 export default {
   name:'Normal',
+  components:{
+    AddPost
+  },
   data(){
     return {
       currentUser:{},
-      // 上傳內容
-      form:{
-        content:'',
-        attachments:[]
-      },
       isSending:false,
-      showPlaceholder:true,
-      // 貼文創建
-      dialogTableVisible:false,
-      sendEnabled: false,
-      inputKeyUpfunction:{},
-      // 圖片牆
-      dialogImageUrl: '',
-      dialogVisible: false,
-
       // 顯示貼文
       q:'',
       share:'',
@@ -184,14 +155,10 @@ export default {
     }
   },
   async mounted(){
-    this.inputKeyUpfunction = window.addEventListener('keyup',()=>{
-      if(this.dialogTableVisible && this.$refs.input){
-        if(this.$refs.input.innerText.trim()=='' && this.$refs.input.innerHTML.length == 4) this.$refs.input.innerHTML = ''
-      }
-    })
     await this.getPost()
     await this.getUserInfo()
     this.currentUser = JSON.parse(localStorage.getItem('currentUser'))
+    this.$bus.$on('handleAddPost', this.handleAddPost);;
   },
   watch:{
     '$route.query.share':{
@@ -205,6 +172,13 @@ export default {
     }
   },
   methods:{
+    // 處理 AddPost.vue 邏輯
+    async handleAddPost(){
+      this.q = '';
+      this.posts = [];
+      this.page = 1;
+      await this.getPost()
+    },
     // 轉換內文中的 @href=[url]
     linkify(text){
       if (!text) return "";
@@ -286,7 +260,8 @@ export default {
       const postAllDiv = this.$refs.postAll;
       this.share = this.$route.query.share ?? null;
 
-      if (!this.share && postAllDiv.scrollHeight - postAllDiv.scrollTop === postAllDiv.clientHeight) {
+      const bottomThreshold = 2; // 容許誤差
+      if (!this.share && postAllDiv.scrollTop + postAllDiv.clientHeight >= postAllDiv.scrollHeight - bottomThreshold){
         await this.getPost();
       }
     },
@@ -340,39 +315,6 @@ export default {
         this.isLoading = false;
       }
     },
-    async create(){
-      this.isSending = true;
-      this.q = '';
-
-      this.form.content = this.$refs.input.innerHTML;
-      const formData = new FormData();
-      formData.append('content', this.form.content);
-
-      if (this.form.attachments && this.form.attachments.length > 0) {
-          this.form.attachments.forEach((file, index) => {
-              formData.append('attachments', file.raw);
-          });
-      }
-      const res = await axios.post('/api/post/create',formData,{
-          headers:{
-              'x-user-token':jsCookie.get('authToken'),
-          }
-      })
-      if(res.data.type == 'success'){
-          this.posts = [];
-          this.page = 1;
-          await this.getPost()
-          this.dialogTableVisible = false;
-          this.form = {
-              content:'',
-              attachments:[]
-          },
-          this.$refs.input.innerHTML = '';
-          this.$bus.$emit('handleAlert','貼文創建通知',res.data.message,res.data.type)
-      }
-      else this.$bus.$emit('handleAlert','貼文創建通知',res.data.message,res.data.type)
-      this.isSending = false;
-    },
     async deletePost(idx){
       try{
         await this.$confirm(`確認是否刪除貼文?`, '提示', {
@@ -414,7 +356,7 @@ export default {
         if(res.data.type == 'success'){
 
           // 不要刷新頁面 --> 避免修改後的貼文要重找
-          let modifyPost = this.posts.find((i)=> i.idx = this.modifyIdx);
+          let modifyPost = this.posts.find((i)=> i.idx === this.modifyIdx);
           if(modifyPost){
             modifyPost.content = this.modifyContent
           }
@@ -469,21 +411,6 @@ export default {
       document.body.removeChild(temp);
 
       return exceeds;
-    },
-    openDialog(){
-      if(this.showPermission) this.dialogTableVisible = true;
-      else this.$bus.$emit('handleAlert','創建貼文權限通知','目前平台並未開放學生進行貼文','warning')
-    },
-    // 圖片處理
-    handleUpload(file,fileList){
-      this.form.attachments = fileList
-    },
-    handleRemove(file, fileList) {
-      this.form.attachments = fileList
-    },
-    handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url;
-      this.dialogVisible = true;
     },
     // 留言區
     msgScrollToBottom(event){
@@ -556,16 +483,11 @@ export default {
     },
     // 貼文圖片展開
     showPostImgDetail(imgUrl){
-      //
       let url = location.protocol+'//'+location.host + imgUrl;
       window.open(url, '_blank')
 
     }
-
   },
-  beforeDestroy(){
-    window.removeEventListener('keyup',this.inputKeyUpfunction);
-  }
 }
 </script>
 
@@ -632,76 +554,6 @@ export default {
     cursor: pointer;
     color: rgba(0,0,0,0.7);
   }
-  .inputBox{
-    width: 100%;
-    height: auto;
-    min-height: 120px;
-    box-shadow: 0px 1px 3px gray;
-    border-radius: 5px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 15px;
-  }
-  .inputTextBox{
-    width: 95%;
-    height: 60px;
-    margin: 0 auto;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .inputTextBoxImg{
-    width: 40px;
-    height: 40px;
-    border-radius: 40px;
-    overflow: hidden;
-  }
-  .inputTextBoxImg>img{
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .textArea {
-    width: calc(100% - 60px);
-    height: 40px;
-    line-height: 40px;
-    overflow-y: auto;
-    padding-left: 20px;
-    margin-left: 20px;
-    font-size: 14px;
-    border-radius: 20px;
-    border: none;
-    outline: none;
-    background-color: #F0F2F5;
-    box-sizing: border-box;
-    color: gray;
-  }
-  .textArea:hover{
-    cursor: pointer;
-    background-color:rgb(240,240,240);
-  }
-  .iconBox{
-    width: 95%;
-    height: 60px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-  }
-  .icon_item{
-    width: 50%;
-    height: 55px;
-    line-height: 55px;
-    text-align: center;
-    border-radius: 5px;
-  }
-  .icon_item:hover{
-    cursor: pointer;
-    background-color: rgba(240,240,240);
-  }
   .icon{
     margin-right: 5px;
   }
@@ -711,19 +563,7 @@ export default {
   ::v-deep .el-dialog{
     width: 720px;
   }
-  .real_input{
-    width: 100%;
-    height: auto;
-    min-height: 100px;
-    max-height: 200px;
-    overflow-y: scroll;
-    line-height: 1.5;
-    margin: 0 auto;
-    margin-top: -15px;
-    margin-bottom: 20px;
-    box-sizing: border-box;
-    position: relative;
-  }
+
   .real_input2{
     width: 100%;
     height: auto;
@@ -735,35 +575,28 @@ export default {
     box-sizing: border-box;
     position: relative;
   }
-  .real_input:focus, .real_input2:focus{
+  .real_input2:focus{
     outline: none;
-  }
-  .real_input:empty::before {
-    content: "請輸入您要發表的貼文內容，超連結可善用 @href=[your url]";
-    color: #aaa;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    font-size: 16px;
-    pointer-events: none;
   }
   .button{
     margin-top: 30px;
     margin-bottom: -10px;
     width: 100%;
   }
+  .postAll_wrapper{
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 95px);
+  }
   .postAll{
     width: 100%;
-    height: calc(100vh - 225px);
+    height: calc(100vh);
     overflow-y:scroll;
     padding-bottom: 10px;
     padding-top: 5px;
     padding-left: 1px;
     padding-right: 1px;
     box-sizing: border-box;
-  }
-  .postAll_student{
-    height: calc(100vh - 90px);
   }
   .postAll_empty{
     display: flex;
