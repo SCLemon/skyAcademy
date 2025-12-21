@@ -53,15 +53,13 @@ export default {
     },
     mounted(){
         this.inputKeyUpfunction = window.addEventListener('keyup',()=>{
-            if(this.dialogTableVisible && this.$refs.input){
+            if(this.showAddBox && this.$refs.input){
                 if(this.$refs.input.innerText.trim()=='' && this.$refs.input.innerHTML.length == 4) this.$refs.input.innerHTML = ''
             }
         })
     },
     data() {
         return {
-            // 顯示框
-            showAddBox: false,
             // 上傳內容
             form:{
                 content:'',
@@ -70,8 +68,7 @@ export default {
             isSending:false,
             showPlaceholder:true,
             // 貼文創建
-            dialogTableVisible:false,
-            sendEnabled: false,
+            showAddBox: false,
             inputKeyUpfunction:{},
             // 圖片牆
             dialogImageUrl: '',
@@ -156,7 +153,7 @@ export default {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 .inputTextBox {
     width: 95%;

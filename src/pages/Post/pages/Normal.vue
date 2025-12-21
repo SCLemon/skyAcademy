@@ -6,9 +6,9 @@
           <div class="search_input_div"><input type="search" class="search_input" v-model="q" placeholder="搜尋 Lemon's Universe 的貼文"></div>
           <div class="search_icon_div" @click="searchPost()"><i class="fa-solid fa-magnifying-glass"></i></div>
         </div>
-        <div class="postAll_wrapper">
+        <div class="postAll_wrapper" ref="postAll_wrapper" @scroll="postDivScroll()">
           <add-post v-if="!hideCreatePostBox && currentUser && currentUser.typeEng == 'teacher'" :currentUser="currentUser"></add-post>
-          <div :class="{ postAll: true }" ref="postAll" @scroll="postDivScroll()" v-if="posts.length">
+          <div class="postAll" ref="postAll" v-if="posts.length">
             <div class="post" v-for="(obj,id) in posts" :key="id">
               <div class="post_more" v-if="showPermission">
                 <el-dropdown @command="handleCommand">
@@ -70,7 +70,7 @@
               </div>
             </div>
           </div>
-          <div :class="{ postAll: true, postAll_empty: true }" v-else>
+          <div class="postAll_empty" v-else>
             <el-empty description="暫無貼文"></el-empty>
           </div>
         </div>
@@ -257,11 +257,11 @@ export default {
     },
     async postDivScroll(){
       
-      const postAllDiv = this.$refs.postAll;
+      const target = this.$refs['postAll_wrapper'];
       this.share = this.$route.query.share ?? null;
 
       const bottomThreshold = 2; // 容許誤差
-      if (!this.share && postAllDiv.scrollTop + postAllDiv.clientHeight >= postAllDiv.scrollHeight - bottomThreshold){
+      if (!this.share && target.scrollTop + target.clientHeight >= target.scrollHeight - bottomThreshold){
         await this.getPost();
       }
     },
@@ -299,8 +299,8 @@ export default {
           }
 
           this.$nextTick(async() => {
-            const postAllDiv = this.$refs.postAll;
-            if (!this.share && postAllDiv && postAllDiv.scrollHeight <= postAllDiv.clientHeight && newPosts.length > 0) {
+            const target = this.$refs['postAll_wrapper'];
+            if (!this.share && target && target.scrollHeight <= target.clientHeight && newPosts.length > 0) {
               await this.getPost();
             }
           });
@@ -584,21 +584,25 @@ export default {
     width: 100%;
   }
   .postAll_wrapper{
+    height: calc(100vh - 95px);
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 95px);
+    overflow-y: scroll;
+    padding-right: 1px;
+    padding-left: 1px;
+    padding-top: 2px;
+    box-sizing: border-box;
   }
   .postAll{
     width: 100%;
-    height: calc(100vh);
-    overflow-y:scroll;
-    padding-bottom: 10px;
+    height: auto;
     padding-top: 5px;
     padding-left: 1px;
     padding-right: 1px;
     box-sizing: border-box;
   }
   .postAll_empty{
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
