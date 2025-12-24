@@ -661,7 +661,6 @@ export default {
     margin: 0 auto;
     text-align: right;
     font-size: 14px;
-    padding-right: 10px;
     margin-bottom: 7.5px;
     font-weight: bolder;
   }
@@ -672,8 +671,8 @@ export default {
     width: 94.5%;
     margin: 0 auto;
     margin-top: 5px;
-    margin-bottom: 7.5px;
-    max-height: 144px;
+    margin-bottom: 10px;
+    max-height: 147px;
     line-height: 1.5;
     font-size: 14px;
     text-align: justify;

@@ -231,8 +231,6 @@ export default {
     width: 100%;
     height: auto;
     min-height: 100px;
-    max-height: 200px;
-    overflow-y: scroll;
     line-height: 1.5;
     margin: 0 auto;
     margin-bottom: 20px;
