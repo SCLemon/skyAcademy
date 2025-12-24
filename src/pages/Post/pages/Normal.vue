@@ -11,12 +11,16 @@
           <div class="postAll" ref="postAll" v-if="posts.length">
             <div class="post" v-for="(obj,id) in posts" :key="id">
               <div class="post_more" v-if="showPermission">
-                <el-dropdown @command="handleCommand">
+                <template v-if="obj.modifying">
+                  <button class="modifying_button" type="primary" @click="modifyPost(obj, $event)">儲存</button>
+                  <button class="modifying_button" @click="cancelModifyPost(obj)">取消</button>
+                </template>
+                <el-dropdown v-else-if="!obj.modifying" @command="handleCommand">
                   <span class="el-dropdown-link">
                     操作<i class="el-icon-arrow-down el-icon--right"></i>
                   </span>
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item :command="{ method:'modify',content: obj.content, idx: obj.idx}">編輯</el-dropdown-item>
+                    <el-dropdown-item :command="{ method:'modify', obj: obj}">編輯</el-dropdown-item>
                     <el-dropdown-item :command="{ method:'delete', idx: obj.idx}">刪除</el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
@@ -28,8 +32,9 @@
                   <div class="post_top_date">{{obj.createTime}}</div>
                 </div>
               </div>
-              <div class="post_text" v-if="obj.content.trim()!=''" v-html="linkify(obj.content)"></div>
-              <div class="post_text_expand_logo" v-if="checkPostTextOverflow(obj.content)" @click="expandPostText($event)">... 顯示更多</div>
+              <div class="post_text" v-if="obj.content.trim()!='' && !obj.modifying" :key="'view-' + obj.idx" v-html="linkify(obj.content)"></div>
+              <div class="post_text post_text_modifying" v-else-if="obj.content.trim()!='' && obj.modifying" :key="'edit-' + obj.idx" v-html="obj.temp_content" contenteditable="true"></div>
+              <div class="post_text_expand_logo" v-if="checkPostTextOverflow(obj.content) && !obj.modifying" @click="expandPostText($event)">... 顯示更多</div>
               <div class="post_img" v-if="obj.postImg.length">
                 <el-carousel :autoplay="false" :loop="false">
                   <el-carousel-item v-for="(item,id) in obj.postImg" :key="id">
@@ -75,10 +80,6 @@
           </div>
         </div>
     </div>
-    <el-dialog title="修改貼文" :visible.sync="dialogTableVisible2" v-if="showPermission">
-      <div class="real_input2" ref="modifyContent" contenteditable="true"></div>
-      <el-button type="primary" class="button" @click="modifyPost()" :loading="isSending" >修改貼文</el-button>
-    </el-dialog>
     <el-dialog title="分享貼文" :visible.sync="dialogTableVisible3">
       <div class="copyLinkTitle">Share via</div>
       <div class="shareViaBox">
@@ -141,11 +142,6 @@ export default {
       showPermission:false,
       hideCreatePostBox: false,
       isLoading: false, // 加載狀態，避免重複請求
-
-      // 修改貼文內容
-      modifyIdx:'',
-      modifyContent:'',
-      dialogTableVisible2:false,
 
       // 分享貼文內容
       dialogTableVisible3: false,
@@ -214,7 +210,7 @@ export default {
         this.deletePost(payload.idx)
       }
       if(payload.method == 'modify'){
-        this.openModifyBox(payload.content,payload.idx)
+        this.openModifyBox(payload.obj)
       }
     },
     async getUserInfo(){
@@ -337,39 +333,42 @@ export default {
       }
       catch(e){}
     },
-    async openModifyBox(content, idx){
-      this.dialogTableVisible2 = true;
+    // 修改貼文
+    async openModifyBox(obj){
+      if (!('modifying' in obj)) this.$set(obj, 'modifying', true);
+      if (!('temp_content' in obj)) this.$set(obj, 'temp_content', obj.content);
+      else {
+        obj.modifying = true;
+        obj.temp_content = obj.content;
+      }
 
-      this.$nextTick(()=>{
-        this.$refs['modifyContent'].innerHTML = content;
-      })
-      this.modifyIdx = idx;
     },
-    async modifyPost(){
+    async modifyPost(obj, e){
       try{
-        this.modifyContent =  this.$refs['modifyContent'].innerHTML;
-        const res = await axios.post(`/api/post/modifyPost/${this.modifyIdx}`,{content:this.modifyContent},{
+        let modifyContent = e.target.closest('.post').querySelector('.post_text_modifying').innerHTML
+    
+        const res = await axios.post(`/api/post/modifyPost/${obj.idx}`,{content: modifyContent},{
           headers:{
             'x-user-token':jsCookie.get('authToken')
           }
         })
         if(res.data.type == 'success'){
-
-          // 不要刷新頁面 --> 避免修改後的貼文要重找
-          let modifyPost = this.posts.find((i)=> i.idx === this.modifyIdx);
-          if(modifyPost){
-            modifyPost.content = this.modifyContent
-          }
-
-          this.dialogTableVisible2 = false;
-          this.modifyContent = '';
-          this.modifyIdx = '';
+          obj.content = modifyContent;
+          obj.temp_content = '';
+          obj.modifying = false;
           this.$bus.$emit('handleAlert','貼文修改通知',res.data.message,res.data.type)
         }
         else this.$bus.$emit('handleAlert','貼文修改通知',res.data.message,res.data.type)
       }
-      catch(e){}
+      catch(e){
+        console.log(e)
+      }
     },
+    cancelModifyPost(obj){
+      obj.modifying = false;
+      obj.temp_content = '';
+    },
+    //
     async toggleLikePost(idx,event,obj){
       const wrapper = event.currentTarget; 
       const icon = wrapper.querySelector('i');
@@ -681,6 +680,25 @@ export default {
   }
   .post_text_expand{
     max-height: none !important;
+  }
+  .post_text_modifying{
+    overflow-y: scroll;
+    max-height: none;
+  }
+  .post_text_modifying:focus{
+    outline: none;
+  }
+  .modifying_button{
+    font-size: 10px;
+    line-height: 18px;
+    margin-left: 5px;
+    border: 0;
+    transition: 0.3s box-shadow ease;
+    border-radius: 3px;
+  }
+  .modifying_button:hover{
+    cursor: pointer;
+    box-shadow: 0px 0.5px 1px rgba(0,0,0,0.3);
   }
   .post_img{
     width: 100%;
