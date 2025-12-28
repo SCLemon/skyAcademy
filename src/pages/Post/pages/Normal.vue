@@ -33,7 +33,7 @@
                 </div>
               </div>
               <div class="post_text" v-if="obj.content.trim()!='' && !obj.modifying" :key="'view-' + obj.idx" v-html="linkify(obj.content)"></div>
-              <div class="post_text post_text_modifying" v-else-if="obj.content.trim()!='' && obj.modifying" :key="'edit-' + obj.idx" v-html="obj.temp_content" contenteditable="true"></div>
+              <div class="post_text post_text_modifying" :ref="`modifyBox-${obj.idx}`" v-else-if="obj.modifying" :key="'edit-' + obj.idx" v-html="obj.temp_content" contenteditable="true"></div>
               <div class="post_text_expand_logo" v-if="checkPostTextOverflow(obj.content) && !obj.modifying" @click="expandPostText($event)">... 顯示更多</div>
               <div class="post_img" v-if="obj.postImg.length">
                 <el-carousel :autoplay="false" :loop="false">
@@ -335,18 +335,32 @@ export default {
     },
     // 修改貼文
     async openModifyBox(obj){
-      if (!('modifying' in obj)) this.$set(obj, 'modifying', true);
-      if (!('temp_content' in obj)) this.$set(obj, 'temp_content', obj.content);
-      else {
-        obj.modifying = true;
-        obj.temp_content = obj.content;
-      }
 
+      if (!('modifying' in obj)) this.$set(obj, 'modifying', true)
+      else obj.modifying = true;
+
+      if (!('temp_content' in obj)) this.$set(obj, 'temp_content', obj.content);
+      else obj.temp_content = obj.content;
+
+      this.$nextTick(()=>{
+        let modifyBox = this.$refs[`modifyBox-${obj.idx}`][0];
+        if(modifyBox){
+          modifyBox.focus();
+
+          const range = document.createRange();
+          range.selectNodeContents(modifyBox);
+          range.collapse(false); // false = 移到最後
+
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      })
     },
-    async modifyPost(obj, e){
+    async modifyPost(obj){
       try{
-        let modifyContent = e.target.closest('.post').querySelector('.post_text_modifying').innerHTML
-    
+        let modifyContent = this.$refs[`modifyBox-${obj.idx}`][0].innerHTML;
+      
         const res = await axios.post(`/api/post/modifyPost/${obj.idx}`,{content: modifyContent},{
           headers:{
             'x-user-token':jsCookie.get('authToken')
@@ -361,7 +375,7 @@ export default {
         else this.$bus.$emit('handleAlert','貼文修改通知',res.data.message,res.data.type)
       }
       catch(e){
-        console.log(e)
+        this.$bus.$emit('handleAlert','貼文修改通知','修改貼文失敗（參數遺失）','error')
       }
     },
     cancelModifyPost(obj){
@@ -736,13 +750,13 @@ export default {
     object-fit: cover; 
   }
   .post_footer{
-    width: 95%;
+    width: 100%;
     height: auto;
     margin: 0 auto;
   }
   .userMessageBox{
-    border-top: 1px solid rgba(0,0,0,0.1);
-    width: 100%;
+    width: 95%;
+    margin: 0 auto;
     height: 0;
     max-height: 250px;
     overflow-y: scroll;
@@ -808,11 +822,11 @@ export default {
     display: block;
   }
   .post_summary{
-    width: 100%;
+    width: 95%;
+    margin: 0 auto;
     height: 40px;
     position: relative;
     align-items: center;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
   }
   .post_summary_thumb{
     color:gray;
@@ -845,7 +859,7 @@ export default {
     text-align: center;
     height: 40px;
     line-height: 40px;
-    width: 50%;
+    width: calc(100% / 3);
     border-radius: 5px;
   }
   .post_option:hover{
