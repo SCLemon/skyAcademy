@@ -182,9 +182,9 @@ export default {
         }
         
         // 後處理
-        await this.delay(750);
+        await this.delay(500);
         this.$refs['pdf-loading'].style = 'opacity:0;';
-        await this.delay(750); // 需等待 opacity 動畫的 0.75s
+        await this.delay(500); // 需等待 opacity 動畫的 0.75s
 
         this.initObserver();
         this.isLoading = false;
@@ -366,7 +366,7 @@ export default {
     justify-content: center;
     align-items: center;
     opacity: 1;
-    transition: 0.75s opacity ease;
+    transition: 0.5s opacity ease;
   }
   .loadingBar{
     width: 100%;
