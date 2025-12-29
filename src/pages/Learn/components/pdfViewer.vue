@@ -155,7 +155,7 @@ export default {
         // 下載進度條
         loadingTask.onProgress = (progressData) => {
           const { loaded, total } = progressData;
-          const percent = Math.round((loaded / total) * 100);
+          const percent = Math.min(Math.round((loaded / total) * 100), 100);
           this.loadProgress = percent;
         };
 
