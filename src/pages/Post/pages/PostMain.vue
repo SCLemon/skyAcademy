@@ -20,6 +20,7 @@
                   <transition name="fade">
                     <div class="post_more_option_box" v-show="obj.showOption">
                       <div class="post_more_option" @click="openModifyBox(obj)"><i class="el-icon-edit"></i> 編輯貼文</div>
+                      <div class="post_more_option" @click="hidePost(obj)"><i :class="`el-icon-${obj.status?'lock':'unlock'}`"></i> {{obj.status?'隱藏':'公開'}}貼文</div>
                       <div class="post_more_option" @click="deletePost(obj.idx)"><i class="el-icon-delete"></i> 刪除貼文</div>
                     </div>
                   </transition>
@@ -29,7 +30,7 @@
                 <div class="post_top_img"><img :src="obj.creator.userImgUrl?obj.creator.userImgUrl:'img/user.png'" alt=""></div>
                 <div class="post_top_detail">
                   <div class="post_top_name">{{ obj.creator.name }}</div>
-                  <div class="post_top_date">{{obj.createTime}}</div>
+                  <div class="post_top_date">{{obj.createTime}} <i v-if="!obj.status" style="margin-left: 2px;" class="el-icon-lock"></i></div>
                 </div>
               </div>
               <div class="post_text" v-if="obj.content.trim()!='' && !obj.modifying" :key="'view-' + obj.idx" v-html="linkify(obj.content)"></div>
@@ -335,6 +336,29 @@ export default {
           this.$bus.$emit('handleAlert','貼文刪除通知',res.data.message,res.data.type)
         }
         else this.$bus.$emit('handleAlert','貼文刪除通知',res.data.message,res.data.type)
+      }
+      catch(e){}
+    },
+    async hidePost(obj){
+      const currentMethod = `${obj.status?'隱藏':'公開'}`;
+      try{
+        await this.$confirm(`確認是否${currentMethod}貼文?`, '提示', {
+          confirmButtonText: '確認',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+        const res = await axios.put(`/api/post/hidePost/${obj.idx}`,{},{
+          headers:{
+            'x-user-token':jsCookie.get('authToken')
+          }
+        })
+
+        if(res.data.type == 'success'){
+          obj.status = res.data.postStatus;
+          obj.showOption = false;
+        }
+        this.$bus.$emit('handleAlert',`貼文${currentMethod}通知`,res.data.message,res.data.type)
+
       }
       catch(e){}
     },
@@ -849,8 +873,8 @@ export default {
     border-radius: 35px;
   }
   .userMessage_active_msgBox{
-    max-width: calc(100% - 44px);
-    margin-left: 9px;
+    max-width: calc(100% - 100px);
+    margin-left: 13px;
     border-radius: 10px;
     background: #F0F2F5;
     padding: 7px;
