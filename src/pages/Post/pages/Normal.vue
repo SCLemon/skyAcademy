@@ -15,15 +15,15 @@
                   <button class="modifying_button" type="primary" @click="modifyPost(obj, $event)">儲存</button>
                   <button class="modifying_button" @click="cancelModifyPost(obj)">取消</button>
                 </template>
-                <el-dropdown v-else-if="!obj.modifying" @command="handleCommand">
-                  <span class="el-dropdown-link">
-                    操作<i class="el-icon-arrow-down el-icon--right"></i>
-                  </span>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item :command="{ method:'modify', obj: obj}">編輯</el-dropdown-item>
-                    <el-dropdown-item :command="{ method:'delete', idx: obj.idx}">刪除</el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
+                <div class="post_more_option_wrapper" v-else-if="!obj.modifying">
+                  <i class="el-icon-more icon_more" @click.stop="toggleOption(obj)"></i>
+                  <transition name="fade">
+                    <div class="post_more_option_box" v-show="obj.showOption">
+                      <div class="post_more_option" @click="openModifyBox(obj)"><i class="el-icon-edit"></i> 編輯貼文</div>
+                      <div class="post_more_option" @click="deletePost(obj.idx)"><i class="el-icon-delete"></i> 刪除貼文</div>
+                    </div>
+                  </transition>
+                </div>
               </div>
               <div class="post_top">
                 <div class="post_top_img"><img :src="obj.creator.userImgUrl?obj.creator.userImgUrl:'img/user.png'" alt=""></div>
@@ -205,14 +205,16 @@ export default {
 
       return result;
     },
-    handleCommand(payload){
-      if(payload.method == 'delete'){
-        this.deletePost(payload.idx)
-      }
-      if(payload.method == 'modify'){
-        this.openModifyBox(payload.obj)
+    
+    toggleOption(obj) {
+      if (obj.showOption === undefined) {
+        this.$set(obj, 'showOption', true);
+      } 
+      else {
+        obj.showOption = !obj.showOption;
       }
     },
+
     async getUserInfo(){
       const token = jsCookie.get('authToken');
       if(!token) return 
@@ -356,6 +358,7 @@ export default {
           selection.addRange(range);
         }
       })
+      obj.showOption = false;
     },
     async modifyPost(obj){
       try{
@@ -505,6 +508,13 @@ export default {
 </script>
 
 <style scoped>
+
+  .fade-enter-active,.fade-leave-active {
+    transition: opacity 0.25s ease;
+  }
+  .fade-enter,.fade-leave-to {
+    opacity: 0;
+  }
   .posterBox{
     width:100%;
     height: 100vh;
@@ -634,6 +644,42 @@ export default {
     position: absolute;
     top: 10px;
     right: 15px;
+  }
+  .icon_more{
+    width: 30px;
+    height: 30px;
+    border-radius: 30px;
+    line-height: 30px;
+    text-align: center;
+    transition: 0.3s background ease;
+  }
+  .icon_more:hover{
+    cursor: pointer;
+    background: rgba(0,0,0,0.05);
+  }
+  .post_more_option_wrapper{
+    position: relative;
+  }
+  .post_more_option_box{
+    position: absolute;
+    width: 100px;
+    height: auto;
+    margin-top: 4px;
+    right: 5px;
+    box-shadow: 0px 2px 2px rgba(0,0,0,0.2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .post_more_option{
+    width: 100%;
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
+    font-size: 12px;
+  }
+  .post_more_option:hover{
+    cursor: pointer;
+    background: rgba(0,0,0,0.05);
   }
   .post_top{
     width: 95%;
