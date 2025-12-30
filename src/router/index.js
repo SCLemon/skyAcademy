@@ -6,7 +6,7 @@ import Academic from '../pages/Academic/Academic.vue'
 import Learn from '../pages/Learn/Learn.vue'
 import Class from '../pages/Learn/Class.vue'
 import Post from '../pages/Post/Post.vue'
-import Normal from '@/pages/Post/pages/Normal.vue'
+import PostMain from '@/pages/Post/pages/PostMain.vue'
 import Login from '../pages/Login/Login.vue'
 import StudentInfo from '@/pages/InfoPage/StudentInfo.vue'
 import TeacherInfo from '@/pages/InfoPage/TeacherInfo.vue'
@@ -29,12 +29,12 @@ const router = new VueRouter({
             component:Academic,
             children:[
                 {
-                    path:'post',
+                    path:'post/:share?',
                     component:Post,
                     children:[
                         {
                             path:'',
-                            component:Normal
+                            component:PostMain
                         }
                     ]
                 },

@@ -80,7 +80,7 @@
           </div>
         </div>
     </div>
-    <el-dialog title="分享貼文" :visible.sync="dialogTableVisible3">
+    <el-dialog title="分享貼文" :visible.sync="dialogTableVisible">
       <div class="copyLinkTitle">Share via</div>
       <div class="shareViaBox">
         <div class="shareViaItem" @click="shareVia('facebook')">
@@ -126,7 +126,7 @@ import axios from 'axios'
 import jsCookie from 'js-cookie'
 import AddPost from '../components/AddPost.vue';
 export default {
-  name:'Normal',
+  name:'PostMain',
   components:{
     AddPost
   },
@@ -144,7 +144,7 @@ export default {
       isLoading: false, // 加載狀態，避免重複請求
 
       // 分享貼文內容
-      dialogTableVisible3: false,
+      dialogTableVisible: false,
       shareUrl:'',
       shareStatus:'Copy'
       
@@ -157,10 +157,10 @@ export default {
     this.$bus.$on('handleAddPost', this.handleAddPost);;
   },
   watch:{
-    '$route.query.share':{
+    '$route.params.share':{
       deep: true,
       async handler(){
-        this.dialogTableVisible3 = false;
+        this.dialogTableVisible = false;
         this.posts = [];
         this.page = 1;
         await this.getPost();
@@ -232,10 +232,10 @@ export default {
       catch(e){}
     },
     openShare(idx){
-      let text = location.protocol+'//'+location.host + '/#/academic/post?share='+idx;
+      let text = location.protocol+'//'+location.host + '/#/academic/post/' + idx;
       this.shareUrl = text;
       this.shareStatus = 'COPY';
-      this.dialogTableVisible3 = true;
+      this.dialogTableVisible = true;
     },
     async shareVia(target){
       const url = {
@@ -256,7 +256,7 @@ export default {
     async postDivScroll(){
       
       const target = this.$refs['postAll_wrapper'];
-      this.share = this.$route.query.share ?? null;
+      this.share = this.$route.params.share ?? null;
 
       const bottomThreshold = 2; // 容許誤差
       if (!this.share && target.scrollTop + target.clientHeight >= target.scrollHeight - bottomThreshold){
@@ -264,7 +264,7 @@ export default {
       }
     },
     async searchPost(){
-      await this.$router.replace({ query: {} }).catch((e)=>{});
+      await this.$router.replace('/academic/post').catch((e)=>{});
       this.posts = [];
       this.page = 1;
       await this.getPost();
@@ -273,7 +273,7 @@ export default {
       if (this.isLoading) return;
       this.isLoading = true;
 
-      this.share = this.$route.query.share ?? null;
+      this.share = this.$route.params.share ?? null;
       let url =''
       if(this.share) url = `/api/post/share/${this.share}`;
       else url = `/api/post/getPost?page=${this.page}${this.q ? `&q=${this.q}` : ''}`;
