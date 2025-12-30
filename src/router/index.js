@@ -115,8 +115,10 @@ router.beforeEach(async (to, from, next) => {
         return;
     }
 
+    localStorage.setItem('currentUser', JSON.stringify(res.data.userInfo))
+    
     // 訪問教師資料
-    else if(to.fullPath.includes('teacherInfo')){
+    if(to.fullPath.includes('teacherInfo')){
 
         if(res.data.userInfo && res.data.userInfo.typeEng =='teacher') return next();
         else{
@@ -127,7 +129,7 @@ router.beforeEach(async (to, from, next) => {
         }
     }
     // 訪問學生資料
-    else if(to.fullPath.includes('studentInfo')){
+    if(to.fullPath.includes('studentInfo')){
 
         if(res.data.userInfo && res.data.userInfo.typeEng =='student') next();
         else{

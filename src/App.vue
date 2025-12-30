@@ -142,5 +142,11 @@ export default {
     user-select: none;
     pointer-events: none; /* 如果需要完全不能操作 */
   }
+  * {
+    user-select: none;
+    -webkit-user-select: none; /* Chrome / Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* IE / Edge 舊版 */
+  }
 </style>
 

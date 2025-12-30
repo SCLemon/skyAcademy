@@ -11,20 +11,17 @@
             ></pdf-viewer>
         </div>
         <div class="column">
-            <div class="list_add" @click="openUpload()" v-if="showUploadOption"><i class="fa-solid fa-cloud-arrow-up upload_icon"></i>Upload Chapter</div>
+            <div class="list_add" @click="openUpload()" v-if="showOption"><i class="fa-solid fa-cloud-arrow-up upload_icon"></i>Upload Chapter</div>
             <div class="list_add" v-else @click="toggleList()"><i class="fa-solid fa-list upload_icon"></i>Chapter List</div>
             <div :class="{list_box:true}" ref="list_box">
-                <div :class="{
-                        list: true, list_selected: currentChapterIdx == chapter.idx,
-                    }
-                    " v-for="(chapter,id) in materials" :key="id">
+                <div :class="{list: true, list_selected: currentChapterIdx == chapter.idx}" v-for="(chapter,id) in materials" :key="id">
                     <div class="list_chapter right-list-target" @click="viewChapter(chapter)">Chapter {{ id+1 }}</div>
                     <div class="list_title" @click="viewChapter(chapter)">{{ chapter.title }}</div>
-                    <div :class="{edit: true, isDownloading:isDownloading}" @click="downloadChapter(chapter)">
+                    <div v-if="showOption" :class="{edit: true, isDownloading:isDownloading}" @click="downloadChapter(chapter)">
                         <i class="fa-regular fa-file-pdf" v-if="!chapter.isDownloading"></i>
                         <div v-else class="chapter_file_download_percent">{{ chapter.downloadPercent ?? 0 }}%</div>
                     </div>
-                    <div class="sort" v-if="showUploadOption">
+                    <div class="sort" v-if="showOption">
                         <i @click="modifyIndex(chapter, 'up')" class="el-icon-arrow-up arrow"></i>
                         <i @click="openUpdate(chapter)" class="fa-regular fa-pen-to-square pen"></i>
                         <i @click="modifyIndex(chapter, 'down')" class="el-icon-arrow-down arrow"></i>
@@ -85,7 +82,7 @@ export default {
             dialogTableVisible:false,
             attachment:[],
             isSending:false,
-            showUploadOption:false,
+            showOption:false,
             
             // 下載
             isDownloading: false,
@@ -112,7 +109,7 @@ export default {
 
         await this.getData();
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if(currentUser && currentUser.typeEng == 'teacher') this.showUploadOption = true;
+        if(currentUser && currentUser.typeEng == 'teacher') this.showOption = true;
     },
     methods:{
         getToken(){
@@ -147,6 +144,8 @@ export default {
         },
         async downloadChapter(chapter){
             
+            if(!this.showOption) return;
+
             if(this.isDownloading){
                 this.$bus.$emit('檔案下載通知','檔案正在執行下載，請稍後再試。', 'warning');
                 return;
