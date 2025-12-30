@@ -205,7 +205,8 @@ export default {
       result += remaining;
       return this.saveRender(result);
     },
-    saveRender(text){ // 避免 XSS
+    // 避免 XSS
+    saveRender(text){
       return DOMPurify.sanitize(text);
     },
     toggleOption(obj) {
