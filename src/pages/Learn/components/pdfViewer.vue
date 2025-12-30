@@ -42,7 +42,6 @@ export default {
       pageCanvases: [],
       observer: null,
       resizeTimer: null,
-      memoryTimer: null,
     };
   },
   mounted() {
@@ -51,19 +50,10 @@ export default {
     pdfjsLib.enableWebGL = this.isWebGLAvailable(); // GPU 渲染加速
     
     window.addEventListener('resize', this.handleResize);
-    this.memoryTimer = setInterval(() => {
-      if (performance.memory) {
-        const mem = performance.memory;
-        console.log(
-          `[MEM] ${(mem.usedJSHeapSize / 1024 / 1024).toFixed(1)} MB / ${(mem.jsHeapSizeLimit / 1024 / 1024).toFixed(0)} MB`
-        );
-      }
-    }, 1000);
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize);
     if (this.observer) this.observer.disconnect();
-    clearInterval(this.memoryTimer)
     this.cleanAll();
   },
   methods: {

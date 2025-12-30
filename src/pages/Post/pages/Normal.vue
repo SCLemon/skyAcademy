@@ -669,6 +669,8 @@ export default {
     box-shadow: 0px 2px 2px rgba(0,0,0,0.2);
     border-radius: 2px;
     overflow: hidden;
+    z-index: 999;
+    background: white;
   }
   .post_more_option{
     width: 100%;
