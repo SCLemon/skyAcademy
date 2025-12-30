@@ -33,7 +33,7 @@
                 </div>
               </div>
               <div class="post_text" v-if="obj.content.trim()!='' && !obj.modifying" :key="'view-' + obj.idx" v-html="linkify(obj.content)"></div>
-              <div class="post_text post_text_modifying" :ref="`modifyBox-${obj.idx}`" v-else-if="obj.modifying" :key="'edit-' + obj.idx" v-html="obj.temp_content" contenteditable="true"></div>
+              <div class="post_text post_text_modifying" :ref="`modifyBox-${obj.idx}`" v-else-if="obj.modifying" :key="'edit-' + obj.idx" v-html="saveRender(obj.temp_content)" contenteditable="true"></div>
               <div class="post_text_expand_logo" v-if="checkPostTextOverflow(obj.content) && !obj.modifying" @click="expandPostText($event)">... 顯示更多</div>
               <div class="post_img" v-if="obj.postImg.length">
                 <el-carousel :autoplay="false" :loop="false">
@@ -125,6 +125,7 @@
 import axios from 'axios'
 import jsCookie from 'js-cookie'
 import AddPost from '../components/AddPost.vue';
+import DOMPurify from 'dompurify';
 export default {
   name:'PostMain',
   components:{
@@ -202,10 +203,11 @@ export default {
       }
 
       result += remaining;
-
-      return result;
+      return this.saveRender(result);
     },
-    
+    saveRender(text){ // 避免 XSS
+      return DOMPurify.sanitize(text);
+    },
     toggleOption(obj) {
       if (obj.showOption === undefined) {
         this.$set(obj, 'showOption', true);
@@ -336,6 +338,18 @@ export default {
       catch(e){}
     },
     // 修改貼文
+    normalizeHTML(html){
+      const div = document.createElement('div');
+      div.innerHTML = html;
+
+      // 移除所有 style 屬性
+      div.querySelectorAll('*').forEach(el => {
+        el.removeAttribute('style');
+        el.removeAttribute('class');
+      });
+
+      return div.innerHTML;
+    },
     async openModifyBox(obj){
 
       if (!('modifying' in obj)) this.$set(obj, 'modifying', true)
@@ -362,7 +376,7 @@ export default {
     },
     async modifyPost(obj){
       try{
-        let modifyContent = this.$refs[`modifyBox-${obj.idx}`][0].innerHTML;
+        let modifyContent = this.normalizeHTML(this.$refs[`modifyBox-${obj.idx}`][0].innerHTML);
       
         const res = await axios.post(`/api/post/modifyPost/${obj.idx}`,{content: modifyContent},{
           headers:{

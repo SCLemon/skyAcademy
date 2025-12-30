@@ -76,6 +76,19 @@ export default {
         };
     },
     methods:{
+        // 標準化輸入
+        normalizeHTML(html) {
+            const div = document.createElement('div');
+            div.innerHTML = html;
+
+            // 移除所有 style 屬性
+            div.querySelectorAll('*').forEach(el => {
+                el.removeAttribute('style');
+                el.removeAttribute('class');
+            });
+
+            return div.innerHTML;
+        },
         // 時間格式處理
         timeFormatter(){
             return format(new Date(), 'yyyy-MM-dd HH:mm:ss')
@@ -84,7 +97,7 @@ export default {
         async create(){
             this.isSending = true;
 
-            this.form.content = this.$refs.input.innerHTML;
+            this.form.content = this.normalizeHTML(this.$refs.input.innerHTML);
             const formData = new FormData();
             formData.append('content', this.form.content);
 
