@@ -47,7 +47,7 @@ const router = new VueRouter({
                     component:StudyRoom
                 },
                 {
-                    path:'class',
+                    path:'class/:idx?',
                     component:Class
                 },
                 {

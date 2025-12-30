@@ -70,7 +70,7 @@ export default {
     data(){
         return {
             currentChapterIdx:'',
-            courseIdx:this.$route.query.idx,
+            courseIdx:this.$route.params.idx,
             materials:[],
             pdfUrl:'',
             genRefreshPDFNumber:'', // 避免 url 緩存

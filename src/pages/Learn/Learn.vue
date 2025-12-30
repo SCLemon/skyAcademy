@@ -74,12 +74,7 @@ export default {
       else this.$bus.$emit('handleAlert','專欄資料查詢通知',res.data.message,res.data.type)
     },
     goToClass(idx){
-      this.$router.push({
-        path:'class',
-        query:{
-          idx:idx
-        }
-      }).catch(e=>{})
+      this.$router.push(`class/${idx}`).catch(e=>{})
     },
   }
 }
