@@ -1,12 +1,15 @@
 <template>
   <div>
     <div class="top">
-      <div class="title"><i class="fa-solid fa-book book_icon"></i> 學習紀錄簿</div>
+      <div class="title"><i class="fa-solid fa-book book_icon"></i> 學習紀錄簿 <i class="el-icon-warning-outline alert" @click="showAlert()"></i> </div>
       <input type="file" ref="importFile" class="importFile" @change="importRecord($event)" accept=".json">
       <el-button class="add" v-if="currentUser && currentUser.typeEng == 'teacher' && !showClock" @click="handleImport()">匯入紀錄</el-button>
       <el-button class="add" v-if="currentUser && currentUser.typeEng == 'teacher' && !showClock" @click="dialogFormVisible = true">新增計畫</el-button>
     </div>
-    <statistics class="statistics"></statistics>
+    <div class="showRegion">
+      <statistics class="statistics"></statistics>
+      <paper-read class="paperRead"></paper-read>
+    </div>
     <div class="table">
         <div class="clock" v-if="currentUser && currentUser.typeEng == 'teacher' && showClock">
           <div class="timer">{{showTime}}</div>
@@ -99,12 +102,13 @@
 <script>
 import axios from 'axios';
 import Statistics from './components/Statistics.vue';
+import PaperRead from './components/PaperRead.vue';
 import jsCookie from 'js-cookie';
 import {differenceInMilliseconds, format} from 'date-fns'
 export default {
     name:'StudyRoom',
     components:{
-      Statistics
+      Statistics, PaperRead
     },
     data(){
       return{
@@ -167,7 +171,20 @@ export default {
       this.pickerOptions2.disabledDate = this.disabledDate2;
     },
     methods:{
-
+      // 顯示 Question
+      showAlert(){
+       try{
+          const str = `本學習記錄簿旨在系統性整理與記錄本學期之修課學習歷程。惟實驗操作與論文閱讀屬於高度動態且需反覆修正之學習活動，較難即時完整紀錄，故本記錄簿主要聚焦於修課相關之學習內容與理解歷程。`
+          this.$alert(str, '學習記錄簿介紹', {
+            confirmButtonText: '確定',
+            callback: ()=>{}
+          });
+          this.$nextTick(()=>{
+            document.querySelector('.el-message-box').style = 'text-align: justify !important;';
+          })
+       }
+       catch(e){}
+      },
       // 修改過程 - 時間
       disabledDate2(time) {
         let limit = new Date(this.updateForm.date);
@@ -454,10 +471,27 @@ export default {
     font-size: 24px;
     font-weight: bolder;
   }
-  .statistics{
+  .alert{
+    font-size:16px;
+  }
+  .alert:hover{
+    cursor: pointer;
+  }
+  .showRegion{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     width: calc(100% - 60px);
     margin: 0 auto;
     margin-bottom: 30px;
+    box-sizing: border-box;
+  }
+  .statistics{
+    width: 70%;
+    margin-right: 35px;
+  }
+  .paperRead{
+    width: 30%;
   }
   .export_button_wrapper{
     margin-top: 15px;

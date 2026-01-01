@@ -1,4 +1,3 @@
-<!-- 練習 -->
 <template>
   <div class="view">
     <div class="normalForm">

@@ -9,10 +9,10 @@
       </div>
       <div class="iconBox">
         <div class="icon_item" @click="showAddBox = true">
-          <i class="fa-regular fa-pen-to-square icon"></i> 建立貼文
+          <i class="el-icon-edit-outline icon"></i> 建立貼文
         </div>
         <div class="icon_item"  @click="showAddBox = true">
-          <i class="fa-regular fa-images icon"></i> 建立圖片
+          <i class="el-icon-picture-outline icon"></i> 建立圖片
         </div>
       </div>
     </div>
@@ -225,6 +225,9 @@ export default {
 .icon_item:hover {
     cursor: pointer;
     background-color: rgba(240, 240, 240);
+}
+.icon{
+    margin-right: 5px;
 }
 .newPost{
     width: 100%;

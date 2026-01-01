@@ -18,12 +18,12 @@
                     <div class="list_chapter right-list-target" @click="viewChapter(chapter)">Chapter {{ id+1 }}</div>
                     <div class="list_title" @click="viewChapter(chapter)">{{ chapter.title }}</div>
                     <div v-if="showOption" :class="{edit: true, isDownloading:isDownloading}" @click="downloadChapter(chapter)">
-                        <i class="fa-regular fa-file-pdf" v-if="!chapter.isDownloading"></i>
+                        <i class="el-icon-download" v-if="!chapter.isDownloading"></i>
                         <div v-else class="chapter_file_download_percent">{{ chapter.downloadPercent ?? 0 }}%</div>
                     </div>
                     <div class="sort" v-if="showOption">
                         <i @click="modifyIndex(chapter, 'up')" class="el-icon-arrow-up arrow"></i>
-                        <i @click="openUpdate(chapter)" class="fa-regular fa-pen-to-square pen"></i>
+                        <i @click="openUpdate(chapter)" class="el-icon-edit pen"></i>
                         <i @click="modifyIndex(chapter, 'down')" class="el-icon-arrow-down arrow"></i>
                     </div>
                 </div>
