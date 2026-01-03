@@ -59,7 +59,7 @@
                 <div class="id_card_issuer">Copyright © 2025 Lemon's Universe All Rights Reserved</div>
             </div>
             <div class="id_card_download">
-                <div class="level">
+                <div class="level" v-if="enableModifyLevel()">
                     <div class="manageLevelTitle">調整會員等級</div>
                     <el-select v-model="userInfo.level.level" placeholder="請選擇等級">
                         <el-option v-for="(item,id) in levelTitleArray" :key="id" :label="`Lv${id+1} ${item}`" :value="id+1"></el-option>
@@ -241,6 +241,10 @@ export default {
             }
 
             ctx.putImageData(img, 0, 0);
+        },
+        enableModifyLevel(){
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            return currentUser && currentUser.typeEng === 'teacher';
         }
     }
 }

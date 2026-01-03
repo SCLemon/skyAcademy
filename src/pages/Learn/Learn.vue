@@ -1,8 +1,7 @@
-<!-- 線上影音 -->
 <template>
   <div class="view">
     <div class="header">
-      <i class="fa-solid fa-signs-post post_icon"></i>專欄列表
+      <i class="fa-solid fa-folder-open post_icon"></i>專欄列表
       <div class="searchBox">
         <i class="fa-solid fa-magnifying-glass search_icon"></i><input type="text" class="search" placeholder="關鍵字查詢（主題, 代號, 作者名,...）" v-model="search">
       </div>
@@ -96,7 +95,7 @@ export default {
     font-weight: bolder;
   }
   .post_icon{
-    margin-right: 10px;
+    margin-right: 12px;
   }
   .searchBox{
     height: 40px;

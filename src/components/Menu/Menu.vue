@@ -1,8 +1,25 @@
 <template>
   <div class="menu">
-    <div :class="{user:true,list_selected: $route.path.includes('/login') || $route.path.includes('Info')}"
-         @click="isLogin?goTo(`/academic/${userInfo.typeEng}Info`):goTo('/academic/login')">
-        <div :class="{list_selected_flag:$route.path.includes('/login') || $route.path.includes('Info')}" style="height: 130px; position: absolute; box-sizing: border-box;"></div>
+    <div class="menu_logo" @click="goTo('/')"><img class="footer_img" src="img/horizontal_logo_white.png" alt="" > </div>
+    <div @click="goTo('/academic/post')" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/post')}">
+        <i class="fa-solid fa-lock lock" v-if="!isLogin"></i>
+        <i class="fa-solid fa-paper-plane unlock" v-else></i>
+        平台公告
+    </div>
+    <div @click="isLogin?goTo('/academic/learn'):''" :class="{list:true,list_lock:!isLogin,list_selected: ($route.path.includes('/learn') || $route.path.includes('/class'))}">
+        <i class="fa-solid fa-lock lock" v-if="!isLogin"></i>
+        <i class="fa-solid fa-folder-open unlock" v-else></i>
+        專欄列表
+    </div>
+    <div @click="isLogin?goTo('/academic/studyRoom'):''" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/studyRoom')}">
+        <i class="fa-solid fa-lock lock" v-if="!isLogin"></i>
+        <i class="fa-solid fa-book unlock_2" v-else></i>
+        學習紀錄
+    </div>
+    <div class="version_info">
+        <div>General EX I v1.4.2.0 PRE</div>
+    </div>
+    <div class="user">
         <div class="img_block" @click.stop="openImgUpload()">
             <img class="img" :src="userInfo.userImgUrl?userInfo.userImgUrl:'img/user.png'" alt="">
             <div class="img_upload">變更頭像
@@ -11,32 +28,17 @@
         </div>
         <div :class="`username ${isLogin?'username_login':''}`">
             {{ isLogin?`${userInfo.name}`:'登入/註冊' }}
-            <div v-if="isLogin" class="menu_level_box">
-                <img class="menu_level_badge" :src="userInfo.level?`img/badge/${userInfo.level.level}.png`:'img/badge/1.png'">
-                {{ userInfo.level? `${userInfo.level.levelTitle}`:''}} 
-            </div>
+        </div>
+        <div v-if="isLogin" class="menu_more">
+            <transition name="fade">
+                <div class="menu_more_block" v-show="showOption">
+                    <div class="menu_more_block_item" @click="handleMore('setting')"><i class="fa-solid fa-gear menu_more_block_item_icon"></i> 設定</div>
+                    <div class="menu_more_block_item" @click="handleMore('logout')"><i class="fa-solid fa-right-to-bracket menu_more_block_item_icon_2"></i>登出</div>
+                </div>
+            </transition>
+            <i class="fa-solid fa-bars menu_more_block_bars" @click="showOption = !showOption"></i>
         </div>
     </div>
-    <div @click="goTo('/academic/post')" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/post')}">
-        <div :class="{list_selected_flag:$route.path.includes('/post')}"></div>
-        <i class="fa-solid fa-lock lock" v-if="!isLogin"></i>
-        平台公告
-    </div>
-    <div @click="isLogin?goTo('/academic/learn'):''" :class="{list:true,list_lock:!isLogin,list_selected: ($route.path.includes('/learn') || $route.path.includes('/class'))}">
-        <div :class="{list_selected_flag:$route.path.includes('/learn')  || $route.path.includes('/class')}"></div>
-        <i class="fa-solid fa-lock lock" v-if="!isLogin"></i>
-        專欄列表
-    </div>
-    <div @click="isLogin?goTo('/academic/studyRoom'):''" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/studyRoom')}">
-        <div :class="{list_selected_flag:$route.path.includes('/studyRoom')}"></div>
-        <i class="fa-solid fa-lock lock" v-if="!isLogin"></i>
-        學習紀錄
-    </div>
-    <div v-if="isLogin" :class="{list:true}" @click="logout()">登出系統</div>
-    <div class="version_info">
-        <div>General EX I v1.4.2.0 PRE</div>
-    </div>
-    <div class="footer" @click="goTo('/')"><img class="footer_img" src="img/horizontal_logo_white.png" alt="" > </div>
   </div>
 </template>
 
@@ -54,7 +56,8 @@ export default {
                 userImgUrl:'',
                 typeEng:'',
                 type:''
-            }
+            },
+            showOption: false,
         }
     },
     mounted(){
@@ -114,8 +117,25 @@ export default {
                 this.setUserInfo();
             }
         },
+        handleMore(option){
+            switch(option){
+                case 'setting':
+                    if(this.userInfo && this.userInfo.typeEng === 'teacher'){
+                        this.goTo(`/academic/teacherInfo/clientTable`)
+                    }
+                    else if(this.userInfo && this.userInfo.typeEng === 'student'){
+                        this.goTo(`/academic/modifyInfo?idx=${this.userInfo.idx}`)
+                    }
+                    break;
+                case 'logout':
+                    this.logout()
+            }
+            this.showOption = false;
+        },
         goTo(path){
-            this.$router.push(path).catch((e)=>{})
+            this.$router.push(path).catch((e)=>{}).finally(()=>{
+                this.showOption = false;
+            })
         },
         setUserInfo(){
             const userInfo = JSON.parse(localStorage.getItem('currentUser'))
@@ -142,25 +162,83 @@ export default {
 </script>
 
 <style scoped>
+    .fade-enter-active,.fade-leave-active {
+        transition: opacity 0.25s ease;
+    }
+    .fade-enter,.fade-leave-to {
+        opacity: 0;
+    }
     .menu{
         width: 250px;
         height: 100vh;
         background: black;
         position: relative;
     }
-    .user{
-        width: 100%;
-        height: 130px;
+    .menu_logo{
+        width:90%;
+        height: 100px;
         display: flex;
-        justify-content: space-evenly;
+        align-items: center;
+        margin: 0 auto;
+        margin-bottom: 5px;
+        border-bottom: 1px solid rgba(255,255,255,0.15);
+    }
+    .menu_logo>img{
+        width: 95%;
+        margin: 0 auto;
+    }
+    .menu_logo:hover{
+        cursor: pointer;
+    }
+    .list{
+        width:100%;
+        height: 60px;
+        line-height: 60px;
+        text-align: center;
+        color: gray;
+        transition: all 0.5s;
+    }
+    .list_selected{
+        color: white;
+    }
+    .lock{
+        margin-right: 10px;
+    }
+    .unlock{
+        margin-right: 10px;
+    }
+    .unlock_2{
+        margin-right: 12.5px;
+    }
+    .list:hover{
+        cursor: pointer;
+        color: white;
+    }
+    .list_lock{
+        cursor: not-allowed !important;
+    }
+    .version_info{
+        color: gray;
+        text-align: center;
+        font-size: 12px;
+        margin-top: 40px;
+    }
+    .user{
+        width: 90%;
+        height: 100px;
+        display: flex;
         align-items: center;
         color:white;
+        position: absolute;
+        bottom: 5px;
+        left: 5%;
+        border-top: 1px solid rgba(255,255,255,0.15);
     }
     .img_block{
-        width: 90px;
-        height: 90px;
+        width: 60px;
+        height: 60px;
         background: white;
-        border-radius: 90px;
+        border-radius: 60px;
         overflow: hidden;
         position: relative;
     }
@@ -172,14 +250,14 @@ export default {
     .img_upload{
         position: absolute;
         width: 100%;
-        height: 30px;
-        line-height: 30px;
+        height: 20px;
+        line-height: 20px;
         color: white;
         font-size: 10px;
         text-align: center;
         background-color: rgba(0,0,0,0.5);
         left: 0;
-        bottom: -30px;
+        bottom: -20px;
         transition: bottom 0.75s;
     }
     .img_block:hover{
@@ -193,70 +271,48 @@ export default {
     }
     .username{
         width: 120px;
-        height: 60px;
-        line-height: 60px;
-        text-align: center;
+        line-height: 100px;
+        margin-left: 18px;
         overflow-y: scroll;
     }
     .username_login{
         line-height: 30px;
     }
-    .menu_level_box{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    .menu_level_badge{
-        width: 30px;
-        height: 30px;
-        object-fit: contain;
-        margin-right: 5px;
-    }
-    .list{
-        width:100%;
-        height: 60px;
-        line-height: 60px;
+    .menu_more{
+        width: 20px;
+        line-height: 100px;
         text-align: center;
-        color: white;
-        transition: all 1s;
+        position: relative;
     }
-    .lock{
-        margin-right: 20px;
-    }
-    .user:hover,.list:hover,.list_selected{
-        cursor: pointer;
-        background: rgba(255,255,255,0.15);
-        color: white;
-    }
-    .list_selected_flag{
+    .menu_more_block{
         position: absolute;
-        left: 0;
-        width: 5px;
-        height: 60px;
-        background: white;
-        transition: all 1s;
+        width: 100px;
+        background: rgba(255,255,255,0.1);
+        bottom: 80%;
+        right: 0;
+        border-radius: 2px;
     }
-    .list_lock{
-        cursor: not-allowed !important;
-    }
-    .version_info{
-        color: rgba(255,255,255,0.4);
-        text-align: center;
-        font-size: 12px;
-        margin-top: 40px;
-    }
-    .footer{
-        width:95%;
-        height: 60px;
-        position: absolute;
-        bottom: 15px;
-        left:2.5%;
-    }
-    .footer>img{
+    .menu_more_block_item{
         width: 100%;
-        margin: 0 auto;
+        height: 40px;
+        color: white;
+        line-height: 40px;
+        font-size: 14px;
+        color: gray;
+        transition: all 0.5s;
+        
     }
-    .footer:hover{
+    .menu_more_block_item:hover{
+        cursor: pointer;
+        color: white;
+    }
+    .menu_more_block_item_icon{
+        margin-right: 8px;
+    }
+    .menu_more_block_item_icon_2{
+        margin-right: 12px;
+    }
+    .menu_more_block_bars:hover{
         cursor: pointer;
     }
 </style>

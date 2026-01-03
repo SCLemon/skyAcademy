@@ -22,7 +22,7 @@ export default {
           `[MEM] ${(mem.usedJSHeapSize / 1024 / 1024).toFixed(1)} MB / ${(mem.jsHeapSizeLimit / 1024 / 1024).toFixed(0)} MB`
         );
       }
-    }, 1000);
+    }, 5000);
   },
   data(){
     return {

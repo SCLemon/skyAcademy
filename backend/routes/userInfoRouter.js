@@ -111,7 +111,7 @@ router.get('/api/userInfo/getUserInfo/:idx',authMiddleware,async (req, res) => {
     const idx = req.params.idx;
 
     try{
-        if(req.user.type  == 'teacher'){
+        if(req.user.type  == 'teacher' || req.user.type == 'student'){
             const user = await userModel.findOne({idx: idx, group: req.user.group})
 
             if(!user){
