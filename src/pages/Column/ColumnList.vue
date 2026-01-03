@@ -7,7 +7,7 @@
       </div>
     </div>
     <div class="classList" v-if="searchCourse.length">
-      <div class="classItem" v-for="(courses,id) in searchCourse" :key="id" @click="courses.idx?goToClass(courses.idx):handleLockMsg('若要開啟此專欄，請逕行向版主申請。')">
+      <div class="classItem" v-for="(courses,id) in searchCourse" :key="id" @click="courses.idx?goToColumn(courses.idx):handleLockMsg('若要開啟此專欄，請逕行向版主申請。')">
         <div class="banner">
           <el-carousel class="carousel" width="100%" height="175px" :autoplay="false">
             <el-carousel-item v-for="item in courses.bannerImg" :key="item.url">
@@ -30,7 +30,7 @@
 import axios from 'axios';
 import jsCookie from 'js-cookie';
 export default {
-  name:'Learn',
+  name:'ColumnList',
   data(){
     return {
       search:'',
@@ -72,8 +72,8 @@ export default {
       }
       else this.$bus.$emit('handleAlert','專欄資料查詢通知',res.data.message,res.data.type)
     },
-    goToClass(idx){
-      this.$router.push(`class/${idx}`).catch(e=>{})
+    goToColumn(idx){
+      this.$router.push(`column/${idx}`).catch(e=>{})
     },
   }
 }

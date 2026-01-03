@@ -130,7 +130,7 @@ export default {
     }
     .paperRead_list_item{
         width: 100%;
-        height: 50px;
+        height: 55px;
         font-size: 14px;
         margin: 0 auto;
         box-sizing: border-box;

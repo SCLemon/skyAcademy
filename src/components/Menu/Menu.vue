@@ -3,10 +3,10 @@
     <div class="menu_logo" @click="goTo('/')"><img class="footer_img" src="img/horizontal_logo_white.png" alt="" > </div>
     <div @click="goTo('/academic/post')" :class="{list:true,list_lock:!isLogin,list_selected: $route.path.includes('/post')}">
         <i class="fa-solid fa-lock lock" v-if="!isLogin"></i>
-        <i class="fa-solid fa-paper-plane unlock" v-else></i>
+         <i class="fa-brands fa-font-awesome unlock" v-else></i>
         平台公告
     </div>
-    <div @click="isLogin?goTo('/academic/learn'):''" :class="{list:true,list_lock:!isLogin,list_selected: ($route.path.includes('/learn') || $route.path.includes('/class'))}">
+    <div @click="isLogin?goTo('/academic/columnList'):''" :class="{list:true,list_lock:!isLogin,list_selected: ($route.path.includes('/column') && !$route.path.includes('/admin'))}">
         <i class="fa-solid fa-lock lock" v-if="!isLogin"></i>
         <i class="fa-solid fa-folder-open unlock" v-else></i>
         專欄列表
@@ -121,7 +121,7 @@ export default {
             switch(option){
                 case 'setting':
                     if(this.userInfo && this.userInfo.typeEng === 'teacher'){
-                        this.goTo(`/academic/teacherInfo/clientTable`)
+                        this.goTo(`/academic/admin`)
                     }
                     else if(this.userInfo && this.userInfo.typeEng === 'student'){
                         this.goTo(`/academic/modifyInfo?idx=${this.userInfo.idx}`)
@@ -202,13 +202,13 @@ export default {
         color: white;
     }
     .lock{
-        margin-right: 10px;
+        margin-right: 14px;
     }
     .unlock{
-        margin-right: 10px;
+        margin-right: 14px;
     }
     .unlock_2{
-        margin-right: 12.5px;
+        margin-right: 16.5px;
     }
     .list:hover{
         cursor: pointer;
@@ -230,17 +230,18 @@ export default {
         align-items: center;
         color:white;
         position: absolute;
-        bottom: 5px;
+        bottom: 3px;
         left: 5%;
         border-top: 1px solid rgba(255,255,255,0.15);
     }
     .img_block{
-        width: 60px;
-        height: 60px;
+        width: 53px;
+        height: 53px;
         background: white;
-        border-radius: 60px;
+        border-radius: 53px;
         overflow: hidden;
         position: relative;
+        margin-left: 10px;
     }
     .img{
         width: 100%;
@@ -250,14 +251,14 @@ export default {
     .img_upload{
         position: absolute;
         width: 100%;
-        height: 20px;
-        line-height: 20px;
+        height: 17px;
+        line-height: 17px;
         color: white;
-        font-size: 10px;
+        font-size: 8px;
         text-align: center;
         background-color: rgba(0,0,0,0.5);
         left: 0;
-        bottom: -20px;
+        bottom: -17px;
         transition: bottom 0.75s;
     }
     .img_block:hover{
@@ -270,7 +271,7 @@ export default {
         display: none;
     }
     .username{
-        width: 120px;
+        width: 114px;
         line-height: 100px;
         margin-left: 18px;
         overflow-y: scroll;
@@ -280,7 +281,6 @@ export default {
     }
     .menu_more{
         width: 20px;
-        line-height: 100px;
         text-align: center;
         position: relative;
     }
@@ -312,7 +312,15 @@ export default {
     .menu_more_block_item_icon_2{
         margin-right: 12px;
     }
+    .menu_more_block_bars{
+        height: 100px;
+        width: 100%;
+        line-height: 100px;
+        color:gray;
+        transition: all 0.5s;
+    }
     .menu_more_block_bars:hover{
         cursor: pointer;
+        color: white;
     }
 </style>

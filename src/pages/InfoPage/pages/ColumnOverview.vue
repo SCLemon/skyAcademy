@@ -88,7 +88,7 @@
     import axios from 'axios'
     import jsCookie from 'js-cookie'
     export default {
-        name:'TeacherCourseTable',
+        name:'CoulmnOverview',
         data(){
             return{
                 tableData: [],

@@ -1,18 +1,15 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import jsCookie from 'js-cookie'
-
 import Academic from '../pages/Academic/Academic.vue'
-import Learn from '../pages/Learn/Learn.vue'
-import Class from '../pages/Learn/Class.vue'
+import ColumnList from '../pages/Column/ColumnList.vue'
+import Column from '../pages/Column/Column.vue'
 import Post from '../pages/Post/Post.vue'
 import PostMain from '@/pages/Post/pages/PostMain.vue'
 import Login from '../pages/Login/Login.vue'
-import StudentInfo from '@/pages/InfoPage/StudentInfo.vue'
-import TeacherInfo from '@/pages/InfoPage/TeacherInfo.vue'
-import StudentCourseTable from '@/pages/InfoPage/pages/StudentCourseTable.vue'
-import TeacherCourseTable from '@/pages/InfoPage/pages/TeacherCourseTable.vue'
-import ClientTable from '@/pages/InfoPage/pages/ClientTable.vue'
+import Admin from '@/pages/InfoPage/Admin.vue'
+import ColumnOverview from '@/pages/InfoPage/pages/ColumnOverview.vue'
+import ClientOverview from '@/pages/InfoPage/pages/ClientOverview.vue'
 import Index from '@/pages/Index/Index.vue'
 import ModifyInfo from '@/pages/InfoPage/ModifyInfo.vue'
 import StudyRoom from '@/pages/StudyRoom/StudyRoom.vue'
@@ -39,47 +36,36 @@ const router = new VueRouter({
                     ]
                 },
                 {
-                    path:'learn',
-                    component:Learn
+                    path:'columnList',
+                    component:ColumnList
+                },
+                {
+                    path:'column/:idx?',
+                    component:Column
                 },
                 {
                     path:'studyRoom',
                     component:StudyRoom
                 },
                 {
-                    path:'class/:idx?',
-                    component:Class
-                },
-                {
                     path:'login',
                     component:Login
                 },
                 {
-                    path:'studentInfo',
-                    component:StudentInfo,
-                    children:[{
-                        path:'studentCourseTable',
-                        component:StudentCourseTable
-                    },{
-                        path:'/',
-                        redirect:'studentCourseTable'
-                    }]
-                },
-                {
-                    path:'teacherInfo',
-                    component:TeacherInfo,
+                    path:'admin',
+                    component:Admin,
                     children:[
                     {
-                        path:'clientTable',
-                        component:ClientTable
+                        path:'clientOverview',
+                        component:ClientOverview
                     },
                     {
-                        path:'teacherCourseTable',
-                        component:TeacherCourseTable
+                        path:'columnOverview',
+                        component:ColumnOverview
                     },
                     {
                         path:'/',
-                        redirect:'clientTable'
+                        redirect:'clientOverview'
                     }]
                 },
                 {
@@ -118,20 +104,9 @@ router.beforeEach(async (to, from, next) => {
     localStorage.setItem('currentUser', JSON.stringify(res.data.userInfo))
     
     // 訪問教師資料
-    if(to.fullPath.includes('teacherInfo')){
+    if(to.fullPath.includes('admin')){
 
         if(res.data.userInfo && res.data.userInfo.typeEng =='teacher') return next();
-        else{
-            jsCookie.remove('authToken')
-            next('/academic/login')
-            location.reload()
-            return
-        }
-    }
-    // 訪問學生資料
-    if(to.fullPath.includes('studentInfo')){
-
-        if(res.data.userInfo && res.data.userInfo.typeEng =='student') next();
         else{
             jsCookie.remove('authToken')
             next('/academic/login')

@@ -61,7 +61,7 @@
 import axios from 'axios'
 import jsCookie from 'js-cookie'
 export default {
-    name:'ClientTable',
+    name:'ClientOverview',
     data(){
         return{
             tableData: [],

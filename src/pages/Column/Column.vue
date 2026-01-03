@@ -60,7 +60,7 @@ import jsCookie from 'js-cookie';
 import pdfViewer from './components/PdfViewer.vue';
 import { nanoid } from 'nanoid';
 export default {
-    name:'Class',
+    name:'Column',
     components:{
         pdfViewer
     },

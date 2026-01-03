@@ -63,7 +63,7 @@ export default {
         if(data.type == 'success'){
           localStorage.setItem('currentUser', JSON.stringify(res.data.userInfo))
           this.$bus.$emit('setUserInfo')
-          this.$router.replace(`/academic/${type}Info`).catch((e)=>{})
+          this.$router.replace(`/academic/post`).catch((e)=>{})
         }
       }
       catch(e){}

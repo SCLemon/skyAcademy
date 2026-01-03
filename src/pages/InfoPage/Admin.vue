@@ -1,11 +1,11 @@
 <template>
   <div class="view">
     <div class="sum_box">
-        <router-link to="clientTable" class="sum">
+        <router-link to="clientOverview" class="sum">
             <div class="sum_title">用戶總數 (上限 {{ limit.studentNum }} 人)</div>
             <div class="sum_num">{{ student_num }}</div>
         </router-link>
-        <router-link :to="{ path:'teacherCourseTable' }" class="sum">
+        <router-link to="columnOverview" class="sum">
             <div class="sum_title">專欄總數 (上限 {{ limit.classNum }} 欄)</div>
             <div class="sum_num">{{ course_num }}</div>
         </router-link>
@@ -24,7 +24,7 @@
 import axios from 'axios'
 import jsCookie from 'js-cookie'
 export default {
-    name:'TeacherInfo',
+    name:'Admin',
     async mounted(){
         this.$bus.$on('setStudentNum',this.setStudentNum)
         this.$bus.$on('setCourseNum',this.setCourseNum)
