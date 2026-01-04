@@ -75,6 +75,18 @@ export default {
     },
     beforeDestroy(){
         this.$bus.$off('refreshStudyRecordStatistics', this.getData);
+        
+
+        if (this.chartInstance) {
+            this.chartInstance.destroy();
+            this.chartInstance = null;
+        }
+
+        const canvas = document.getElementById('chart');
+        if (canvas) {
+            canvas.width = 0;
+            canvas.height = 0;
+        }
     }
     
 }
