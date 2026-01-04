@@ -253,7 +253,7 @@ export default {
         margin: 0 auto;
         position: absolute;
         left: 20px;
-        bottom: 120px;
+        bottom: 125px;
         background: rgba(255,255,255,0.1);
         border-radius: 9px;
         display: flex;
