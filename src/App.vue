@@ -14,20 +14,6 @@ export default {
     this.$bus.$on('copyToClipboard',this.copyToClipboard)
     await this.setAnonymousMode();
     await this.generateFingerprint();
-
-    this.memoryTimer = setInterval(() => {
-      if (performance.memory) {
-        const mem = performance.memory;
-        console.log(
-          `[MEM] ${(mem.usedJSHeapSize / 1024 / 1024).toFixed(1)} MB / ${(mem.jsHeapSizeLimit / 1024 / 1024).toFixed(0)} MB`
-        );
-      }
-    }, 5000);
-  },
-  data(){
-    return {
-      memoryTimer: null,
-    }
   },
   computed:{
   },
@@ -123,9 +109,6 @@ export default {
 
         return hashHex;
     }
-  },
-  beforeDestroy(){
-    clearInterval(this.memoryTimer)
   }
 }
 </script>

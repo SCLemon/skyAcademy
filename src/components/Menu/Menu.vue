@@ -19,6 +19,16 @@
     <div class="version_info">
         <div>General EX I v1.4.2.0 PRE</div>
     </div>
+    <div class="memoryUsageBlock_wrapper">
+        <div class="memoryUsageBlock">
+            <div class="memoryUsageBlock_title">Memory Usage</div>
+            <div class="memoryUsageBlock_subTitle">Measured using JavaScript heap usage for this page.</div>
+            <div class="memoryUsageBlock_usage">{{memoryUsage}}</div>
+            <div class="memoryUsageBlock_bar_wrapper">
+                <div class="memoryUsageBlock_bar" :style="{ width: `${memoryPercent}%` }"></div>
+            </div>
+        </div>
+    </div>
     <div class="user">
         <div class="img_block" @click.stop="openImgUpload()">
             <img class="img" :src="userInfo.userImgUrl?userInfo.userImgUrl:'img/user.png'" alt="">
@@ -58,11 +68,21 @@ export default {
                 type:''
             },
             showOption: false,
+            memoryTimer: null,
+            memoryUsage: '0 MB / 0 MB',
+            memoryPercent: 0,
         }
     },
     mounted(){
         this.$bus.$on('setUserInfo',this.setUserInfo)
         this.$bus.$on('updateCurrentUser',this.updateCurrentUser)
+        this.memoryTimer = setInterval(() => {
+            if (performance.memory) {
+                const mem = performance.memory;
+                this.memoryUsage = `${(mem.usedJSHeapSize / 1024 / 1024).toFixed(1)} MB / ${(mem.jsHeapSizeLimit / 1024 / 1024).toFixed(0)} MB`
+                this.memoryPercent = (mem.usedJSHeapSize / mem.jsHeapSizeLimit * 100).toFixed(1);
+            }
+        }, 1000);
     },
     methods:{
         openImgUpload(){
@@ -157,6 +177,9 @@ export default {
                 this.$router.replace('/academic/login').catch((e)=>{})
             }).catch(() => {});
         }
+    },
+    beforeDestroy(){
+        clearInterval(this.memoryTimer)
     }
 }
 </script>
@@ -222,6 +245,53 @@ export default {
         text-align: center;
         font-size: 12px;
         margin-top: 40px;
+    }
+
+    .memoryUsageBlock_wrapper{
+        width: 210px;
+        height: 150px;
+        margin: 0 auto;
+        position: absolute;
+        left: 20px;
+        bottom: 120px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 9px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .memoryUsageBlock{
+        width: 170px;
+        height: auto;
+    }
+    .memoryUsageBlock_title{
+        color: rgba(255,255,255,0.9);
+        margin-bottom: 10px;
+    }
+    .memoryUsageBlock_subTitle{
+        color: rgba(255,255,255,0.7);
+        text-align: justify;
+        line-height: 1.25;
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
+    .memoryUsageBlock_usage{
+        font-size: 11px;
+        color: rgba(255,255,255,0.7);
+        width: 100%;
+        text-align: right;
+        margin-bottom: 9px;
+    }
+    .memoryUsageBlock_bar_wrapper{
+        width: 100%;
+        height: 6px;
+        background: rgba(255,255,255,0.1);
+    }
+    .memoryUsageBlock_bar{
+        width: 0%;
+        height: 6px;
+        background: rgba(255,255,255,0.7);
+        transition: 0.2s width ease;
     }
     .user{
         width: 90%;
