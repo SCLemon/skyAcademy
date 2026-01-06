@@ -6,16 +6,16 @@ const groupModel = require('../models/groupModel')
 const fs = require('fs');
 const {format} = require('date-fns')
 const { v4: uuidv4 } = require('uuid');
-const upload = require('../config/multer.config.js')
 const path = require('path')
 
 const authMiddleware = require('../middleware/auth.middleware')
 const { checkUsageMemory } = require('../middleware/checkUsageMemory.middleware')
 const checkClassNum = require('../middleware/checkClassNum.middleware')
+const { upload, autoCleanupTmp } = require('../config/multer.config');
 
 
 // 創建課程
-router.post('/api/infoPage/createCourse',upload.fields([{ name: 'attachments', maxCount: 2}]),authMiddleware,checkClassNum,checkUsageMemory, async (req, res) => {
+router.post('/api/infoPage/createCourse',authMiddleware,upload.fields([{ name: 'attachments', maxCount: 2}]),autoCleanupTmp,checkClassNum,checkUsageMemory, async (req, res) => {
     
     const {courseId,courseName, courseType,lecturer} = req.body;
 
