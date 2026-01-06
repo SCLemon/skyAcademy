@@ -1,4 +1,3 @@
-// 針對創建課程
 const express = require('express');
 const router = express.Router();
 const courseModel = require('../models/courseModel');

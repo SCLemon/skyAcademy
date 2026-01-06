@@ -17,7 +17,7 @@
         學習紀錄
     </div>
     <div class="version_info">
-        <div>General EX I v1.4.2.0</div>
+        <div>General EX I v1.4.2.0 Stable</div>
     </div>
     <div class="memoryUsageBlock_wrapper">
         <div class="memoryUsageBlock">

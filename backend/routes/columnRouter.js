@@ -1,4 +1,3 @@
-// 針對 Learn 課程列表
 const express = require('express');
 const router = express.Router();
 const courseModel = require('../models/courseModel');

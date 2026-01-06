@@ -78,6 +78,12 @@ const router = new VueRouter({
                 },
             ]
         },
+        
+        // 不存在的路徑 → 直接跳轉
+        {
+            path: '*',
+            redirect: '/'
+        }
     ]
 })
 router.beforeEach(async (to, from, next) => {
