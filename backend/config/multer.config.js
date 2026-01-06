@@ -44,7 +44,6 @@ function autoCleanupTmp(req, res, next) {
 
       if (fs.existsSync(realPath)) {
         fs.unlinkSync(realPath);
-        console.log(realPath)
       }
     };
 
