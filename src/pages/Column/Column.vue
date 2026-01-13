@@ -140,6 +140,8 @@ export default {
                 return;
             }
             this.currentChapterIdx = chapter.idx
+
+            this.genRefreshPDFNumber = nanoid();
             this.pdfUrl = chapter.attachmentUrl;
         },
         async downloadChapter(chapter){
@@ -268,11 +270,13 @@ export default {
                 formData.append('idx', this.courseIdx);
                 formData.append('materialIdx',this.update.materialIdx)
                 formData.append('title', this.update.title);
+
+                let hasfileUpdated = false;
                 if (this.update.fileList && this.update.fileList.length > 0) {
                     this.update.fileList.forEach((file, index) => {
                         formData.append('attachments', file.raw);
                     });
-                
+                    hasfileUpdated = true;
                 }
                 const res = await axios.post('/api/learn/modifyMaterial', formData, {
                     headers:{
@@ -285,7 +289,9 @@ export default {
                 })
                 if(res.data.type == 'success'){
 
-                    this.genRefreshPDFNumber = nanoid(); // 避免 url 緩存
+                    if(hasfileUpdated && res.data.material.idx == this.currentChapterIdx){
+                        this.genRefreshPDFNumber = nanoid(); // 避免 url 緩存
+                    }
                     
                     // 更新該項目
                     let target = this.materials.find((m)=> m.idx == res.data.material.idx);

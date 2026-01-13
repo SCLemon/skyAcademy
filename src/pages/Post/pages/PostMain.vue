@@ -36,13 +36,7 @@
               <div class="post_text" v-if="obj.content.trim()!='' && !obj.modifying" :key="'view-' + obj.idx" v-html="linkify(obj.content)"></div>
               <div class="post_text post_text_modifying" :ref="`modifyBox-${obj.idx}`" v-else-if="obj.modifying" :key="'edit-' + obj.idx" v-html="saveRender(obj.temp_content)" contenteditable="true"></div>
               <div class="post_text_expand_logo" v-if="checkPostTextOverflow(obj.content) && !obj.modifying" @click="expandPostText($event)">... 顯示更多</div>
-              <div class="post_img" v-if="obj.postImg.length">
-                <el-carousel :autoplay="false" :loop="false">
-                  <el-carousel-item v-for="(item,id) in obj.postImg" :key="id">
-                    <div class="carousel_img" @click="showPostImgDetail(item.url)"><img src="img/Loading.gif" :data-src="item.url" v-lazy alt=""></div>
-                  </el-carousel-item>
-                </el-carousel>
-              </div>
+              <carousel :post-img="obj.postImg"></carousel>
               <div class="post_footer">
                 <div class="post_summary" v-if="obj.likeCount || obj.message.length">
                   <div class="post_summary_thumb" v-if="obj.likeCount || obj.isLike">
@@ -126,11 +120,12 @@
 import axios from 'axios'
 import jsCookie from 'js-cookie'
 import AddPost from '../components/AddPost.vue';
+import Carousel from '../components/Carousel.vue';
 import DOMPurify from 'dompurify';
 export default {
   name:'PostMain',
   components:{
-    AddPost
+    AddPost, Carousel
   },
   data(){
     return {
@@ -528,7 +523,6 @@ export default {
         console.log(e)
       }
     },
-
     // 貼文內文展開
     expandPostText(event){
       const post = event.currentTarget.closest('.post'); 
@@ -536,12 +530,6 @@ export default {
       event.currentTarget.innerText == '... 顯示更多'? event.currentTarget.innerText = '顯示更少':event.currentTarget.innerText = '... 顯示更多'
       postText.classList.toggle('post_text_expand');
     },
-    // 貼文圖片展開
-    showPostImgDetail(imgUrl){
-      let url = location.protocol+'//'+location.host + imgUrl;
-      window.open(url, '_blank')
-
-    }
   },
 }
 </script>
@@ -801,36 +789,7 @@ export default {
     cursor: pointer;
     box-shadow: 0px 0.5px 1px rgba(0,0,0,0.3);
   }
-  .post_img{
-    width: 100%;
-    min-height: 300px !important;
-    height: calc((100vw - 250px) * 0.3) !important;
-    height: auto;
-    padding-top: 5px;
-    padding-bottom: 5px;
-  }
-  .carousel_img{
-    width: 100%;
-    min-height: 300px !important;
-    height: calc((100vw - 250px) * 0.3) !important;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .carousel_img:hover{
-    cursor: pointer;
-  }
-  .carousel_img>img{
-    max-width: 100%;
-    object-fit: contain;
-  }
-  ::v-deep .el-carousel__container{
-    min-height: 300px !important;
-    height: calc((100vw - 250px) * 0.3) !important;
-  }
-  ::v-deep .el-carousel__indicator{
-    display: none;
-  }
+
   ::v-deep .el-upload-list__item img {
     width: 100%;   
     height: 100%;  
