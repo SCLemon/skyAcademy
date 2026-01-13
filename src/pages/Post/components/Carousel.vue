@@ -1,13 +1,15 @@
 <template>
-    <div class="post_img_box" v-if="postImg.length">
-        <div class="previous_button button" @click="goPreviousPostImage(index)" v-if="hasPrevious">
-            <i class="el-icon-arrow-left"></i>
-        </div>
-        <div class="post_img" v-for="(item,id) in postImg" :key="id" @click="showPostImgDetail(item.url)">
-            <img src="img/Loading.gif" :data-src="item.url" v-lazy alt="">
-        </div>
-        <div class="next_button button" @click="goNextPostImage(index)" v-if="hasNext">
-            <i class="el-icon-arrow-right"></i>
+    <div class="post_img_box_wrapper">
+        <div class="post_img_box" v-if="postImg.length">
+            <div class="previous_button button" @click="goPreviousPostImage(index)" v-if="hasPrevious">
+                <i class="el-icon-arrow-left"></i>
+            </div>
+            <div class="post_img" v-for="(item,id) in postImg" :key="id" @click="showPostImgDetail(item.url)">
+                <img src="img/Loading.gif" :data-src="item.url" v-lazy alt="">
+            </div>
+            <div class="next_button button" @click="goNextPostImage(index)" v-if="hasNext">
+                <i class="el-icon-arrow-right"></i>
+            </div>
         </div>
     </div>
 </template>
@@ -64,6 +66,11 @@ export default {
 </script>
 
 <style scoped>
+    .post_img_box_wrapper{
+        position: relative;
+        height: auto;
+        width: 100%;
+    }
     .post_img_box{
         height: auto;
         max-height: calc((100vw - 250px) * 0.3) !important;
@@ -113,7 +120,7 @@ export default {
     .button:hover{
         cursor: pointer;
     }
-    .post_img_box:hover .button{
+    .post_img_box_wrapper:hover .button{
         opacity: 1;
     }
 
