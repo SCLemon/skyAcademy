@@ -36,7 +36,7 @@ export default {
         } ,
         hasPrevious(){
             return this.index > 0;
-        }
+        },
     },
     methods:{
 
@@ -79,7 +79,6 @@ export default {
         display: grid;
         grid-auto-flow: column;
         grid-auto-columns: 100%;
-        grid-template-rows: 1fr;
         overflow-x: auto;
         overflow-y: hidden;
     }
@@ -97,7 +96,6 @@ export default {
     }
     .post_img>img{
         max-width: 100%;
-        object-fit: contain;
     }
     .button{
         position: absolute;
