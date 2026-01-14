@@ -151,7 +151,7 @@ export default {
     await this.getPost()
     await this.getUserInfo()
     this.currentUser = JSON.parse(localStorage.getItem('currentUser'))
-    this.$bus.$on('handleAddPost', this.handleAddPost);;
+    this.$bus.$on('handleAddPost', this.handleAddPost);
   },
   watch:{
     '$route.params.share':{
@@ -864,7 +864,8 @@ export default {
   .post_summary{
     width: 95%;
     margin: 0 auto;
-    height: 40px;
+    height: 38px;
+    margin-bottom: 2px;
     position: relative;
     align-items: center;
   }

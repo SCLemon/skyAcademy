@@ -50,7 +50,7 @@ export default {
             const next = imgs[index + 1]
             if (next) {
                 next.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
-                this.index = ++index;
+                this.index++;
             }
         },
         goPreviousPostImage(index) {
@@ -58,7 +58,7 @@ export default {
             const previous = imgs[index - 1]
             if (previous) {
                 previous.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
-                this.index = --index;
+                this.index--;
             }
         }
     }
@@ -70,6 +70,7 @@ export default {
         position: relative;
         height: auto;
         width: 100%;
+        margin-bottom: 2px;
     }
     .post_img_box{
         height: auto;
@@ -82,20 +83,21 @@ export default {
         overflow-x: auto;
         overflow-y: hidden;
     }
-
     .post_img{
         width: 100%;
         height: 100%;
         display: flex;
         justify-content: center;
         align-items: flex-start;
+        box-sizing: border-box;
+        margin: 0 auto;
+        overflow: hidden;
     }
-
     .post_img:hover{
         cursor: pointer;
     }
     .post_img>img{
-        max-width: 100%;
+        max-width: 99.5%;
     }
     .button{
         position: absolute;
