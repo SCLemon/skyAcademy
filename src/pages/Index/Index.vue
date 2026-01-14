@@ -12,14 +12,14 @@
             <div class="content">
                 <div class="title_block">
                     <div class="title">Lemon's Websites</div>
-                    <div class="subTitle"><div class="subText" ref="subText">{{ subTitle }}</div></div>
+                    <div class="subTitle"><div class="subText" ref="subText">{{ subText }}</div></div>
                     <div class="box">
                         <div class="btn btn-1" @click="goTo('/academic')">進入基地 <i class="fa-solid fa-arrow-right start-arrow"></i></div>
                         <div class="btn btn-2" @click="scrollToSection('developer')">版主介紹 <i class="fa-solid fa-chevron-right"></i></div>
                     </div>
                 </div>
                 <div class="carousel">
-                    <el-carousel :interval="3000" type="card" height="281.25px">
+                    <el-carousel  type="card" :autoplay="0" :interval="3000">
                         <el-carousel-item v-for="(item,id) in banner" :key="id">
                             <div class="medium">
                                 <img :src="item" alt="">
@@ -37,7 +37,7 @@
                     <div class="developer_name">主要作者：林英豪</div>
                     <div class="developer_detail">
                   嗨，我是林英豪，也可以叫我 SCLemon。目前就讀於國立清華大學碩士學位，研究領域為「前瞻半導體二維材料元件設計」。同時，我對人工智慧、前端開發與投資研究也充滿熱情。從理論到實作，我喜歡把想法化為具體成果──無論是自行訓練 LSTM 股價預測模型、嘗試大語言模型的本地部署，還是開發 Vue.js 專案與 Chrome 擴充功能，都是我探索的旅程。
-                 <br>在學習與研究的過程中，我不僅追求技術上的突破，也重視創意與應用的延展。對我來說，科技就像「檸檬」──看似平凡，卻能激發無限可能，既能為生活增添風味，也能成為靈感的起點。這裡是我的小小天地，用來分享我的學習、作品與想法。如果你也對人工智慧、程式設計，或是創新的投資思維感興趣，歡迎一起交流，探索更廣闊的世界。
+                 <br>在學習與研究的過程中，我不僅追求技術上的突破，也重視創意與應用的延展。對我來說，科技就像「檸檬」──看似平凡，卻能激發無限可能，既能為生活增添風味，也能成為靈感的起點。這裡是我的小小天地，用來分享我的學習、作品與想法。如果你也對人工智慧、程式設計，或是創新投資思維感興趣，歡迎一起交流，探索更廣闊的世界。
                 </div>
                 </div>
             </div>
@@ -58,7 +58,13 @@ export default {
     data(){
         return {
             banner:['img/banner1.jpg','img/banner2.jpg','img/banner3.jpg'],
-            subTitle:'Step into Lemon’s Universe — A Journey of Curiosity, Creation, and Endless Discovery.'
+            subTitleForPC:'Step into Lemon’s Universe — A Journey of Curiosity, Creation, and Endless Discovery.',
+            subTitleForMobile: 'A Journey of Curiosity, Creation, and Endless Discovery.'
+        }
+    },
+    computed:{
+        subText(){
+            return window.innerWidth <= 430 ? this.subTitleForMobile : this.subTitleForPC;
         }
     },
     mounted(){
@@ -94,9 +100,6 @@ export default {
 </script>
   
 <style scoped>
-    .view{
-        min-width: 1440px;
-    }
     .back{
         position: fixed;
         bottom: 105px;
@@ -117,7 +120,6 @@ export default {
     }
     .header{
         width: 100vw;
-        min-width: 1440px;
         height: 90px;
         display: flex;
         position: fixed;
@@ -159,9 +161,7 @@ export default {
     }
     .top {
         width: 100vw;
-        min-width: 1440px;
         height: 100vh;
-        min-height: 858px;
         color: white;
         background: black;
         display: flex;
@@ -170,8 +170,9 @@ export default {
     }
     .content{
         width: 1000px;
-        height: 580px;
+        height: auto;
         position: relative;
+        overflow-x: hidden;
     }
     .time{
         font-weight: 500;
@@ -179,7 +180,7 @@ export default {
         font-size: 14px;
     }
     .title_block{
-        width: 1000px;
+        width: 100%;
         margin: 0 auto;
         display: flex;
         justify-content: center;
@@ -272,24 +273,28 @@ export default {
         color:white;
     }
     .carousel{
-        width: 1000px;
+        width: 100%;
         margin: 0 auto;
-        margin-top: 40px;
-        position: absolute;
-        bottom: 0;
+        margin-top: 60px;
+    }
+    .carousel :deep(.el-carousel__item) {
+        aspect-ratio: 16 / 9;
+        height: auto;
+    }
+
+    .carousel :deep(.el-carousel__container) {
+        width: 100%;
+        height: auto !important;
+        aspect-ratio: 10 / 2.85;
+    }
+    .carousel :deep(.el-carousel__mask) {
+        background-color: transparent;
     }
     .meduim{
         width: 100%;
     }
     .medium>img{
         width: 100%;
-    }
-    .el-carousel__item:nth-child(2n) {
-        background-color: #99a9bf;
-    }
-    
-    .el-carousel__item:nth-child(2n+1) {
-        background-color: #d3dce6;
     }
     ::v-deep .el-carousel__indicator--horizontal{
         display: none !important;
@@ -393,6 +398,13 @@ export default {
         width: 100%;
         margin-bottom: 25px;
     }
+    .developer_content{
+        width: 100%;
+        height: 300px;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+    }
     .developer_title{
         width: 100%;
         height: 80px;
@@ -400,13 +412,6 @@ export default {
         font-size: 28px;
         text-align: center;
         font-weight: bolder;
-    }
-    .developer_content{
-        width: 100%;
-        height: 300px;
-        display: flex;
-        justify-content: space-evenly;
-        align-items: center;
     }
     .developer_img{
         width: 270px;
@@ -428,13 +433,6 @@ export default {
         font-weight: bolder;
         line-height: 65px;
     }
-    .developer_intro{
-        width: 100%;
-        height: 190px;
-        text-align: justify;
-        padding: 10px;
-        box-sizing: border-box;
-    }
     .developer_detail{
         text-align: justify;
         line-height: 2;
@@ -451,5 +449,71 @@ export default {
     .footer_item{
         line-height: 2;
         text-align: center;
+    }
+    @media screen and (max-width: 440px) {
+        .logo{
+            width: 235px;
+        }
+        .contact{
+            display: none;
+        }
+        .top{
+        }
+        .content{
+            width: 85%;
+        }
+        .title{
+            font-size: 36px;
+        }
+        .subText{
+            font-size: 14px;
+            overflow-wrap: break-word;
+        }
+        .carousel{
+            width: 100%;
+            margin-top: 50px;
+        }
+        .carousel :deep(.el-carousel__container) {
+            width: 100%;
+            height: 108px;
+        }
+        .developer{
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .developer_content{
+            height: auto;
+        }
+        .developer_title{
+            font-size: 24px;
+            height: 48px;
+            line-height: 48px;
+        }
+        .developer_img{
+            width: 120px;
+            height: 120px;
+            border-radius: 120px;
+            overflow: hidden;
+        }
+        .developer_intro_box{
+            width: calc(100% - 160px);
+            height: 230px;
+        }
+        .developer_name{
+            font-size: 18px;
+        }
+        .developer_detail{
+            font-size: 12px;
+            height: 150px;
+            line-height: 1.75;
+            overflow-y:scroll;
+        }
+        .footer{
+            height: 80px;
+            font-size: 12px;
+        }
+        .footer_item{
+            line-height: 1.75;
+        }
     }
 </style>
