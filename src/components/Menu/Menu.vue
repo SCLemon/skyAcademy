@@ -57,16 +57,25 @@ import jsCookie from 'js-cookie'
 import axios from 'axios'
 export default {
     name:'Menu',
-    data(){
-        return{
-            isLogin:false,
-            userInfo:{
+    props:{
+        userInfo:{
+            type:Object,
+            default:{
                 account:'',
                 name:'',
                 userImgUrl:'',
                 typeEng:'',
                 type:''
             },
+        }
+    },
+    computed:{
+        isLogin(){
+            return !Object.values(this.userInfo).some(value => value === null || value === undefined || value === '')
+        }
+    },
+    data(){
+        return{
             showOption: false,
             memoryTimer: null,
             memoryUsage: '0 MB / 0 MB',
@@ -74,8 +83,6 @@ export default {
         }
     },
     mounted(){
-        this.$bus.$on('setUserInfo',this.setUserInfo)
-        this.$bus.$on('updateCurrentUser',this.updateCurrentUser)
         this.memoryTimer = setInterval(() => {
             if (performance.memory) {
                 const mem = performance.memory;
@@ -112,7 +119,7 @@ export default {
                     },
                 })
                 if(res.data.type == 'success'){
-                    this.updateCurrentUser();
+                    this.$bus.$emit('setUserInfo')
                     this.$bus.$emit('handleAlert','頭像上傳通知',res.data.message,res.data.type)
                 }
                 else this.$bus.$emit('handleAlert','頭像上傳通知',res.data.message,res.data.type)
@@ -122,19 +129,6 @@ export default {
             }
             finally{
                 this.$refs['img_upload_file'].value = '';
-            }
-        },
-        async updateCurrentUser(){
-            const token = jsCookie.get('authToken')
-            const res = await axios.post('/login/token',{save:true},{
-                headers:{
-                    'x-user-token':token,
-                    'x-user-fingerprint':localStorage.getItem('deviceFingerprint')
-                }
-            })
-            if(res.data.type == 'success'){
-                this.$bus.$currentUser = JSON.parse(localStorage.getItem('currentUser'))
-                this.setUserInfo();
             }
         },
         handleMore(option){
@@ -157,12 +151,6 @@ export default {
                 this.showOption = false;
             })
         },
-        setUserInfo(){
-            const userInfo = JSON.parse(localStorage.getItem('currentUser'))
-            if(userInfo) this.isLogin = true;
-            userInfo.userImgUrl += `?${new Date().getTime()}`
-            this.userInfo = userInfo
-        },
         logout(){
             this.$confirm('確認是否登出系統?', '提示', {
                 confirmButtonText: '登出',
@@ -170,9 +158,8 @@ export default {
                 type: 'warning'
             }).then(() => {
                 jsCookie.remove('authToken')
-                this.isLogin = false;
                 localStorage.removeItem('currentUser')
-                this.userInfo = {}
+                this.$bus.$emit('setUserInfo')
                 this.$bus.$emit('handleAlert','登出訊息','登出成功！','success')
                 this.$router.replace('/academic/login').catch((e)=>{})
             }).catch(() => {});

@@ -1,23 +1,17 @@
 <template>
   <div class="view">
-    <div class="normalForm">
-      <div class="box">
-        <div class="header"><i class="fa-solid fa-id-card"></i> 會員登入</div>
-        <div class="login"><div class="login_text">帳號：</div><el-input placeholder="請輸入帳號" v-model="student.account" clearable></el-input></div>
-        <div class="login"><div class="login_text">密碼：</div><el-input placeholder="請輸入密碼" v-model="student.password" clearable show-password></el-input></div>
-        <div class="btn"><el-button type="primary" @click="login('student')">會員登入</el-button></div>
-      </div>
-      <div class="box">
-        <div class="header"><i class="fa-solid fa-id-card"></i> 管理員登入</div>
-        <div class="login"><div class="login_text">帳號：</div><el-input placeholder="請輸入帳號" v-model="teacher.account" clearable></el-input></div>
-        <div class="login"><div class="login_text">密碼：</div><el-input placeholder="請輸入密碼" v-model="teacher.password" clearable show-password></el-input></div>
-        <div class="btn"><el-button type="primary" @click="login('teacher')">管理員登入</el-button></div>
-      </div>
-    </div>
-    <div class="fast_header"><i class="fa-solid fa-id-card"></i> 會員卡快速通道</div>
-    <div class="fastForm">
-      <el-button type="warning" v-if="!fast_login_isOpen" @click="openInput()">上傳電子會員卡</el-button>
-      <input type="file" class="fastInput" ref="fastInput" @change="fastLogin($event)">
+    <div class="form_wrapper">
+        <div class="normalForm">
+          <div class="header"><i class="fa-solid fa-id-card card_icon"></i> 一般登入</div>
+          <div class="login"><div class="login_text">帳號：</div><el-input placeholder="請輸入帳號" v-model="loginData.account" clearable></el-input></div>
+          <div class="login"><div class="login_text">密碼：</div><el-input placeholder="請輸入密碼" v-model="loginData.password" clearable show-password></el-input></div>
+          <div class="btn"><el-button type="primary" @click="login()">會員登入</el-button></div>
+        </div>
+        <div class="fast_header"><i class="fa-solid fa-id-card card_icon"></i> 會員卡快速通道</div>
+        <div class="fastForm">
+          <el-button type="warning" v-if="!fast_login_isOpen" @click="openInput()">上傳電子會員卡</el-button>
+          <input type="file" class="fastInput" ref="fastInput" @change="fastLogin($event)">
+        </div>
     </div>
   </div>
 </template>
@@ -30,15 +24,9 @@ export default {
   data(){
     return {
       text:'',
-      student:{
+      loginData:{
         account:'',
         password:'',
-        type:'student'
-      },
-      teacher:{
-        account:'',
-        password:'',
-        type:'teacher'
       },
       fast_login_isOpen:false,
     }
@@ -46,13 +34,13 @@ export default {
   mounted(){
   },
   methods:{
-    async login(type){
+    async login(){
       let data;
-      if(Object.values(this[type]).some(value => value === null || value === undefined || value.trim() === '')){
+      if(Object.values(this.loginData).some(value => value === null || value === undefined || value.trim() === '')){
           return this.$bus.$emit('handleAlert','登入訊息','登入資料不可為空。','error')
       }
       try{
-        const res = await axios.post('/login/verify',this[type],
+        const res = await axios.post('/login/verify',this.loginData,
           {
                 headers: {
                   'x-user-fingerprint': localStorage.getItem('deviceFingerprint')
@@ -147,17 +135,21 @@ export default {
   .view{
     width: calc(100vw - 250px);
     height: 100vh;
+    padding-left: 50px;
+    padding-right: 50px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .form_wrapper{
+    width: 100%;
+    height: auto;
   }
   .normalForm{
     width: 100%;
-    display: flex;
-    justify-content: space-evenly;
     height: 338px;
-  }
-  .box{
-    width: 45%;
-    margin: 0 auto;
-    margin-top: 40px;
+    margin-top: 20px;
   }
   .btn{
     margin-top: 20px;
@@ -171,10 +163,9 @@ export default {
   .login_text{
     line-height: 3;
   }
-
   .fastForm{
     width: 100%;
-    height: calc(100vh - 398px);
+    height: 40vh;
     margin: 0 auto;
     box-sizing: border-box;
     display: flex;
@@ -185,9 +176,19 @@ export default {
     height: 60px;
     line-height: 60px;
     font-size: 24px;
-    margin-left: 30px;
   }
   .fastInput{
     display: none;
+  }
+  .card_icon{
+    margin-right: 5px;
+  }
+  @media screen and (max-width: 440px) {
+    .view{
+      width: 100vw;
+    }
+    .fastForm{
+      height: 30vh;
+    }
   }
 </style>

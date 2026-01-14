@@ -19,7 +19,7 @@
                     </div>
                 </div>
                 <div class="carousel">
-                    <el-carousel  type="card" :autoplay="0" :interval="3000">
+                    <el-carousel  type="card" :interval="5000">
                         <el-carousel-item v-for="(item,id) in banner" :key="id">
                             <div class="medium">
                                 <img :src="item" alt="">
@@ -64,7 +64,7 @@ export default {
     },
     computed:{
         subText(){
-            return window.innerWidth <= 430 ? this.subTitleForMobile : this.subTitleForPC;
+            return this.$isMobile ? this.subTitleForMobile : this.subTitleForPC;
         }
     },
     mounted(){
@@ -485,14 +485,14 @@ export default {
             height: auto;
         }
         .developer_title{
-            font-size: 24px;
+            font-size: 20px;
             height: 48px;
             line-height: 48px;
         }
         .developer_img{
-            width: 120px;
-            height: 120px;
-            border-radius: 120px;
+            width: 100px;
+            height: 100px;
+            border-radius: 100px;
             overflow: hidden;
         }
         .developer_intro_box{
@@ -500,10 +500,10 @@ export default {
             height: 230px;
         }
         .developer_name{
-            font-size: 18px;
+            font-size: 16px;
         }
         .developer_detail{
-            font-size: 12px;
+            font-size: 12.5px;
             height: 150px;
             line-height: 1.75;
             overflow-y:scroll;

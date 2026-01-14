@@ -140,7 +140,8 @@ export default {
             this.$confirm('此操作將永久刪除該草稿, 是否繼續?', '提示', {
                 confirmButtonText: '確定',
                 cancelButtonText: '取消',
-                type: 'warning'
+                type: 'warning',
+                customClass:'globalCSS_MessageBox'
             })
             .then(() => {
                 this.showAddBox = false;

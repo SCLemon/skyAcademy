@@ -50,7 +50,7 @@
                 <div class="post_option_box">
                   <div :class="`post_option ${obj.isLike?'like':''}`" @click="toggleLikePost(obj.idx, $event, obj)"><i :class="`fa-regular fa-thumbs-up icon ${obj.isLike?'fa-solid':''}`"></i> <span>{{ obj.isLike?'收回讚':'按讚' }}</span></div>
                   <div class="post_option" @click="openUserMessageBox($event)"><i class="fa-regular fa-message icon"></i> 留言</div>
-                  <div class="post_option" @click="openShare(obj.idx)"><i class="fa-regular fa-share-from-square icon"></i> 分享</div>
+                  <div class="post_option" @click="openShare(obj)"><i class="fa-regular fa-share-from-square icon"></i> 分享</div>
                 </div>
                 <div class="userMessageBox">
                   <div class="userMessage" style="text-align: center; color:gray; font-size: 14px;" v-if="!obj.message.length">目前暫時沒有人留言</div>
@@ -230,11 +230,16 @@ export default {
       }
       catch(e){}
     },
-    openShare(idx){
-      let text = location.protocol+'//'+location.host + '/#/academic/post/' + idx;
-      this.shareUrl = text;
-      this.shareStatus = 'COPY';
-      this.dialogTableVisible = true;
+    openShare(obj){
+      let url = location.protocol+'//'+location.host + '/#/academic/post/' + obj.idx;
+      if (navigator.share && this.$isMobile) {
+        navigator.share({ title: "Lemon's Universe", text: '🍋 檸檬偷偷發了一篇小貼文，快來看看！', url: url }).catch((e)=>{})
+      }
+      else {
+        this.shareUrl = url;
+        this.shareStatus = 'COPY';
+        this.dialogTableVisible = true;
+      }
     },
     async shareVia(target){
       const url = {
@@ -317,7 +322,8 @@ export default {
         await this.$confirm(`確認是否刪除貼文?`, '提示', {
           confirmButtonText: '刪除',
           cancelButtonText: '取消',
-          type: 'warning'
+          type: 'warning',
+          customClass:'globalCSS_MessageBox'
         })
         const res = await axios.delete(`/api/post/deletePost/${idx}`,{
           headers:{
@@ -340,7 +346,8 @@ export default {
         await this.$confirm(`確認是否${currentMethod}貼文?`, '提示', {
           confirmButtonText: '確認',
           cancelButtonText: '取消',
-          type: 'warning'
+          type: 'warning',
+          customClass:'globalCSS_MessageBox'
         })
         const res = await axios.put(`/api/post/hidePost/${obj.idx}`,{},{
           headers:{
@@ -571,6 +578,7 @@ export default {
     box-sizing: border-box;
     border: 0;
     font-size: 16px;
+    background: transparent;
   }
   .search_input:focus{
     outline: 0;
@@ -1029,5 +1037,13 @@ export default {
   .shareButton:hover{
     cursor: pointer;
     box-shadow: 0px 1px 3px gray;
+  }
+  @media screen and (max-width: 440px) {
+    .search_input_div{
+      width: 82.5%;
+    }
+    .search_icon_div{
+      width: 17.5%;
+    }
   }
 </style>

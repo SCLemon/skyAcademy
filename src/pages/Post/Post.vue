@@ -21,13 +21,8 @@ export default {
 </script>
 
 <style scoped>
-  .view{
-    width: calc(100vw - 250px);
-    height: 100vh;
-  }
   .router_view{
     width: 73%;
-    min-width: 623px;
     max-width: calc((100vw - 560px) * 0.73);
     margin-top: 20px;
     height: 100vh;
@@ -44,5 +39,14 @@ export default {
     height: 100vh;
     padding-top: 20px;
     box-sizing: border-box;
+  }
+  @media screen and (max-width: 440px) {
+    .router_view{
+      width: 95vw;
+      max-width: 95vw;
+    }
+    .column{
+      display: none;
+    }
   }
 </style>

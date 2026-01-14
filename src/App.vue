@@ -120,5 +120,9 @@ export default {
   #app {
     overflow: hidden;
   }
+  .globalCSS_MessageBox{
+    max-width: 420px !important;
+    width: 85vw !important;
+  }
 </style>
 

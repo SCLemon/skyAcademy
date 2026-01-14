@@ -1,13 +1,13 @@
 <template>
     <div class="post_img_box_wrapper">
         <div class="post_img_box" v-if="postImg.length">
-            <div class="previous_button button" @click="goPreviousPostImage(index)" v-if="hasPrevious">
+            <div class="previous_button button" @click="goPreviousPostImage(index)" v-if="!$isMobile && hasPrevious">
                 <i class="el-icon-arrow-left"></i>
             </div>
             <div class="post_img" v-for="(item,id) in postImg" :key="id" @click="showPostImgDetail(item.url)">
                 <img src="img/Loading.gif" :data-src="item.url" v-lazy alt="">
             </div>
-            <div class="next_button button" @click="goNextPostImage(index)" v-if="hasNext">
+            <div class="next_button button" @click="goNextPostImage(index)" v-if="!$isMobile && hasNext">
                 <i class="el-icon-arrow-right"></i>
             </div>
         </div>
@@ -41,6 +41,7 @@ export default {
     methods:{
 
         showPostImgDetail(imgUrl){
+            if(this.$isMobile) return
             let url = location.protocol+'//'+location.host + imgUrl;
             window.open(url, '_blank')
         },
@@ -129,5 +130,18 @@ export default {
     }
     .next_button{
         right: 20px;
+    }
+    @media screen and (max-width: 440px) {
+        .post_img_box{
+            max-height: calc((100vw) * 0.6) !important;
+        }
+        .post_img_box{
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        .post_img{
+            scroll-snap-align: start;
+        }
     }
 </style>
