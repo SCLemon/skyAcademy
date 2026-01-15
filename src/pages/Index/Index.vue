@@ -77,7 +77,7 @@ export default {
             return new Promise((resolve)=>setTimeout(resolve,ms))
         },
         async onTypingEnd(e) {
-            if (e.animationName !== 'typing') return
+            if (!e.animationName) return
             await this.delay(2000)
             e.target.style.borderRight = 'none'
         },

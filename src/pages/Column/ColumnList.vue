@@ -83,6 +83,7 @@ export default {
   .column_box{
     width: calc(100vw - 250px);
     height: 100vh;
+    box-sizing: border-box;
   }
   .header{
     height: 80px;
@@ -140,7 +141,11 @@ export default {
     height: calc(100vh - 120px);
     overflow-x: hidden;
     overflow-y: scroll;
-    padding: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    box-sizing: border-box;
     /* grid */
     display: grid;
     grid-template-columns: repeat(auto-fill, 350px);
@@ -236,10 +241,51 @@ export default {
 
   @media screen and (max-width: 440px) {
     .column_box{
-      width: 100vw;
+      width: 95vw;
+      margin: 0 auto;
+      margin-top: 20px;
     }
     .title{
       display: none;
     }
+    .header{
+      width: 100%;
+      height: 50px;
+      margin-left: 0;
+      margin-bottom: 20px;
+      padding-left: 0;
+      position: static;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .searchBox{
+      width: 100%;
+      height: 50px;
+      position: static;
+    }
+    .search_icon{
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+    .search{
+      line-height: 40px;
+      width: 300px;
+      margin-right: 10px;
+    }
+    .classList{
+      margin: 0 auto;
+      width: 100%;
+      height: calc(100vh - 80px);
+      justify-content: center;
+      padding-bottom: 110px;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .classItem{
+      margin: 0 auto;
+      margin-bottom: 20px;
+    }
+
   }
 </style>
