@@ -196,7 +196,8 @@
                     await this.$confirm(`確認是否刪除專欄 (${courseId})?`, '提示', {
                         confirmButtonText: '刪除',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        customClass:'PWACSS_MessageBox'
                     })
                     const res = await axios.delete(`/api/infoPage/deleteCourse/${idx}`,{
                         headers:{
@@ -218,7 +219,8 @@
                     await this.$confirm(`確認是否變更專欄 (${courseId}) 權限?`, '提示', {
                         confirmButtonText: '確認',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        customClass:'PWACSS_MessageBox'
                     })
                     const res = await axios.put(`/api/infoPage/stopCourse/${idx}`,{},{
                         headers:{
@@ -269,7 +271,8 @@
                     await this.$confirm(`確認是否修改專欄資訊?`, '提示', {
                         confirmButtonText: '確認',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        customClass:'PWACSS_MessageBox'
                     })
                     const res = await axios.post('/api/infoPage/setStudentToCourse',this.setStudentList,{
                         headers:{
@@ -364,5 +367,31 @@
             width: 260px !important;
             height: 130px !important;
             line-height: 130px !important; /* 讓圖標垂直置中 */
+        }
+        :deep(.el-table){
+            width: 100%;
+            height: calc(100vh - 360px);
+        }
+        @media screen and (max-width: 440px)  {
+            .transfer{
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+            .transfer :deep(.el-transfer__buttons){
+                margin-top: 10px;
+                margin-bottom: 3px;
+            }
+            .transfer :deep(.el-transfer__buttons  .el-icon-arrow-left){
+                rotate: 90deg !important;
+            }
+            .transfer :deep(.el-transfer__buttons  .el-icon-arrow-right){
+                rotate: 90deg !important;
+            }
+            :deep(.el-table){
+                width: 100%;
+                height: calc(100vh - 460px);
+            }
         }
     </style>

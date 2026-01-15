@@ -18,7 +18,7 @@
             <el-button type="success" @click="stop(true)">完成計畫</el-button>
           </div>
         </div>
-        <el-table :data="tableData" border height="calc(100vh - 505px)" style="width: 100%;"  empty-text="暫無數據">
+        <el-table :data="tableData" border  empty-text="暫無數據">
           <el-table-column prop="date" label="計畫日期" width="140px" ></el-table-column>
           <el-table-column label="學習計畫概要">
             <template v-slot="scope">
@@ -163,16 +163,22 @@ export default {
         dialogFormVisible3:false,
         showRecordData:[],
         showRecordIdx:'',
+        
+        resizeTimer: null,
       }
     },
     mounted(){
       this.getData();
       this.currentUser = JSON.parse(localStorage.getItem('currentUser'))
       this.pickerOptions2.disabledDate = this.disabledDate2;
+      window.addEventListener('resize', this.handleResize);
     },
     methods:{
-      test(){
-            this.$notify('t','t','warning');
+      handleResize(){
+        if (this.resizeTimer) clearTimeout(this.resizeTimer);
+        this.resizeTimer = setTimeout(async () => {
+          this.refreshStatistics();
+        }, 500);
       },
       // 顯示 Question
       showAlert(){
@@ -454,6 +460,7 @@ export default {
     },
     async beforeDestroy(){
       clearInterval(this.timer)
+      window.removeEventListener('resize', this.handleResize);
     }
 }
 </script>
@@ -580,6 +587,10 @@ export default {
       opacity: 1;
     }
   }
+  :deep(.el-table){
+    height: calc(100vh - 505px);
+    width: 100%;
+  }
   @media screen and (max-width: 440px) {
     .view{
       width: 95vw;
@@ -623,6 +634,10 @@ export default {
     }
     .table{
       width: 100%;
+    }
+    :deep(.el-table){
+        width: 100%;
+        height: calc(100vh - 605px);
     }
   }
 </style>

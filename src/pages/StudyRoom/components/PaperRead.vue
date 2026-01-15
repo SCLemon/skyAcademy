@@ -171,9 +171,4 @@ export default {
         justify-content: center;
         align-items: center;
     }
-    @media screen and (max-width: 440px) {
-        .paperRead_wrapper{
-            height: 273px;
-        }
-    }
 </style>

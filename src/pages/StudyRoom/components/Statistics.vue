@@ -124,8 +124,5 @@ export default {
         .canvas_wrapper:hover{
             box-shadow: none;
         }
-        canvas{
-            height: 273px !important;
-        }
     }
 </style>

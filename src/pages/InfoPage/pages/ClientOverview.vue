@@ -7,7 +7,7 @@
             <el-button  @click="dialogFormVisible = true">新增用戶</el-button>
         </div>
     </div>
-        <el-table :data="tableData" border height="calc(100vh - 360px)" style="width: 100%" class="tableData" empty-text="暫無數據">
+        <el-table :data="tableData" border  empty-text="暫無數據">
             <el-table-column prop="level" label="會員階級" sortable :sort-by="row => row.level?.level">
                 <template #default="{ row }">
                     Lv{{ row.level? `${row.level.level} ${row.level.levelTitle}`:''}}
@@ -111,7 +111,8 @@ export default {
                 await this.$confirm(`確認是否刪除用戶 (${account})?`, '提示', {
                     confirmButtonText: '刪除',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    customClass:'PWACSS_MessageBox'
                 })
                 const res = await axios.delete(`/api/infoPage/deleteStudent/${idx}`,{
                     headers:{
@@ -132,7 +133,8 @@ export default {
                 await this.$confirm(`確認是否變更用戶 (${account}) 權限?`, '提示', {
                     confirmButtonText: '確認',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    customClass:'PWACSS_MessageBox'
                 })
                 const res = await axios.put(`/api/infoPage/stopStudent/${idx}`,{},{
                     headers:{
@@ -213,5 +215,15 @@ export default {
         overflow: hidden;
         text-overflow: ellipsis;
         word-break: break-all; /* 長字自動換行 */
+    }
+    :deep(.el-table){
+        width: 100%;
+        height: calc(100vh - 360px);
+    }
+    @media screen and (max-width: 440px) {
+        :deep(.el-table){
+            width: 100%;
+            height: calc(100vh - 460px);
+        }
     }
 </style>
