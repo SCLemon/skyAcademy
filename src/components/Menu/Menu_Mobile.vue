@@ -85,7 +85,7 @@ export default {
     }
     .select{
         width: calc(100% - 15px);
-        height: 50px;
+        height: 55px;
         margin: 0 auto;
         display: flex;
         align-items: center;
@@ -97,7 +97,7 @@ export default {
         z-index: 1;
         position: absolute;
         width: 20%;
-        height: 40px;
+        height: 45px;
         border-radius: 55px;
         background: rgba(255,255,255,0.2);
         transition: 0.5s left ease;

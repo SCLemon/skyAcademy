@@ -278,7 +278,7 @@ export default {
       width: 100%;
       height: calc(100vh - 80px);
       justify-content: center;
-      padding-bottom: 110px;
+      padding-bottom: 120px;
       padding-left: 0;
       padding-right: 0;
     }

@@ -1046,7 +1046,7 @@ export default {
       width: 17.5%;
     }
     .postAll_wrapper{
-      padding-bottom: 90px;
+      padding-bottom: 95px;
     }
   }
 </style>

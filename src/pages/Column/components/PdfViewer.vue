@@ -158,7 +158,8 @@ export default {
           canvasWrapper.style.display = 'block';
           canvasWrapper.style.marginTop = '5px';
           canvasWrapper.style.marginBottom = '5px';
-          canvasWrapper.style.minHeight = '100vh';
+          canvasWrapper.style.width = '100%'
+          canvasWrapper.style.aspectRatio = '1 / 1.414';
           container.appendChild(canvasWrapper);
           this.pageCanvases.push({ pageNum, canvasWrapper, renderTask: null });
         }
@@ -174,7 +175,7 @@ export default {
         // 後處理
         await this.delay(500);
         this.$refs['pdf-loading'].style = 'opacity:0;';
-        await this.delay(500); // 需等待 opacity 動畫的 0.75s
+        await this.delay(500); // 需等待 opacity 動畫的 0.5s
 
         this.initObserver();
         this.isLoading = false;
@@ -271,7 +272,6 @@ export default {
       const containerWidth = this.$refs.pdfContainer.clientWidth;
       const dpr = window.devicePixelRatio || 1;
       const qualityFactor = 1.75;
-
       const viewport = page.getViewport({ scale: 1 });
       const scale = (containerWidth / viewport.width) * dpr * qualityFactor;
       const scaledViewport = page.getViewport({ scale });
@@ -280,8 +280,8 @@ export default {
       canvas.height = scaledViewport.height;
       canvas.style.width = `${containerWidth}px`;
       canvas.style.height = `${(scaledViewport.height / scaledViewport.width) * containerWidth}px`;
-      canvas.style.border = '0.5px solid rgba(0,0,0,0.15)'
-      canvas.style.boxSizing = 'border-box'
+      canvas.style.border = '0.5px solid rgba(0,0,0,0.15)';
+      canvas.style.boxSizing = 'border-box';
 
       const ctx = canvas.getContext('2d');
       ctx.imageSmoothingEnabled = true;
@@ -334,16 +334,16 @@ export default {
 </script>
 
 <style scoped>
-
   .pdf-wrapper{
     width: 100%;
-    height: 100%;
     position: relative;
   }
   .pdf-container{
     width: 100%;
     height: 100vh;
     overflow: auto;
+    z-index: 2;
+    box-sizing: border-box;
   }
   .pdf-loading{
     position: absolute;
@@ -377,5 +377,10 @@ export default {
     margin-top: 10px;
     text-align: center;
     color: skyblue;
+  }
+  @media screen and (max-width: 440px) {
+    .pdf-container{
+      padding-bottom: 110px;
+    }
   }
 </style>

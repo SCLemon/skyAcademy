@@ -512,4 +512,18 @@ export default {
     ::v-deep .el-button+.el-button{
         margin-left: 0 !important;
     }
+
+    @media screen and (max-width: 440px) {
+        .view{
+            width: 100vw;
+        }
+        .column {
+            display: none;
+        }
+        .pdf{
+            width: 100%;
+            padding-left: 3px;
+            padding-right: 3px;
+        }
+    }
 </style>
