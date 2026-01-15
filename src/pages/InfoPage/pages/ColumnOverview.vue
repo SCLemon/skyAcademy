@@ -4,7 +4,7 @@
             <div class="tableTitle_left">專欄總覽</div>
             <el-button class="tableTitle_right" @click="dialogFormVisible = true">新增專欄</el-button>
         </div>
-            <el-table :data="tableData" border height="calc(100vh - 360px)" style="width: 100%" class="tableData" empty-text="暫無數據">
+            <el-table :data="tableData" border height="calc(100vh - 360px)" empty-text="暫無數據">
                 <el-table-column prop="createTime" label="創建時間"></el-table-column>
                 <el-table-column prop="courseName" label="專欄名稱"></el-table-column>
                 <el-table-column prop="lecturer" label="專欄負責人"></el-table-column>
@@ -391,7 +391,7 @@
             }
             :deep(.el-table){
                 width: 100%;
-                height: calc(100vh - 460px);
+                height: calc(100vh - 435px) !important;
             }
         }
     </style>

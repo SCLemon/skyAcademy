@@ -18,7 +18,7 @@
             <el-button type="success" @click="stop(true)">完成計畫</el-button>
           </div>
         </div>
-        <el-table :data="tableData" border  empty-text="暫無數據">
+        <el-table :data="tableData" border height="calc(100vh - 505px)" empty-text="暫無數據">
           <el-table-column prop="date" label="計畫日期" width="140px" ></el-table-column>
           <el-table-column label="學習計畫概要">
             <template v-slot="scope">
@@ -637,7 +637,7 @@ export default {
     }
     :deep(.el-table){
         width: 100%;
-        height: calc(100vh - 605px);
+        height: calc(100vh - 605px) !important;
     }
   }
 </style>

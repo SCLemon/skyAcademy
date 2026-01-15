@@ -7,7 +7,7 @@
             <el-button  @click="dialogFormVisible = true">新增用戶</el-button>
         </div>
     </div>
-        <el-table :data="tableData" border  empty-text="暫無數據">
+        <el-table :data="tableData" border height="calc(100vh - 360px)" empty-text="暫無數據">
             <el-table-column prop="level" label="會員階級" sortable :sort-by="row => row.level?.level">
                 <template #default="{ row }">
                     Lv{{ row.level? `${row.level.level} ${row.level.levelTitle}`:''}}
@@ -223,7 +223,7 @@ export default {
     @media screen and (max-width: 440px) {
         :deep(.el-table){
             width: 100%;
-            height: calc(100vh - 460px);
+            height: calc(100vh - 435px) !important;
         }
     }
 </style>

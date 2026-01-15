@@ -161,6 +161,7 @@ export default {
             width: 100vw;
         }
         .sum_box{
+            margin-top: 15px;
             display: grid;
             grid-auto-flow: column;
             grid-auto-columns: 100%;
