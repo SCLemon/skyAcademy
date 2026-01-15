@@ -61,7 +61,7 @@ export default {
                 confirmButtonText: '登出',
                 cancelButtonText: '取消',
                 type: 'warning',
-                customClass:'globalCSS_MessageBox'
+                customClass:'PWACSS_MessageBox'
             }).then(() => {
                 jsCookie.remove('authToken')
                 localStorage.removeItem('currentUser')

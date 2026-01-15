@@ -112,6 +112,7 @@ export default {
         background-position: bottom;
         background-size: 100% 200%;
         transition: background-position 0.5s ease-in-out;
+        box-sizing: border-box;
     }
     .sum:hover{
         background-position: top;
@@ -155,5 +156,24 @@ export default {
         cursor: pointer;
         color: blue;
     }
-    
+    @media screen and (max-width: 440px) {
+        .view{
+            width: 100vw;
+        }
+        .sum_box{
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        .sum{
+            width: 95%;
+            margin: 0 auto;
+            scroll-snap-align: center;
+        }
+    }
 </style>

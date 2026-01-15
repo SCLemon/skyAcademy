@@ -23,7 +23,7 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <el-dialog title="創建專欄" :visible.sync="dialogFormVisible">
+            <el-dialog title="創建專欄" :visible.sync="dialogFormVisible" custom-class="PWACSS_MessageBox">
                 <el-form :model="form">
                     <el-form-item label="專欄名稱">
                         <el-input v-model="form.courseName" autocomplete="off" clearable></el-input>
@@ -40,7 +40,7 @@
                         </el-select>
                     </el-form-item>
                 </el-form>
-                <div class="class_banner_title">專欄封面上傳（限制兩張，上傳後暫不提供修改，至少 350 pixel x 175 pixel）</div>
+                <div class="class_banner_title">專欄封面上傳（最多兩張 Ratio 2/1)</div>
                 <el-upload  action="#" :on-change="handleUpload" list-type="picture-card" :auto-upload="false" :file-list="fileList" :limit="2" :multiple="true" accept="image/*">
                     <i slot="default" class="el-icon-plus"></i>
                     <div slot="file" slot-scope="{file}">
@@ -57,7 +57,7 @@
                     <el-button type="primary" @click="create()">創建</el-button>
                 </div>
             </el-dialog>
-            <el-dialog :title="`${setStudentList.courseName} - 用戶名單`" :visible.sync="dialogFormVisible2">
+            <el-dialog :title="`${setStudentList.courseName} - 用戶名單`" :visible.sync="dialogFormVisible2" custom-class="PWACSS_MessageBox">
                 <el-form :model="setStudentList">
                     <el-form-item label="專欄名稱">
                         <el-input v-model="setStudentList.courseName" autocomplete="off" clearable></el-input>

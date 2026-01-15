@@ -614,7 +614,7 @@ export default {
     .statistics{
       width: 100%;
       margin-right: 0;
-      scroll-snap-align: start;
+      scroll-snap-align: center;
     }
     .paperRead{
       width: 100%;

@@ -141,7 +141,7 @@ export default {
             -webkit-overflow-scrolling: touch;
         }
         .post_img{
-            scroll-snap-align: start;
+            scroll-snap-align: center;
         }
         .button{
             display: none;
