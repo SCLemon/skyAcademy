@@ -6,7 +6,7 @@
          <i class="fa-brands fa-font-awesome unlock" v-else></i>
         平台公告
     </div>
-    <div @click="isLogin?goTo('/academic/columnList'):''" :class="{list:true,list_lock:!isLogin,list_selected: ($route.path.includes('/column') && !$route.path.includes('/admin'))}">
+    <div @click="isLogin?goTo('/academic/columnList'):''" :class="{list:true,list_lock:!isLogin,list_selected: ($route.path.includes('/column') && !($route.path.includes('/admin')))}">
         <i class="fa-solid fa-lock lock" v-if="!isLogin"></i>
         <i class="fa-solid fa-folder-open unlock" v-else></i>
         專欄列表
@@ -60,13 +60,15 @@ export default {
     props:{
         userInfo:{
             type:Object,
-            default:{
-                account:'',
-                name:'',
-                userImgUrl:'',
-                typeEng:'',
-                type:''
-            },
+            default () {
+                return {
+                    account: '',
+                    name: '',
+                    userImgUrl: '',
+                    typeEng: '',
+                    type: ''
+                }
+            }
         }
     },
     computed:{

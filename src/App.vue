@@ -43,7 +43,6 @@ export default {
           })
           data = res.data;
           if(data.type == 'success'){
-            this.$bus.$currentUser = res.data.userInfo
             this.$bus.$emit('setUserInfo')
           }
         }

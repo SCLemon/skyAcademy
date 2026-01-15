@@ -3,8 +3,8 @@
     <div class="menu_wrapper" v-if="!$isMobile">
       <Menu :userInfo="userInfo"></Menu>
     </div>
-    <div class="menu_mobile_wrapper" v-if="$isMobile">
-      <Menu_Mobile></Menu_Mobile>
+    <div class="menu_mobile_wrapper" v-if="$isMobile && showMobileOption">
+      <Menu_Mobile :userInfo="userInfo"></Menu_Mobile>
     </div>
     <div class="view">
       <transition name="slide-fade">
@@ -40,6 +40,11 @@ export default {
     this.$bus.$on('setUserInfo',this.setUserInfo)
     this.$bus.$on('updateCurrentUser',this.updateCurrentUser)
     await this.checkToken()
+  },
+  computed:{
+    showMobileOption(){
+        return !Object.values(this.userInfo).some(value => value === null || value === undefined || value === '')
+    }
   },
   methods:{
     async checkToken(){
@@ -139,7 +144,6 @@ export default {
       left: 50%;
       transform: translateX(-50%);
       z-index: 100;
-      display: none;
     }
   }
 </style>
