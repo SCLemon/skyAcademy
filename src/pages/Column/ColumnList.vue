@@ -110,6 +110,7 @@ export default {
     box-shadow: 0px 1px 3px gray;
     border-radius: 40px;
     box-sizing: border-box;
+    overflow: hidden;
   }
   .search_icon{
     width: 40px;
@@ -246,32 +247,32 @@ export default {
       margin-top: 20px;
     }
     .title{
-      display: none;
+      font-size: 18px;
     }
     .header{
-      width: 100%;
+      width: 350px;
       height: 50px;
-      margin-left: 0;
+      margin: 0 auto;
       margin-bottom: 20px;
       padding-left: 0;
       position: static;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
     }
     .searchBox{
-      width: 100%;
+      width: 60%;
       height: 50px;
       position: static;
     }
     .search_icon{
       margin-left: 5px;
-      margin-right: 5px;
     }
     .search{
       line-height: 40px;
-      width: 300px;
+      width: 150px;
       margin-right: 10px;
+      font-size: 14px;
     }
     .classList{
       margin: 0 auto;
