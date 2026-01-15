@@ -323,7 +323,7 @@ export default {
           confirmButtonText: '刪除',
           cancelButtonText: '取消',
           type: 'warning',
-          customClass:'globalCSS_MessageBox'
+          customClass:'PWACSS_MessageBox'
         })
         const res = await axios.delete(`/api/post/deletePost/${idx}`,{
           headers:{
@@ -347,7 +347,7 @@ export default {
           confirmButtonText: '確認',
           cancelButtonText: '取消',
           type: 'warning',
-          customClass:'globalCSS_MessageBox'
+          customClass:'PWACSS_MessageBox'
         })
         const res = await axios.put(`/api/post/hidePost/${obj.idx}`,{},{
           headers:{

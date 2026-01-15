@@ -15,9 +15,6 @@ export default {
     await this.setAnonymousMode();
     await this.generateFingerprint();
   },
-  mounted(){
-
-  },
   methods:{
     handleAlert(title,message,type){
       // success, warning, info, error
@@ -120,9 +117,13 @@ export default {
   #app {
     overflow: hidden;
   }
-  .globalCSS_MessageBox{
-    max-width: 420px !important;
-    width: 85vw !important;
+  .PWACSS_MessageBox{
+    
+  }
+  @media screen and (max-width: 440px) {
+    .PWACSS_MessageBox{
+      width: 85vw !important;
+    }
   }
 </style>
 

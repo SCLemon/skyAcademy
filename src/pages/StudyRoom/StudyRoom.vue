@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="view">
     <div class="top">
       <div class="title"><i class="fa-solid fa-book book_icon"></i> 學習紀錄簿 <i class="el-icon-warning-outline alert" @click="showAlert()"></i> </div>
       <input type="file" ref="importFile" class="importFile" @change="importRecord($event)" accept=".json">
@@ -18,7 +18,7 @@
             <el-button type="success" @click="stop(true)">完成計畫</el-button>
           </div>
         </div>
-        <el-table :data="tableData" border height="calc(100vh - 505px)" style="width: 100%" class="tableData" empty-text="暫無數據">
+        <el-table :data="tableData" border height="calc(100vh - 505px)" style="width: 100%;"  empty-text="暫無數據">
           <el-table-column prop="date" label="計畫日期" width="140px" ></el-table-column>
           <el-table-column label="學習計畫概要">
             <template v-slot="scope">
@@ -52,7 +52,7 @@
           </el-table-column>
         </el-table>
     </div>
-    <el-dialog title="新增計畫" :visible.sync="dialogFormVisible">
+    <el-dialog title="新增計畫" :visible.sync="dialogFormVisible" custom-class="PWACSS_MessageBox">
       <el-form :model="form">
         <el-form-item label="計畫日期：">
           <el-date-picker v-model="form.date" align="right" type="date" placeholder="選擇日期" :picker-options="pickerOptions"></el-date-picker>
@@ -71,7 +71,7 @@
       </el-form>
       <el-button type="primary" class="create" :disabled="(form.content.trim() =='')" @click="(form.content.trim()=='')?'':create()">新增計畫</el-button>
     </el-dialog>
-    <el-dialog title="修改計畫" :visible.sync="dialogFormVisible2">
+    <el-dialog title="修改計畫" :visible.sync="dialogFormVisible2" custom-class="PWACSS_MessageBox">
       <el-form :model="form">
         <el-form-item label="計畫日期">
           <el-date-picker v-model="updateForm.date" align="right" type="date" placeholder="選擇日期" :picker-options="pickerOptions2"></el-date-picker>
@@ -87,12 +87,12 @@
       </el-form>
       <el-button type="primary" class="create" :disabled="(!updateForm.date ||updateForm.content.trim()=='')" @click="(!updateForm.date ||updateForm.content.trim()=='')?'':update()">修改計畫</el-button>
     </el-dialog>
-    <el-dialog title="計畫執行紀錄" :visible.sync="dialogFormVisible3">
+    <el-dialog title="計畫執行紀錄" :visible.sync="dialogFormVisible3" custom-class="PWACSS_MessageBox">
       <el-table :data="showRecordData" stripe height="auto" style="width: 100%; max-height: 400px; overflow-y: scroll;" :empty-text="'暫無數據'">
-        <el-table-column prop="idx" label="輪次" width="100px"></el-table-column>
+        <el-table-column prop="idx" label="輪次" width="50px"></el-table-column>
         <el-table-column prop="start" label="起始時間"></el-table-column>
         <el-table-column prop="end" label="截止時間"></el-table-column>
-        <el-table-column prop="diff" label="持續時間" width="120px"></el-table-column>
+        <el-table-column prop="diff" label="持續時間"></el-table-column>
       </el-table>
       <div class="export_button_wrapper" v-if="currentUser && currentUser.typeEng == 'teacher'"><el-button class="export_button" @click="exportRecord(showRecordIdx)">匯出紀錄</el-button></div>
     </el-dialog>
@@ -171,13 +171,17 @@ export default {
       this.pickerOptions2.disabledDate = this.disabledDate2;
     },
     methods:{
+      test(){
+            this.$notify('t','t','warning');
+      },
       // 顯示 Question
       showAlert(){
        try{
           const str = `本學習記錄簿旨在系統性整理與記錄本學期之修課學習歷程。惟實驗操作與論文閱讀屬於高度動態且需反覆修正之學習活動，較難即時完整紀錄，故本記錄簿主要聚焦於修課相關之學習內容與理解歷程。`
           this.$alert(str, '學習記錄簿介紹', {
             confirmButtonText: '確定',
-            callback: ()=>{}
+            callback: ()=>{},
+            customClass:'PWACSS_MessageBox'
           });
           this.$nextTick(()=>{
             document.querySelector('.el-message-box').style = 'text-align: justify !important;';
@@ -272,7 +276,8 @@ export default {
         this.$confirm('此操作將永久刪除計畫, 是否繼續?', '提示', {
           confirmButtonText: '確定',
           cancelButtonText: '取消',
-          type: 'warning'
+          type: 'warning',
+          customClass:'PWACSS_MessageBox'
         }).then(async () => {
           try{
             const res = await axios.delete(`/api/studyRecord/delete/${idx}`,{
@@ -573,6 +578,51 @@ export default {
     }
     100% {
       opacity: 1;
+    }
+  }
+  @media screen and (max-width: 440px) {
+    .view{
+      width: 95vw;
+      margin: 0 auto;
+      margin-top: 20px;
+    }
+    .top{
+      padding-left: 5px;
+      padding-right: 5px;
+      height: 50px;
+      line-height: 50px;
+      width: 100%;
+      margin: 0 auto;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+    }
+    .title{
+      font-size: 18px;
+      font-weight: bolder;
+    }
+    .showRegion{
+      width:100%;
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+    .statistics{
+      width: 100%;
+      margin-right: 0;
+      scroll-snap-align: start;
+    }
+    .paperRead{
+      width: 100%;
+      box-shadow: none;
+      scroll-snap-align: start;
+    }
+    .table{
+      width: 100%;
     }
   }
 </style>

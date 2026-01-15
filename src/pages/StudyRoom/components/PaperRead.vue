@@ -39,6 +39,7 @@ export default {
                 const { value }  = await this.$prompt('請輸入論文名稱', '新增閱讀紀錄', {
                     confirmButtonText: '確定',
                     cancelButtonText: '取消',
+                    customClass:'PWACSS_MessageBox'
                 })
                 const res = await axios.post('/api/paperRecord/add',{
                         name: value
@@ -70,7 +71,8 @@ export default {
                 await this.$confirm('此操作將永久刪除閱讀紀錄, 是否繼續？', '提示', {
                     confirmButtonText: '確認',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    customClass:'PWACSS_MessageBox'
                 })
                 const res = await axios.delete(`/api/paperRecord/delete/${idx}`,{
                     headers:{
@@ -168,5 +170,10 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+    @media screen and (max-width: 440px) {
+        .paperRead_wrapper{
+            height: 273px;
+        }
     }
 </style>

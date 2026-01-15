@@ -110,8 +110,22 @@ export default {
         box-shadow: 0px 5px 8px rgba(0,0,0,0.3);
     }
     canvas {
-        width: 100% !important;
+        width: 100%;
         margin: 0 auto;
         height: 330px !important;
+    }
+    @media screen and (max-width: 440px) {
+        .canvas_wrapper{
+            box-shadow: none;
+            padding:0;
+            padding-left: 3px;
+            padding-right: 3px;
+        }
+        .canvas_wrapper:hover{
+            box-shadow: none;
+        }
+        canvas{
+            height: 273px !important;
+        }
     }
 </style>

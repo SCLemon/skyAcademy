@@ -141,7 +141,7 @@ export default {
                 confirmButtonText: '確定',
                 cancelButtonText: '取消',
                 type: 'warning',
-                customClass:'globalCSS_MessageBox'
+                customClass:'PWACSS_MessageBox'
             })
             .then(() => {
                 this.showAddBox = false;
