@@ -153,11 +153,13 @@ export default {
   .form_wrapper{
     width: 100%;
     height: auto;
+    box-sizing: border-box;
   }
   .normalForm{
     width: 100%;
     height: 338px;
     margin-top: 20px;
+    box-sizing: border-box;
   }
   .btn{
     margin-top: 20px;

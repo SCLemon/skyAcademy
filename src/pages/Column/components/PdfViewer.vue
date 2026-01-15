@@ -380,6 +380,7 @@ export default {
   }
   @media screen and (max-width: 440px) {
     .pdf-container{
+      padding-top: 62px;
       padding-bottom: 110px;
     }
   }

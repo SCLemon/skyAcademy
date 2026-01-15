@@ -1,5 +1,29 @@
 <template>
   <div class="view">
+    <div class="mobile_column_wrapper">
+        <div class="mobile_column" @click="isOpenMobileList = !isOpenMobileList">
+            <div class="mobile_column_currentChapter_title">{{currentChapter?.title}}</div>
+            <i :class="{'el-icon-arrow-down': true, arrow:true, rotateArrow: isOpenMobileList}"></i>
+        </div>
+        <div class="mobile_column_list" ref="mobile_column_list" v-if="isOpenMobileList">
+            <div :class="{mobile_column_list_item: true, mobile_column_list_item_selected: currentChapter.idx == chapter.idx}" v-for="(chapter,id) in materials" :key="id">
+                <div class="mobile_column_list_item_chapter_box" @click="viewChapter(chapter)">
+                    <div class="mobile_column_list_item_chapter">Chapter {{ id+1 }}</div>
+                    <div class="mobile_column_list_item_title">{{ chapter.title }}</div>
+                </div>
+                <div v-if="showOption" :class="{edit: true, isDownloading:isDownloading}" @click="downloadChapter(chapter)">
+                    <i class="el-icon-download" v-if="!chapter.isDownloading"></i>
+                    <div v-else class="chapter_file_download_percent">{{ chapter.downloadPercent ?? 0 }}%</div>
+                </div>
+                <div class="sort_mobile" v-if="showOption" @click="modifyIndex(chapter, 'up')">
+                    <i  class="el-icon-arrow-up arrow"></i>
+                </div>
+                <div class="sort_mobile" v-if="showOption" @click="modifyIndex(chapter, 'down')">
+                    <i class="el-icon-arrow-down arrow"></i>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="box">
         <div class="pdf pdf_empty" v-if="!materials.length">
             <el-empty description="本專欄暫無資料"></el-empty>
@@ -14,7 +38,7 @@
             <div class="list_add" @click="openUpload()" v-if="showOption"><i class="fa-solid fa-cloud-arrow-up upload_icon"></i>Upload Chapter</div>
             <div class="list_add" v-else @click="toggleList()"><i class="fa-solid fa-list upload_icon"></i>Chapter List</div>
             <div :class="{list_box:true}" ref="list_box">
-                <div :class="{list: true, list_selected: currentChapterIdx == chapter.idx}" v-for="(chapter,id) in materials" :key="id">
+                <div :class="{list: true, list_selected: currentChapter.idx == chapter.idx}" v-for="(chapter,id) in materials" :key="id">
                     <div class="list_chapter right-list-target" @click="viewChapter(chapter)">Chapter {{ id+1 }}</div>
                     <div class="list_title" @click="viewChapter(chapter)">{{ chapter.title }}</div>
                     <div v-if="showOption" :class="{edit: true, isDownloading:isDownloading}" @click="downloadChapter(chapter)">
@@ -66,7 +90,7 @@ export default {
     },
     data(){
         return {
-            currentChapterIdx:'',
+            currentChapter:{},
             courseIdx:this.$route.params.idx,
             materials:[],
             pdfUrl:'',
@@ -100,6 +124,8 @@ export default {
 
             // 刪除
             isSending3:false,
+            // 以下為移動端參數
+            isOpenMobileList: false,
         }
     },
     async mounted(){
@@ -139,10 +165,12 @@ export default {
                 this.$bus.$emit('handleAlert','專欄閱讀通知','請等待頁面渲染完畢再執行此操作。','warning')
                 return;
             }
-            this.currentChapterIdx = chapter.idx
-
+            this.currentChapter = chapter;
             this.genRefreshPDFNumber = nanoid();
             this.pdfUrl = chapter.attachmentUrl;
+
+            // 若為移動端，可在此自動隱藏選單：
+            this.isOpenMobileList = false;
         },
         async downloadChapter(chapter){
             
@@ -289,7 +317,7 @@ export default {
                 })
                 if(res.data.type == 'success'){
 
-                    if(hasfileUpdated && res.data.material.idx == this.currentChapterIdx){
+                    if(hasfileUpdated && res.data.material.idx == this.currentChapter.idx){
                         this.genRefreshPDFNumber = nanoid(); // 避免 url 緩存
                     }
                     
@@ -360,7 +388,7 @@ export default {
             finally{
                 this.isSending3 = false;
             }
-        }
+        },
     }
 }
 </script>
@@ -385,6 +413,9 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+    .mobile_column_wrapper{
+        display: none;
     }
     .column{
         width: 335px;
@@ -516,6 +547,80 @@ export default {
     @media screen and (max-width: 440px) {
         .view{
             width: 100vw;
+        }
+        .mobile_column_wrapper{
+            display: block;
+            width: 100%;
+            height: 60px;
+            position: fixed;
+            top:0px;
+            font-size: 16px;
+            background: black;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+        .mobile_column{
+            color: white;
+            display: flex;
+        }
+        .mobile_column_currentChapter_title{
+            max-width: 180px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .mobile_column:hover{
+            cursor: pointer;
+        }
+        .mobile_column_list{
+            width: 100%;
+            height: auto;
+            max-height: 300px;
+            overflow-y: scroll;
+            position: absolute;
+            top:60px;
+            background: black;
+        }
+        .mobile_column_list_item{
+            width: 100%;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        .mobile_column_list_item_selected{
+            background: rgba(255,255,255,0.1);
+
+        }
+        .mobile_column_list_item_chapter_box{
+            display: flex;
+        }
+        .mobile_column_list_item_chapter{
+            margin-right: 10px;
+        }
+        .mobile_column_list_item_title{
+            width: 180px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .arrow{
+            box-sizing: border-box;
+            margin-left: 5px;
+            transition: 0.3s rotate ease;
+        }
+        .rotateArrow{
+            rotate: 180deg;
+        }
+        .sort_mobile{
+            width: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .column {
             display: none;

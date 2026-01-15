@@ -41,7 +41,7 @@ export default {
     methods:{
 
         showPostImgDetail(imgUrl){
-            if(this.$isMobile) return
+            if(/Mobi|Android|iPhone/i.test(navigator.userAgent) || window.innerWidth <= 440) return
             let url = location.protocol+'//'+location.host + imgUrl;
             window.open(url, '_blank')
         },
