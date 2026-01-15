@@ -69,6 +69,23 @@
                 <div><el-button class="download_btn" type="primary" @click="downloadBackward()">下載卡片背面</el-button></div>
             </div>
         </div>
+        <div class="mobile_show">
+            <div class="mobile_user_img_box">
+                <div class="user_img" @click="openFile()">
+                    <img :src="userInfo.userImgUrl" alt="">
+                    <div class="uploadImgBtn">點擊上傳</div>
+                </div>
+                <input type="file" class="imgFile" ref="imgFile" @change="handleChangeFile()" accept="image/*">
+            </div>
+            <div class="mobile_level">
+                <div class="level" v-if="enableModifyLevel()">
+                    <div class="manageLevelTitle">調整會員等級</div>
+                    <el-select v-model="userInfo.level.level" placeholder="請選擇等級">
+                        <el-option v-for="(item,id) in levelTitleArray" :key="id" :label="`Lv${id+1} ${item}`" :value="id+1"></el-option>
+                    </el-select>
+                </div>
+            </div>
+        </div>
     </div>
   </div>
 </template>
@@ -552,5 +569,48 @@ export default {
     }
     .download_btn{
         margin-top: 15px;
+    }
+    .mobile_show{
+        display: none;
+    }
+    @media screen and (max-width: 440px) {
+        .box{
+            overflow-y: scroll;
+            padding-bottom: 85px;
+        }
+        .mobile_show{
+            display: block;
+        }
+        .user_img_box{
+            display: none;
+        }
+        .user_info{
+            width: 100%;
+            padding-left: 5px;
+            padding-right: 5px;
+            margin: 0 auto;
+        }
+        .input_title{
+            width: 140px;
+        }
+        .id_card_box{
+            display: none;
+        }
+        .mobile_user_img_box{
+            width: 100%;
+            height: 370px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            align-items: center;
+        }
+        .mobile_level{
+            width:226.09px;
+            margin-left: 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 auto;
+        }
     }
 </style>
