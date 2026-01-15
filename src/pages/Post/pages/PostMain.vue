@@ -232,7 +232,7 @@ export default {
     },
     openShare(obj){
       let url = location.protocol+'//'+location.host + '/#/academic/post/' + obj.idx;
-      if (navigator.share) {
+      if (/Mobi|Android|iPhone/i.test(navigator.userAgent) &&navigator.share) {
         navigator.share({ title: "Lemon's Universe", text: '🍋 檸檬偷偷發了一篇小貼文，快來看看！', url: url }).catch((e)=>{})
       }
       else {
