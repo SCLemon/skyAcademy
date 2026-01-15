@@ -5,7 +5,7 @@
         <div class="option" @click="goTo('/academic/post')"><i class="fa-solid fa-house"></i></div>
         <div class="option" @click="goTo('/academic/columnList')"><i class="fa-solid fa-folder-open"></i></div>
         <div class="option" @click="goTo('/academic/studyRoom')"><i class="fa-solid fa-book"></i></div>
-        <div class="option" @click="goToProfile()"><i class="fa-solid fa-user"></i></div>
+        <div class="option" @click="goToProfile()"><img class="userIcon" :src="userInfo.userImgUrl?userInfo.userImgUrl:'img/user.png'" alt=""></div>
         <div class="option" @click="logout()"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
     </div>
   </div>
@@ -116,4 +116,10 @@ export default {
     .option:hover{
         cursor: pointer;
     }
+    .userIcon{
+        width: 24px;
+        height: 24px;
+        border-radius: 24px;
+    }
+
 </style>

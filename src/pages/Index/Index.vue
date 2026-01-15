@@ -12,7 +12,10 @@
             <div class="content">
                 <div class="title_block">
                     <div class="title">Lemon's Websites</div>
-                    <div class="subTitle"><div class="subText" ref="subText">{{ subText }}</div></div>
+                    <div class="subTitle">
+                        <div class="subText subTextForPC" ref="subTextForPC">{{ subTextForPC }}</div>
+                        <div class="subText subTextForMobile" ref="subTextForMobile">{{ subTextForMobile }}</div>
+                    </div>
                     <div class="box">
                         <div class="btn btn-1" @click="goTo('/academic')">進入基地 <i class="fa-solid fa-arrow-right start-arrow"></i></div>
                         <div class="btn btn-2" @click="scrollToSection('developer')">版主介紹 <i class="fa-solid fa-chevron-right"></i></div>
@@ -58,25 +61,26 @@ export default {
     data(){
         return {
             banner:['img/banner1.jpg','img/banner2.jpg','img/banner3.jpg'],
-            subTitleForPC:'Step into Lemon’s Universe — A Journey of Curiosity, Creation, and Endless Discovery.',
-            subTitleForMobile: 'A Journey of Curiosity, Creation, and Endless Discovery.'
-        }
-    },
-    computed:{
-        subText(){
-            return this.$isMobile ? this.subTitleForMobile : this.subTitleForPC;
+            subTextForPC:'Step into Lemon’s Universe — A Journey of Curiosity, Creation, and Endless Discovery.',
+            subTextForMobile: 'A Journey of Curiosity, Creation, and Endless Discovery.',
+            subTextEls:[]
         }
     },
     mounted(){
-        setTimeout(() => {
-            try{
-                let el = this.$refs.subText;
-                if(el) el.style = 'border-right:none;'
-            }
-            catch(e){}
-        }, 6500);
+        this.subTextEls = document.querySelectorAll('.subText')
+        this.subTextEls.forEach(el => {
+            el.addEventListener('animationend', this.onTypingEnd)
+        })
     },
     methods: {
+        async delay(ms){
+            return new Promise((resolve)=>setTimeout(resolve,ms))
+        },
+        async onTypingEnd(e) {
+            if (e.animationName !== 'typing') return
+            await this.delay(2000)
+            e.target.style.borderRight = 'none'
+        },
         goTo(path){
             this.$router.push(path).catch((e)=>{})
         },
@@ -94,7 +98,10 @@ export default {
         }
     },
     beforeDestroy(){
-        
+        if (!this.subTextEls) return
+        this.subTextEls.forEach(el => {
+            el.removeEventListener('animationend', this.onTypingEnd)
+        })  
     }
 };
 </script>
@@ -206,6 +213,12 @@ export default {
         padding-right: 2px;
         width: 0;
         animation: typing 4s steps(77) 1s 1 normal forwards, blink 0.75s step-end infinite;
+    }
+    .subTextForPC{
+        display: block;
+    }
+    .subTextForMobile{
+        display: none;
     }
 
     @keyframes typing {
@@ -468,6 +481,12 @@ export default {
         .subText{
             font-size: 14px;
             overflow-wrap: break-word;
+        }
+        .subTextForPC{
+            display: none;
+        }
+        .subTextForMobile{
+            display: block;
         }
         .carousel{
             width: 100%;

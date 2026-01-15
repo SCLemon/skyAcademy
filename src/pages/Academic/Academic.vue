@@ -1,9 +1,9 @@
 <template>
   <div class="body">
-    <div class="menu_wrapper" v-if="!$isMobile">
+    <div class="menu_wrapper">
       <Menu :userInfo="userInfo"></Menu>
     </div>
-    <div class="menu_mobile_wrapper" v-if="$isMobile && showMobileOption">
+    <div class="menu_mobile_wrapper">
       <Menu_Mobile :userInfo="userInfo"></Menu_Mobile>
     </div>
     <div class="view">
@@ -42,7 +42,7 @@ export default {
     await this.checkToken()
   },
   computed:{
-    showMobileOption(){
+    isLogin(){
         return !Object.values(this.userInfo).some(value => value === null || value === undefined || value === '')
     }
   },
@@ -107,6 +107,9 @@ export default {
     width: 250px;
     height: 100vh;
   }
+  .menu_mobile_wrapper{
+    display: none;
+  }
   .view{
     width: calc(100vw - 250px);
     height: 100vh;
@@ -144,6 +147,7 @@ export default {
       left: 50%;
       transform: translateX(-50%);
       z-index: 100;
+      display: block;
     }
   }
 </style>

@@ -23,8 +23,6 @@ Vue.directive('lazy', {
   }
 })
 
-Vue.prototype.$isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent) || window.innerWidth <= 440;
-
 new Vue({
   render: h => h(App),
   router,

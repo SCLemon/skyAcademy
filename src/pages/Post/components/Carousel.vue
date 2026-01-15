@@ -1,13 +1,13 @@
 <template>
     <div class="post_img_box_wrapper">
         <div class="post_img_box" v-if="postImg.length">
-            <div class="previous_button button" @click="goPreviousPostImage(index)" v-if="!$isMobile && hasPrevious">
+            <div class="previous_button button" @click="goPreviousPostImage(index)" v-if="hasPrevious">
                 <i class="el-icon-arrow-left"></i>
             </div>
             <div class="post_img" v-for="(item,id) in postImg" :key="id" @click="showPostImgDetail(item.url)">
                 <img src="img/Loading.gif" :data-src="item.url" v-lazy alt="">
             </div>
-            <div class="next_button button" @click="goNextPostImage(index)" v-if="!$isMobile && hasNext">
+            <div class="next_button button" @click="goNextPostImage(index)" v-if="hasNext">
                 <i class="el-icon-arrow-right"></i>
             </div>
         </div>
@@ -142,6 +142,9 @@ export default {
         }
         .post_img{
             scroll-snap-align: start;
+        }
+        .button{
+            display: none;
         }
     }
 </style>

@@ -1,7 +1,7 @@
 <template>
-  <div class="view">
+  <div class="column_box">
     <div class="header">
-      <i class="fa-solid fa-folder-open post_icon"></i>專欄列表
+      <div class="title"><i class="fa-solid fa-folder-open title_icon"></i>專欄列表</div>
       <div class="searchBox">
         <i class="fa-solid fa-magnifying-glass search_icon"></i><input type="text" class="search" placeholder="關鍵字查詢（主題, 代號, 作者名,...）" v-model="search">
       </div>
@@ -80,7 +80,7 @@ export default {
 </script>
 
 <style scoped>
-  .view{
+  .column_box{
     width: calc(100vw - 250px);
     height: 100vh;
   }
@@ -94,7 +94,7 @@ export default {
     position: relative;
     font-weight: bolder;
   }
-  .post_icon{
+  .title_icon{
     margin-right: 12px;
   }
   .searchBox{
@@ -232,5 +232,14 @@ export default {
   }
   ::v-deep .el-carousel__indicator{
     display: none;
+  }
+
+  @media screen and (max-width: 440px) {
+    .column_box{
+      width: 100vw;
+    }
+    .title{
+      display: none;
+    }
   }
 </style>

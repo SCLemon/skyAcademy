@@ -15,7 +15,8 @@ export default {
     await this.setAnonymousMode();
     await this.generateFingerprint();
   },
-  computed:{
+  mounted(){
+
   },
   methods:{
     handleAlert(title,message,type){

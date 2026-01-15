@@ -1,7 +1,7 @@
 <template>
   <div class="view">
     <div class="form_wrapper">
-        <div class="banner" v-if="$isMobile" @click="goTo('/')">
+        <div class="banner" @click="goTo('/')">
           <img src="img/horizontal_logo.png" alt="">
         </div>
         <div class="normalForm">
@@ -147,6 +147,9 @@ export default {
     justify-content: center;
     align-items: center;
   }
+  .banner{
+    display: none;
+  }
   .form_wrapper{
     width: 100%;
     height: auto;
@@ -199,6 +202,7 @@ export default {
       width: 100%;
       margin: 0 auto;
       margin-bottom: 40px;
+      display: block;
     }
     .banner>img{
       max-width: 100%;
