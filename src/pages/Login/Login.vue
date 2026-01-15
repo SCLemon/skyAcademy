@@ -1,6 +1,9 @@
 <template>
   <div class="view">
     <div class="form_wrapper">
+        <div class="banner" v-if="$isMobile" @click="goTo('/')">
+          <img src="img/horizontal_logo.png" alt="">
+        </div>
         <div class="normalForm">
           <div class="header"><i class="fa-solid fa-id-card card_icon"></i> 一般登入</div>
           <div class="login"><div class="login_text">帳號：</div><el-input placeholder="請輸入帳號" v-model="loginData.account" clearable></el-input></div>
@@ -59,7 +62,6 @@ export default {
         this.$bus.$emit('handleAlert','登入訊息',data.message,data.type)
       }
     },
-
     // 快速登入通道
     openInput(){
       this.$refs.fastInput.click();
@@ -126,7 +128,10 @@ export default {
         bytes[b] = v;
       }
       return new TextDecoder().decode(bytes);
-    }
+    },
+    goTo(path){
+      this.$router.push(path).catch((e)=>{})
+    },
   }
 }
 </script>
@@ -189,6 +194,19 @@ export default {
     }
     .fastForm{
       height: 30vh;
+    }
+    .banner{
+      width: 100%;
+      margin: 0 auto;
+      margin-bottom: 40px;
+    }
+    .banner>img{
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .banner:hover{
+      cursor: pointer;
     }
   }
 </style>

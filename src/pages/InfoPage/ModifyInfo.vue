@@ -370,8 +370,8 @@ export default {
     }
     .id_card_forward_top{
         position: absolute;
-        top:10px;
-        left: 10px;
+        top:8px;
+        left: 16px;
         width: 190px;
         z-index: 1;
     }

@@ -1045,5 +1045,8 @@ export default {
     .search_icon_div{
       width: 17.5%;
     }
+    .postAll_wrapper{
+      padding-bottom: 90px;
+    }
   }
 </style>
