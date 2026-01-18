@@ -637,7 +637,7 @@ export default {
     }
     :deep(.el-table){
         width: 100%;
-        height: calc(100vh - 605px) !important;
+        height: calc(100vh - 565px) !important;
     }
   }
 </style>

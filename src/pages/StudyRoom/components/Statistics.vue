@@ -112,7 +112,7 @@ export default {
     canvas {
         width: 100%;
         margin: 0 auto;
-        height: 330px !important;
+        height: 290px !important;
     }
     @media screen and (max-width: 440px) {
         .canvas_wrapper{

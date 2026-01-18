@@ -4,6 +4,14 @@
         <el-button type="primary" class="btn" :loading="loading" @click="modifyData()">更新資料</el-button>
     </div>
     <div class="box">
+        <div class="mobile_show_changeUserIcon">
+            <div class="img_block" @click.stop="openImgUpload()">
+                <img class="img" :src="userInfo.userImgUrl?userInfo.userImgUrl:'img/user.png'" alt="">
+                <div class="img_upload">變更頭像
+                    <input type="file" @change="uploadUserImg()" class="img_upload_file" ref="img_upload_file" accept="image/*">
+                </div>
+            </div>
+        </div>
         <div class="userInfoBox">
             <div class="user_info">
                 <div class="inputBox"><div class="input_title">帳號：</div><el-input placeholder="請輸入使用者學號" disabled v-model="userInfo.account"></el-input></div>
@@ -15,7 +23,7 @@
             </div>
             <div class="user_img_box">
                 <div class="user_img" @click="openFile()">
-                    <img :src="userInfo.userImgUrl" alt="">
+                    <img :src="userInfo.userPhotoStickerUrl" alt="">
                     <div class="uploadImgBtn">點擊上傳</div>
                 </div>
                 <input type="file" class="imgFile" ref="imgFile" @change="handleChangeFile()" accept="image/*">
@@ -28,7 +36,7 @@
                 <div class="id_card_forward_name">{{ userInfo.name }}</div>
                 <div class="id_card_forward_id_title">證號/{{ userInfo.type=='teacher'?'Admin':'Member' }} ID</div>
                 <div class="id_card_forward_id">{{userInfo.account}}</div>
-                <div class="id_card_forward_imgBox"><img :src="userInfo.userImgUrl" alt=""></div>
+                <div class="id_card_forward_imgBox"><img :src="userInfo.userPhotoStickerUrl" alt=""></div>
                 <div class="id_card_forward_barcode">
                     <svg ref="barcode"></svg>
                 </div>
@@ -70,16 +78,9 @@
             </div>
         </div>
         <div class="mobile_show">
-            <div class="mobile_user_img_box">
-                <div class="user_img" @click="openFile()">
-                    <img :src="userInfo.userImgUrl" alt="">
-                    <div class="uploadImgBtn">點擊上傳</div>
-                </div>
-                <input type="file" class="imgFile" ref="imgFile" @change="handleChangeFile()" accept="image/*">
-            </div>
             <div class="mobile_level">
                 <div class="level" v-if="enableModifyLevel()">
-                    <div class="manageLevelTitle">調整會員等級</div>
+                    <div class="manageLevelTitle">會員等級：</div>
                     <el-select v-model="userInfo.level.level" placeholder="請選擇等級">
                         <el-option v-for="(item,id) in levelTitleArray" :key="id" :label="`Lv${id+1} ${item}`" :value="id+1"></el-option>
                     </el-select>
@@ -119,7 +120,8 @@ export default {
                     level:1,
                     levelTitle:'新手會員'
                 },
-                userImgUrl:''
+                userImgUrl:'',
+                userPhotoStickerUrl:'',
             },
             levelTitleArray:[],
         }
@@ -143,6 +145,7 @@ export default {
             })
             if(res.data.type == 'success'){
                 res.data.user.userImgUrl += `?${new Date().getTime()}`
+                res.data.user.userPhotoStickerUrl += `?${new Date().getTime()}`
                 this.userInfo = res.data.user
                 this.levelTitleArray = res.data.levelTitleArray
                 this.$bus.$emit('updateCurrentUser')
@@ -195,7 +198,7 @@ export default {
                 let reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = () => {
-                    this.userInfo.userImgUrl = reader.result;
+                    this.userInfo.userPhotoStickerUrl= reader.result;
                 };
                 this.file = file;
             }
@@ -262,7 +265,50 @@ export default {
         enableModifyLevel(){
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             return currentUser && currentUser.typeEng === 'teacher';
-        }
+        },
+        
+        // 移動端更改顯示頭像
+        openImgUpload(){
+            let el = this.$refs['img_upload_file'];
+            el.click();
+        },
+        async uploadUserImg(){
+            try{
+                const token = jsCookie.get('authToken')
+
+                let el = this.$refs['img_upload_file'];
+                let file = el.files[0];
+                if (!file) return;
+
+                await this.$confirm(`確認修改頭貼?`, '提示', {
+                    confirmButtonText: '確認',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    customClass:'PWACSS_MessageBox'
+                })
+                let formData = new FormData();
+                formData.append("attachments", file);
+
+                const res = await axios.post("/api/userInfo/updateIcon", formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        "x-user-token": token,
+                    },
+                })
+                if(res.data.type == 'success'){
+                    await this.getData();
+                    this.$bus.$emit('setUserInfo')
+                    this.$bus.$emit('handleAlert','頭像上傳通知',res.data.message,res.data.type)
+                }
+                else this.$bus.$emit('handleAlert','頭像上傳通知',res.data.message,res.data.type)
+            }
+            catch(e){
+                console.log(e)
+            }
+            finally{
+                this.$refs['img_upload_file'].value = '';
+            }
+        },
     }
 }
 </script>
@@ -290,6 +336,9 @@ export default {
         margin-top: 10px;
         height: calc(100vh - 120px);
         box-sizing: border-box;
+    }
+    .mobile_show_changeUserIcon{
+        display: none;
     }
     .userInfoBox{
         width: 100%;
@@ -578,6 +627,52 @@ export default {
             overflow-y: scroll;
             padding-bottom: 85px;
         }
+        .mobile_show_changeUserIcon{
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+        .img_block{
+            width: 140px;
+            height: 140px;
+            background: white;
+            border-radius: 140px;
+            overflow: hidden;
+            position: relative;
+            margin-left: 10px;
+        }
+        .img{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .img_upload{
+            position: absolute;
+            width: 100%;
+            height: 34px;
+            line-height: 34px;
+            color: white;
+            font-size: 13px;
+            text-align: center;
+            background-color: rgba(0,0,0,0.5);
+            left: 0;
+            bottom: -34px;
+            transition: bottom 0.75s;
+        }
+        .img_block:hover{
+            cursor: pointer;
+        }
+        .img_block:hover .img_upload{
+            bottom: 0;
+        }
+        .img_upload_file{
+            display: none;
+        }
         .mobile_show{
             display: block;
         }
@@ -591,26 +686,28 @@ export default {
             margin: 0 auto;
         }
         .input_title{
-            width: 140px;
+            width: 110px;
         }
         .id_card_box{
             display: none;
         }
-        .mobile_user_img_box{
-            width: 100%;
-            height: 370px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-evenly;
-            align-items: center;
-        }
         .mobile_level{
-            width:226.09px;
-            margin-left: 28px;
+            width:100%;
+            padding-left: 5px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             margin: 0 auto;
+        }
+        .manageLevelTitle{
+            width: 110px;
+        }
+        .inputBox :deep(.el-input){
+            width: calc(100% - 110px);
+        }
+        .level{
+            width: 100%;
+            height: auto;
+            display: flex;
+            align-items: center;
         }
     }
 </style>

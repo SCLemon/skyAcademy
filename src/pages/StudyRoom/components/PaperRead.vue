@@ -92,7 +92,7 @@ export default {
 
 <style scoped>
     .paperRead_wrapper{
-        height: 370px;
+        height: 330px;
         box-sizing: border-box;
         overflow: hidden;
         box-shadow: 0px 1px 4px gray;

@@ -448,27 +448,6 @@ export default {
       }
       catch(e){}
     },
-    checkPostTextOverflow(htmlContent, maxHeight = 168) {
-      // 建立暫時容器
-      const temp = document.createElement('div');
-      temp.style.wordBreak = 'break-all'
-      temp.style.position = 'absolute';
-      temp.style.visibility = 'hidden';
-      temp.style.lineHeight = '1.5'
-      
-      const reference = document.querySelector('.post_text');
-      const width = reference ? reference.clientWidth + 'px' : '589px';
-      temp.style.width = width;
-
-
-      temp.innerHTML = htmlContent;
-
-      document.body.appendChild(temp);
-      const exceeds = temp.offsetHeight > maxHeight;
-      document.body.removeChild(temp);
-
-      return exceeds;
-    },
     // 留言區
     msgScrollToBottom(event){
       this.$nextTick(() => {
@@ -531,6 +510,29 @@ export default {
       }
     },
     // 貼文內文展開
+    checkPostTextOverflow(htmlContent, maxHeight = 147) {
+      // 建立暫時容器
+      const temp = document.createElement('div');
+      temp.style.wordBreak = 'break-all';
+      temp.style.position = 'absolute';
+      temp.style.visibility = 'hidden';
+      temp.style.lineHeight = '1.5';
+      temp.style.fontSize = '14px';
+      
+      const reference = document.querySelector('.post_text');
+      const width = reference ? reference.clientWidth + 'px' : '589px';
+      temp.style.width = width;
+
+
+      temp.innerHTML = htmlContent;
+
+      document.body.appendChild(temp);
+      console.log(temp.offsetHeight, maxHeight)
+      const exceeds = temp.offsetHeight > maxHeight;
+      document.body.removeChild(temp);
+
+      return exceeds;
+    },
     expandPostText(event){
       const post = event.currentTarget.closest('.post'); 
       const postText = post.querySelector('.post_text');

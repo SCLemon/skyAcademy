@@ -563,6 +563,10 @@ export default {
             z-index: 1;
         }
         .mobile_column{
+            height: 60px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
             color: white;
             display: flex;
         }
