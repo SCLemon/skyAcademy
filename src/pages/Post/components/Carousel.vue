@@ -1,6 +1,6 @@
 <template>
     <div class="post_img_box_wrapper">
-        <div class="post_img_box" v-if="postImg.length">
+        <div class="post_img_box" v-if="postImg.length" ref="post_img_box" @scroll="onScroll()">
             <div class="previous_button button" @click="goPreviousPostImage(index)" v-if="hasPrevious">
                 <i class="el-icon-arrow-left"></i>
             </div>
@@ -10,6 +10,9 @@
             <div class="next_button button" @click="goNextPostImage(index)" v-if="hasNext">
                 <i class="el-icon-arrow-right"></i>
             </div>
+        </div>
+        <div class="post_img_currentIndex" v-if="postImg.length > 1">
+            <div :class="{post_img_currentIndex_item:true, post_img_currentIndex_item_selected: id === index}" v-for="(item,id) in postImg" :key="id"></div>
         </div>
     </div>
 </template>
@@ -28,6 +31,7 @@ export default {
     data(){
         return{
             index:0,
+            scrollTimer: null,
         }
     },
     computed: {
@@ -39,7 +43,14 @@ export default {
         },
     },
     methods:{
-
+        onScroll(){
+            clearTimeout(this.scrollTimer);
+                this.scrollTimer = setTimeout(() => {
+                const box = this.$refs.post_img_box;
+                const width = box.clientWidth;
+                this.index = Math.round(box.scrollLeft / width);
+            }, 50);
+        },
         showPostImgDetail(imgUrl){
             if(/Mobi|Android|iPhone/i.test(navigator.userAgent) || window.innerWidth <= 440) return
             let url = location.protocol+'//'+location.host + imgUrl;
@@ -51,7 +62,6 @@ export default {
             const next = imgs[index + 1]
             if (next) {
                 next.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
-                this.index++;
             }
         },
         goPreviousPostImage(index) {
@@ -59,7 +69,6 @@ export default {
             const previous = imgs[index - 1]
             if (previous) {
                 previous.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
-                this.index--;
             }
         }
     }
@@ -76,13 +85,13 @@ export default {
     .post_img_box{
         height: auto;
         max-height: calc((100vw - 250px) * 0.3) !important;
-        padding-top: 5px;
         padding-bottom: 5px;
         display: grid;
         grid-auto-flow: column;
         grid-auto-columns: 100%;
         overflow-x: auto;
         overflow-y: hidden;
+        background: black;
     }
     .post_img{
         width: 100%;
@@ -131,6 +140,28 @@ export default {
     .next_button{
         right: 20px;
     }
+    .post_img_currentIndex{
+        width: auto;
+        max-width: 212.5px;
+        overflow-x: scroll;
+        height: auto;
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+    }
+    .post_img_currentIndex_item{
+        width: 30px;
+        height: 1.6px;
+        background: rgba(255,255,255,0.3);
+        margin-right: 6.5px;
+        box-sizing: border-box;
+    }
+    .post_img_currentIndex_item_selected{
+        background: rgba(255,255,255,1);
+    }
+    
     @media screen and (max-width: 440px) {
         .post_img_box{
             max-height: calc((100vw) * 0.6) !important;

@@ -634,14 +634,14 @@ export default {
             display: flex;
             justify-content: center;
             align-items: center;
-            padding-top: 20px;
-            padding-bottom: 20px;
+            padding-top: 15px;
+            padding-bottom: 15px;
         }
         .img_block{
-            width: 140px;
-            height: 140px;
+            width: 150px;
+            height: 150px;
             background: white;
-            border-radius: 140px;
+            border-radius: 150px;
             overflow: hidden;
             position: relative;
             margin-left: 10px;
@@ -654,14 +654,14 @@ export default {
         .img_upload{
             position: absolute;
             width: 100%;
-            height: 34px;
-            line-height: 34px;
+            height: 38px;
+            line-height: 38px;
             color: white;
             font-size: 13px;
             text-align: center;
             background-color: rgba(0,0,0,0.5);
             left: 0;
-            bottom: -34px;
+            bottom: -38px;
             transition: bottom 0.75s;
         }
         .img_block:hover{

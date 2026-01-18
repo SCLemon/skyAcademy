@@ -17,7 +17,7 @@
         學習紀錄
     </div>
     <div class="version_info">
-        <div>General PWA v1.5.0.0 </div>
+        <div>General EX II v1.5.0.0 </div>
     </div>
     <div class="memoryUsageBlock_wrapper">
         <div class="memoryUsageBlock">

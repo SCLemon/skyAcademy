@@ -527,7 +527,6 @@ export default {
       temp.innerHTML = htmlContent;
 
       document.body.appendChild(temp);
-      console.log(temp.offsetHeight, maxHeight)
       const exceeds = temp.offsetHeight > maxHeight;
       document.body.removeChild(temp);
 
@@ -726,6 +725,7 @@ export default {
     margin: 0 auto;
     display: flex;
     align-items: center;
+    margin-bottom: 5px;
   }
   .post_top_img{
     width: 40px;

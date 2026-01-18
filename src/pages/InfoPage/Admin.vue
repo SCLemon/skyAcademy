@@ -1,6 +1,6 @@
 <template>
   <div class="view">
-    <div class="sum_box">
+    <div class="sum_box" ref="sum_box" @scroll="onScroll()">
         <router-link to="clientOverview" class="sum">
             <div class="sum_title">用戶總數 (上限 {{ limit.studentNum }} 人)</div>
             <div class="sum_num">{{ student_num }}</div>
@@ -40,10 +40,27 @@ export default {
             memory:0,
             studentNum:0,
             classNum:0
-        }
+        },
+        scrollTimer: null,
+        showTableIndex: 1,
       }
     },
     methods:{
+        onScroll(){
+            clearTimeout(this.scrollTimer);
+            this.scrollTimer = setTimeout(() => {
+            const box = this.$refs.sum_box;
+            const width = box.clientWidth;
+            this.showTableIndex = Math.round(box.scrollLeft / width);
+            if(this.showTableIndex >= 1){
+                this.$router.push('columnOverview').catch((e)=>{})
+            }
+            else {
+                this.$router.push('clientOverview').catch((e)=>{})
+            }
+            
+        }, 50);
+        },
         // 初始化
         initialize(){
             this.getUsageMemory()
