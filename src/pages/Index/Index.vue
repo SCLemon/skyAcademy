@@ -288,7 +288,7 @@ export default {
     .carousel{
         width: 100%;
         margin: 0 auto;
-        margin-top: 60px;
+        margin-top: 40px;
     }
     .carousel :deep(.el-carousel__item) {
         aspect-ratio: 16 / 9;
