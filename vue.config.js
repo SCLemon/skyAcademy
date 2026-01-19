@@ -1,6 +1,7 @@
 const { defineConfig } = require('@vue/cli-service')
 const WebpackObfuscator = require('webpack-obfuscator');
 const TerserPlugin = require('terser-webpack-plugin');
+const fs = require("fs");
 
 module.exports = defineConfig({
     productionSourceMap: false,
@@ -8,7 +9,10 @@ module.exports = defineConfig({
     lintOnSave: false,
     publicPath: './',
     devServer:{
-        https:true,
+        https:{
+            key: fs.readFileSync("./dev-cert/localhost-key.pem"),
+            cert: fs.readFileSync("./dev-cert/localhost-cert.pem"),
+        },
         proxy: {
             '/login': {
                 target: 'http://127.0.0.1:3007',
@@ -24,11 +28,11 @@ module.exports = defineConfig({
             config.plugins.push(
                 new WebpackObfuscator(
                 {
-                    rotateUnicodeArray: true, // 混淆文字字串
-                    compact: true,            // 壓縮結構
-                    selfDefending: true       // 防止格式化與除錯
+                    rotateUnicodeArray: true,
+                    compact: true,
+                    selfDefending: true
                 },
-                ['js/chunk-vendors*.js']    // 避免破壞第三方庫
+                ['js/chunk-vendors*.js']
                 )
             );
 
@@ -38,8 +42,8 @@ module.exports = defineConfig({
                 terserOptions: {
                     extractComments: false,
                     compress: {
-                        drop_console: true,     // 移除 console.*
-                        drop_debugger: true     // 移除 debugger
+                        drop_console: true,
+                        drop_debugger: true
                     }
                 }
                 })

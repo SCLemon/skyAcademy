@@ -1,19 +1,26 @@
 <template>
-  <div id="app">
+  <div id="app" @click.capture="onFirstClickSubscribe">
     <router-view></router-view>
   </div>
 </template>
 
 <script>
+import { registerServiceWorker, subscribe } from './service-worker/main'
 import jsCookie from 'js-cookie'
 import axios from 'axios'
 export default {
   name: 'App',
+  data(){
+    return {
+      subscribedTriggered: false,
+    }
+  },
   async mounted(){
     this.$bus.$on('handleAlert',this.handleAlert)
     this.$bus.$on('copyToClipboard',this.copyToClipboard)
     await this.setAnonymousMode();
     await this.generateFingerprint();
+    registerServiceWorker();
   },
   methods:{
     handleAlert(title,message,type){
@@ -105,7 +112,18 @@ export default {
         localStorage.setItem('deviceFingerprint', hashHex);
 
         return hashHex;
-    }
+    },
+    async onFirstClickSubscribe() {
+      if (this.subscribedTriggered) return;
+      this.subscribedTriggered = true;
+
+      try {
+        await subscribe();
+      }
+      catch (e) {
+        console.log(e);
+      }
+    },
   }
 }
 </script>
