@@ -92,7 +92,7 @@ export default {
 
 <style scoped>
     .paperRead_wrapper{
-        height: 330px;
+        height: 380px;
         box-sizing: border-box;
         overflow: hidden;
         box-shadow: 0px 1px 4px gray;
@@ -170,5 +170,10 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+    @media screen and (max-width: 440px) {
+        .paperRead_wrapper{
+            height: 330px;
+        }
     }
 </style>

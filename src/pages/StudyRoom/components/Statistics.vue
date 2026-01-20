@@ -112,7 +112,7 @@ export default {
     canvas {
         width: 100%;
         margin: 0 auto;
-        height: 290px !important;
+        height: 340px !important;
     }
     @media screen and (max-width: 440px) {
         .canvas_wrapper{
@@ -123,6 +123,9 @@ export default {
         }
         .canvas_wrapper:hover{
             box-shadow: none;
+        }
+        canvas{
+            height: 310px !important;
         }
     }
 </style>

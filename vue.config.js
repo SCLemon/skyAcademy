@@ -1,7 +1,6 @@
 const { defineConfig } = require('@vue/cli-service')
 const WebpackObfuscator = require('webpack-obfuscator');
 const TerserPlugin = require('terser-webpack-plugin');
-const fs = require("fs");
 
 module.exports = defineConfig({
     productionSourceMap: false,
@@ -9,10 +8,7 @@ module.exports = defineConfig({
     lintOnSave: false,
     publicPath: './',
     devServer:{
-        https:{
-            key: fs.readFileSync("./dev-cert/localhost-key.pem"),
-            cert: fs.readFileSync("./dev-cert/localhost-cert.pem"),
-        },
+        https: true,
         proxy: {
             '/login': {
                 target: 'http://127.0.0.1:3007',
