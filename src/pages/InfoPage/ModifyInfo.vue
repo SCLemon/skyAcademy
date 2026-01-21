@@ -1,7 +1,9 @@
 <template>
   <div>
-    <div class="header">使用者資料維護
-        <el-button type="primary" class="btn" :loading="loading" @click="modifyData()">更新資料</el-button>
+    <div class="header">
+        <span class="header_text">使用者資料維護</span>
+        <subscribe class="btn"></subscribe>
+        <el-button type="primary" class="btn" :loading="loading" icon="el-icon-refresh" @click="modifyData()">更新資料</el-button>
     </div>
     <div class="box">
         <div class="mobile_show_changeUserIcon">
@@ -96,9 +98,12 @@ import axios from 'axios';
 import jsCookie from 'js-cookie';
 import JsBarcode from "jsbarcode";
 import html2canvas from 'html2canvas';
+import Subscribe from './components/Subscribe.vue';
 export default {
     name:'ModifyStudentInfo',
-
+    components:{
+        Subscribe
+    },
     data(){
         return {
             loading: false,
@@ -626,6 +631,12 @@ export default {
         .box{
             overflow-y: scroll;
             padding-bottom: 85px;
+        }
+        .header{
+            border-bottom: 0;
+        }
+        .header_text{
+            display: none;
         }
         .mobile_show_changeUserIcon{
             display: block;
