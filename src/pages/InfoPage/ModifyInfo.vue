@@ -2,7 +2,7 @@
   <div>
     <div class="header">
         <span class="header_text">使用者資料維護</span>
-        <subscribe class="btn"></subscribe>
+        <subscribe class="btn" v-if="isOwnData"></subscribe>
         <el-button type="primary" class="btn" :loading="loading" icon="el-icon-refresh" @click="modifyData()">更新資料</el-button>
     </div>
     <div class="box">
@@ -108,7 +108,7 @@ export default {
         return {
             loading: false,
             idx:'',
-
+            isOwnData: false,
             // 上傳圖片的 file
             file:{},
             userInfo:{
@@ -139,6 +139,8 @@ export default {
         }
         this.idx = idx;
         await this.getData();
+        this.isOwnData = JSON.parse(localStorage.getItem('currentUser')).idx == this.idx;
+        console.log(this.isOwnData)
     },
     methods:{
         async getData(){
