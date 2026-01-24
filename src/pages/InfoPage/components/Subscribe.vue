@@ -1,5 +1,5 @@
 <template>
-  <el-button v-if="!isSubscribed" type="warning" :loading="isloading" icon="el-icon-message-solid" @click="requestSubscribe()">開啟訂閱</el-button>
+  <el-button v-if="!isSubscribed" type="warning" :loading="isloading" icon="el-icon-message-solid" @click="requestSubscribe()">裝置訂閱</el-button>
 </template>
 
 <script>

@@ -26,10 +26,7 @@
             </div>
         </div>
         <div class="real_input" ref="input" contenteditable="true"></div>
-        <el-upload action="#" :auto-upload="false" list-type="picture-card" :on-change="handleUpload" :on-preview="handlePictureCardPreview" :on-remove="handleRemove" :file-list="form.attachments" :multiple="true" accept="image/*"><i class="el-icon-plus"></i></el-upload>
-        <el-dialog :visible.sync="dialogVisible">
-            <img width="100%" :src="dialogImageUrl" alt="">
-        </el-dialog>
+        <upload-picture v-model="form.attachments"></upload-picture>
         <el-button type="primary" class="button" @click="create()" :loading="isSending" >建立貼文</el-button>
     </div>
   </div>
@@ -39,8 +36,12 @@
 import axios from 'axios';
 import { format } from 'date-fns';
 import jsCookie from 'js-cookie';
+import UploadPicture from './components/UploadPicture.vue';
 export default {
     name: "AddPost",
+    components:{
+        UploadPicture
+    },
     props: {
         currentUser:{
             type: Object,
@@ -99,11 +100,15 @@ export default {
 
             this.form.content = this.normalizeHTML(this.$refs.input.innerHTML);
             const formData = new FormData();
+            
             formData.append('content', this.form.content);
+            
+            const attachmentInfo = this.form.attachments.map(({ file, ...rest }) => rest);
+            formData.append('attachmentInfo', JSON.stringify(attachmentInfo));
 
             if (this.form.attachments && this.form.attachments.length > 0) {
                 this.form.attachments.forEach((file, index) => {
-                    formData.append('attachments', file.raw);
+                    formData.append('attachments', file.file);
                 });
             }
             const res = await axios.post('/api/post/create',formData,{
@@ -123,17 +128,6 @@ export default {
             }
             else this.$bus.$emit('handleAlert','貼文創建通知',res.data.message,res.data.type)
             this.isSending = false;
-        },
-        // 圖片處理
-        handleUpload(file,fileList){
-            this.form.attachments = fileList
-        },
-        handleRemove(file, fileList) {
-            this.form.attachments = fileList
-        },
-        handlePictureCardPreview(file) {
-            this.dialogImageUrl = file.url;
-            this.dialogVisible = true;
         },
         // 取消發文
         addCancel(){

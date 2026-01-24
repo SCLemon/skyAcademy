@@ -5,7 +5,7 @@
                 <i class="el-icon-arrow-left"></i>
             </div>
             <div class="post_img" v-for="(item,id) in postImg" :key="id" @click="showPostImgDetail(item.url)">
-                <img src="img/Loading.gif" :data-src="item.url" v-lazy alt="">
+                <img src="img/Loading.gif" :data-src="item.url" v-lazy alt="" @load="getShowY(item, $event)">
             </div>
             <div class="next_button button" @click="goNextPostImage(index)" v-if="hasNext">
                 <i class="el-icon-arrow-right"></i>
@@ -43,6 +43,12 @@ export default {
         },
     },
     methods:{
+        // 圖片偏移量
+        getShowY(p, e){
+            const showWidth = e.target.parentNode.clientWidth;
+            const offset = p.position.y * (showWidth / p.position.referWidth);
+            e.target.style.transform = `translateY(-${offset}px)`;
+        },
         onScroll(){
             clearTimeout(this.scrollTimer);
                 this.scrollTimer = setTimeout(() => {
@@ -84,8 +90,7 @@ export default {
     }
     .post_img_box{
         height: auto;
-        max-height: calc((100vw - 250px) * 0.3) !important;
-        padding-bottom: 5px;
+        aspect-ratio: 16 / 9;
         display: grid;
         grid-auto-flow: column;
         grid-auto-columns: 100%;
@@ -102,12 +107,14 @@ export default {
         box-sizing: border-box;
         margin: 0 auto;
         overflow: hidden;
+        position: relative;
     }
     .post_img:hover{
         cursor: pointer;
     }
-    .post_img>img{
-        max-width: 99.5%;
+    .post_img img{
+       width: 100%;
+       display: block;
     }
     .button{
         position: absolute;

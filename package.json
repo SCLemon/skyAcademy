@@ -23,6 +23,7 @@
     "markdown-it": "^14.1.0",
     "nanoid": "^5.0.7",
     "pdfjs-dist": "^2.16.105",
+    "uuidv4": "^6.2.13",
     "vue": "^2.6.14",
     "vue-codemirror": "^4.0.6",
     "vue-grid-layout": "^2.4.0",

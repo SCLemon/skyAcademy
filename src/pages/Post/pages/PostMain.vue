@@ -119,7 +119,7 @@
 <script>
 import axios from 'axios'
 import jsCookie from 'js-cookie'
-import AddPost from '../components/AddPost.vue';
+import AddPost from '../components/AddPost/AddPost.vue';
 import Carousel from '../components/Carousel.vue';
 import DOMPurify from 'dompurify';
 export default {
