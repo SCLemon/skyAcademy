@@ -5,15 +5,15 @@
             <el-button class="tableTitle_right" @click="dialogFormVisible = true">新增專欄</el-button>
         </div>
             <el-table :data="tableData" border height="calc(100vh - 360px)" empty-text="暫無數據">
-                <el-table-column prop="createTime" label="創建時間"></el-table-column>
-                <el-table-column prop="courseName" label="專欄名稱"></el-table-column>
-                <el-table-column prop="lecturer" label="專欄負責人"></el-table-column>
-                <el-table-column prop="status" label="狀態">
+                <el-table-column prop="createTime" label="創建時間" min-width="140px"></el-table-column>
+                <el-table-column prop="courseName" label="專欄名稱" min-width="210px"></el-table-column>
+                <el-table-column prop="lecturer" label="專欄負責人" min-width="140px"></el-table-column>
+                <el-table-column prop="status" label="狀態" min-width="140px">
                     <template v-slot="scope">
                         <div :class="scope.row.status?'valid':'invalid'">{{ scope.row.status?'公開':'不公開' }}</div>
                     </template>
                 </el-table-column>
-                <el-table-column label="管理操作" width="250">
+                <el-table-column label="管理操作" width="255px">
                     <template v-slot="scope">
                         <div class="btn">
                             <el-button class="btn_link" @click="openStudentList(scope.row)">編輯</el-button>

@@ -20,7 +20,7 @@
         </div>
         <el-table :data="tableData" border height="calc(100vh - 505px)" empty-text="暫無數據">
           <el-table-column prop="date" label="計畫日期" width="140px" ></el-table-column>
-          <el-table-column label="學習計畫概要">
+          <el-table-column label="學習計畫概要" min-width="210px">
             <template v-slot="scope">
                 <div class="project_detail">{{scope.row.content}}</div>
             </template>

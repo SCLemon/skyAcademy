@@ -8,26 +8,26 @@
         </div>
     </div>
         <el-table :data="tableData" border height="calc(100vh - 360px)" empty-text="暫無數據">
-            <el-table-column prop="level" label="會員階級" sortable :sort-by="row => row.level?.level">
+            <el-table-column prop="level" label="會員階級" sortable :sort-by="row => row.level?.level" min-width="140px">
                 <template #default="{ row }">
                     Lv{{ row.level? `${row.level.level} ${row.level.levelTitle}`:''}}
                 </template>
             </el-table-column>
-            <el-table-column prop="name" label="用戶姓名"></el-table-column>
-            <el-table-column prop="lastOnline" label="上次訪問時間" sortable></el-table-column>
-            <el-table-column prop="fingerprint" label="裝置識別碼">
+            <el-table-column prop="name" label="用戶姓名" min-width="140px"></el-table-column>
+            <el-table-column prop="lastOnline" label="上次訪問時間" sortable min-width="140px"></el-table-column>
+            <el-table-column prop="fingerprint" label="裝置識別碼" min-width="140px">
                 <template #default="{ row }">
                     <div class="fingerprint" @click="copyFingerPrint(row.fingerprint)">
                         {{ row.fingerprint }}
                     </div>
                 </template>
             </el-table-column>
-            <el-table-column prop="status" label="狀態" sortable>
+            <el-table-column prop="status" label="狀態" sortable min-width="140px">
                 <template v-slot="scope">
                     <div :class="scope.row.status?'valid':'invalid'">{{ scope.row.status?'有效':'凍結' }}</div>
                 </template>
             </el-table-column>
-            <el-table-column label="管理操作" width="250">
+            <el-table-column label="管理操作" width="255px">
                 <template v-slot="scope">
                     <div class="btn">
                         <el-button class="btn_link" @click="editUser(scope.row.idx)">查看</el-button>
