@@ -13,10 +13,13 @@
             </div>
         </div>
         <input class="input" ref="input" type="file" accept="image/*" multiple @change="onUpload">
-        <el-dialog title="圖片裁切" :visible.sync="isPreviewing" :before-close="saveCrop">
+        <el-dialog title="圖片呈現位置" :visible.sync="isPreviewing" :before-close="saveCrop">
             <div class="crop_wrapper" ref="cropWrapper">
-                <img class="crop_img" :src="currentPreviewImage.url" ref="crop_img">
-                <div class="crop_box" ref="crop_box" :style="{top: cropPosition.y + 'px', aspectRatio }" @mousedown.prevent="startDragY"></div>
+                <img class="crop_img" :src="currentPreviewImage.url" ref="crop_img" :style="{ transform: `scale(${cropPosition.scale})` }" @load="calMinScale()">
+                <div class="crop_box" ref="crop_box" :style="{top: cropPosition.y + 'px', aspectRatio }" @mousedown.prevent="startDragY" @pointerdown.prevent="startDragY"></div>
+            </div>
+              <div class="crop_controls" style="margin-top: 10px;">
+                <el-slider v-model="cropPosition.scale" :min="minScale" :max="3" :step="0.01" :show-tooltip="false"/>
             </div>
         </el-dialog>
     </div>
@@ -52,6 +55,9 @@ export default {
             cropPosition: { x: 0, y: 0, referWidth: 0, scale: 1 },
             draggingY: false,
             dragOffsetY:0,
+
+            // 縮放比例限制
+            minScale: 1,
         }
     },
     methods:{
@@ -95,18 +101,30 @@ export default {
 
         // 從陣列中移除圖片
         removeUpload(id){
-            const index = this.uploads.findIndex(item => item.id === id);
-            const next = [...this.uploads];
-            next.splice(index, 1);
-            this.uploads = next;
+            this.$confirm('確認是否刪除圖片?', '提示', {
+                confirmButtonText: '確認',
+                cancelButtonText: '取消',
+                type: 'warning',
+                distinguishCancelAndClose: true,
+                customClass:'PWACSS_MessageBox'
+            }).then(()=>{
+                const index = this.uploads.findIndex(item => item.id === id);
+                const next = [...this.uploads];
+                next.splice(index, 1);
+                this.uploads = next;
+            }).catch(()=>{})
         },
 
         // 顯示裁切工具
         showUploadImage(id){
             const index = this.uploads.findIndex(item => item.id === id);
+            if(index === -1) return;
+
             this.currentPreviewImage = {
                 id, url: this.uploads[index].url
             };
+            this.cropPosition = this.uploads[index].position
+                                    ? { ...this.uploads[index].position } : { x: 0, y: 0, referWidth: 0, scale: 1 };
             this.isPreviewing = true;
         },
 
@@ -119,6 +137,10 @@ export default {
 
             window.addEventListener("mousemove", this.onDragMoveY);
             window.addEventListener("mouseup", this.stopDragY);
+
+            window.addEventListener("pointermove", this.onDragMoveY);
+            window.addEventListener("pointerup", this.stopDragY);
+
         },
 
         onDragMoveY(e){
@@ -139,6 +161,21 @@ export default {
             this.draggingY = false;
             window.removeEventListener("mousemove", this.onDragMoveY);
             window.removeEventListener("mouseup", this.stopDragY);
+
+            window.removeEventListener("pointermove", this.onDragMoveY);
+            window.removeEventListener("pointerup", this.stopDragY);
+        },
+
+        // 計算縮放限制
+        calMinScale(){
+            const img_crop = this.$refs.crop_img;
+            const crop_box = this.$refs.crop_box;
+            if(!img_crop || !crop_box) return this.minScale = 1;
+
+            const cropImgHeight = img_crop.clientHeight;
+            const cropBoxHeight = crop_box.clientHeight;
+            
+            this.minScale = Math.min(1, cropBoxHeight / cropImgHeight);
         },
 
         // 儲存裁切位置
@@ -171,7 +208,7 @@ export default {
                         x: 0,
                         y: this.cropPosition.y,
                         referWidth: rect.width,
-                        scale: 1,
+                        scale: this.cropPosition.scale,
                     }
                 };
 
@@ -184,6 +221,7 @@ export default {
                 this.cropPosition = {
                     x:0, y:0, referWidth:0, scale: 1
                 };
+                this.minScale = 1;
 
                 done();
                 
@@ -195,8 +233,9 @@ export default {
                         id: null, url: ''
                     };
                     this.cropPosition = {
-                        x:0, y:0, referWidth:0
+                        x:0, y:0, referWidth:0, scale: 1
                     };
+                    this.minScale = 1;
                     done();
                 } 
                 else if (action === 'close') {} // 按「X」
@@ -272,6 +311,7 @@ export default {
     .crop_wrapper{
         position: relative;
         width: 100%;
+        overflow: hidden;
     }
     .crop_img{
         width: 100%;
@@ -280,18 +320,15 @@ export default {
         position: absolute;
         width: 100%;
         left: 0;
-        border: 2px solid #fff;
         box-sizing: border-box;
         cursor: move;
         box-shadow: 0 0 0 9999px rgba(0,0,0,0.35);
+        
     }
     @media screen and (max-width: 440px) {
         .preview_mask_item{
-            font-size: 12px;
-            padding: 5px;
-        }
-        .preview-edit{
-            display: none;
+            font-size: 14px;
+            padding: 6px;
         }
     }
 </style>

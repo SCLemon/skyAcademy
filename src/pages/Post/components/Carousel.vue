@@ -5,7 +5,7 @@
                 <i class="el-icon-arrow-left"></i>
             </div>
             <div class="post_img" v-for="(item,id) in postImg" :key="id" @click="showPostImgDetail(item.url)">
-                <img src="img/Loading.gif" :data-src="item.url" v-lazy alt="" @load="getShowY(item, $event)">
+                <img src="img/Loading.gif" :data-src="item.url" v-lazy alt="" @load="transformImg(item, $event)">
             </div>
             <div class="next_button button" @click="goNextPostImage(index)" v-if="hasNext">
                 <i class="el-icon-arrow-right"></i>
@@ -18,6 +18,7 @@
 </template>
 
 <script>
+
 export default {
     name:'Carousel',
     props: {
@@ -44,10 +45,10 @@ export default {
     },
     methods:{
         // 圖片偏移量
-        getShowY(p, e){
+        transformImg(p, e){
             const showWidth = e.target.parentNode.clientWidth;
             const offset = p.position.y * (showWidth / p.position.referWidth);
-            e.target.style.transform = `translateY(-${offset}px)`;
+            e.target.style.transform = `translateY(-${offset}px) scale(${p.position.scale})`;
         },
         onScroll(){
             clearTimeout(this.scrollTimer);
