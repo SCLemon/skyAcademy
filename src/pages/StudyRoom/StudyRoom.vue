@@ -591,6 +591,9 @@ export default {
     height: calc(100vh - 505px);
     width: 100%;
   }
+  :deep(.el-table__row){
+    height: 65px !important;
+  }
   @media screen and (max-width: 440px) {
     .view{
       width: 95vw;

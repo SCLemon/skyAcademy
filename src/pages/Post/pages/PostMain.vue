@@ -21,6 +21,7 @@
                     <div class="post_more_option_box" v-show="obj.showOption">
                       <div class="post_more_option" @click="openModifyBox(obj)"><i class="el-icon-edit"></i> 編輯貼文</div>
                       <div class="post_more_option" @click="hidePost(obj)"><i :class="`el-icon-${obj.status?'lock':'unlock'}`"></i> {{obj.status?'隱藏':'公開'}}貼文</div>
+                      <div class="post_more_option" @click="notifyPost(obj)"><i class="el-icon-position"></i> 推播貼文</div>
                       <div class="post_more_option" @click="deletePost(obj.idx)"><i class="el-icon-delete"></i> 刪除貼文</div>
                     </div>
                   </transition>
@@ -50,7 +51,7 @@
                 <div class="post_option_box">
                   <div :class="`post_option ${obj.isLike?'like':''}`" @click="toggleLikePost(obj.idx, $event, obj)"><i :class="`fa-regular fa-thumbs-up icon ${obj.isLike?'fa-solid':''}`"></i> <span>{{ obj.isLike?'收回讚':'按讚' }}</span></div>
                   <div class="post_option" @click="openUserMessageBox($event)"><i class="fa-regular fa-message icon"></i> 留言</div>
-                  <div class="post_option" @click="openShare(obj)"><i class="fa-regular fa-share-from-square icon"></i> 分享</div>
+                  <div class="post_option" @click="openShare(obj)"><i class="fa-regular fa-share-from-square icon"></i></i> 分享</div>
                 </div>
                 <div class="userMessageBox">
                   <div class="userMessage" style="text-align: center; color:gray; font-size: 14px;" v-if="!obj.message.length">目前暫時沒有人留言</div>
@@ -319,7 +320,7 @@ export default {
     },
     async deletePost(idx){
       try{
-        await this.$confirm(`確認是否刪除貼文?`, '提示', {
+        await this.$confirm(`確認是否刪除貼文？`, '提示', {
           confirmButtonText: '刪除',
           cancelButtonText: '取消',
           type: 'warning',
@@ -361,6 +362,27 @@ export default {
         }
         this.$bus.$emit('handleAlert',`貼文${currentMethod}通知`,res.data.message,res.data.type)
 
+      }
+      catch(e){}
+    },
+    async notifyPost(obj){
+      try{
+        await this.$confirm(`確認是否推播貼文?`, '提示', {
+          confirmButtonText: '確認',
+          cancelButtonText: '取消',
+          type: 'warning',
+          customClass:'PWACSS_MessageBox'
+        })
+        const res = await axios.get(`/api/post/notify/${obj.idx}`,{
+          headers:{
+            'x-user-token':jsCookie.get('authToken')
+          }
+        })
+
+        if(res.data.type == 'success'){
+          obj.showOption = false;
+        }
+        this.$bus.$emit('handleAlert',`貼文推播通知`,res.data.message,res.data.type)
       }
       catch(e){}
     },
@@ -505,9 +527,7 @@ export default {
         }
         else this.$bus.$emit('handleAlert','貼文留言通知',res.data.message,res.data.type)
       }
-      catch(e){
-        console.log(e)
-      }
+      catch(e){}
     },
     // 貼文內文展開
     checkPostTextOverflow(htmlContent, maxHeight = 147) {

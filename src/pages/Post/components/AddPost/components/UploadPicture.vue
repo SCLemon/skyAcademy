@@ -135,12 +135,10 @@ export default {
             const box = this.$refs.crop_box;
             this.dragOffsetY = e.clientY - box.offsetTop;
 
-            window.addEventListener("mousemove", this.onDragMoveY);
-            window.addEventListener("mouseup", this.stopDragY);
-
-            window.addEventListener("pointermove", this.onDragMoveY);
+            window.addEventListener("pointermove", this.onDragMoveY, { passive: false });
             window.addEventListener("pointerup", this.stopDragY);
-
+            window.addEventListener("pointercancel", this.stopDragY);
+            
         },
 
         onDragMoveY(e){
@@ -159,11 +157,11 @@ export default {
 
         stopDragY(){
             this.draggingY = false;
-            window.removeEventListener("mousemove", this.onDragMoveY);
-            window.removeEventListener("mouseup", this.stopDragY);
 
             window.removeEventListener("pointermove", this.onDragMoveY);
             window.removeEventListener("pointerup", this.stopDragY);
+            window.removeEventListener("pointercancel", this.stopDragY);
+
         },
 
         // 計算縮放限制
@@ -326,9 +324,18 @@ export default {
         
     }
     @media screen and (max-width: 440px) {
+        .preview_mask{
+            flex-wrap: wrap;
+            padding: 10px;
+            box-sizing: border-box;
+        }
         .preview_mask_item{
-            font-size: 14px;
-            padding: 6px;
+            width: 50%;
+            aspect-ratio: 1 / 1;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
     }
 </style>
