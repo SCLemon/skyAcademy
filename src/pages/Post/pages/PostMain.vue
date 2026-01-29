@@ -873,7 +873,7 @@ export default {
   .userMessage_active_name{
     font-size: 14px;
     font-weight: bold;
-    margin-bottom: 5px;
+    margin-bottom: 2.5px;
     display: flex;
     align-items: center;
   }
@@ -884,7 +884,7 @@ export default {
   }
   .userMessage_active_msg{
     font-size: 14px;
-    line-height: 1;
+    line-height: 1.25;
     word-break: break-all;
   }
   .userMessageBox_open{

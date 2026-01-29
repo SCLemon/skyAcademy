@@ -247,6 +247,7 @@ export default {
     margin-bottom: 20px;
     box-sizing: border-box;
     position: relative;
+    font-size: 14px;
 }
 .real_input:focus{
     outline: none;
@@ -257,7 +258,7 @@ export default {
     position: absolute;
     top: 0px;
     left: 0px;
-    font-size: 16px;
+    font-size: 14px;
     pointer-events: none;
 }
 .button{
