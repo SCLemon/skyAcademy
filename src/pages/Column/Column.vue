@@ -177,7 +177,7 @@ export default {
             if(!this.showOption) return;
 
             if(this.isDownloading){
-                this.$bus.$emit('檔案下載通知','檔案正在執行下載，請稍後再試。', 'warning');
+                this.$bus.$emit('handleAlert','檔案下載通知','檔案正在執行下載，請稍後再試。', 'warning');
                 return;
             }
 
@@ -213,7 +213,6 @@ export default {
 
                 document.body.removeChild(link);
                 URL.revokeObjectURL(link.href);
-
             }
             catch (error) {
                 this.$bus.$emit('handleAlert','檔案下載通知','文件下載失敗。','error')
