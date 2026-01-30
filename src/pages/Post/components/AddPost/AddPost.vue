@@ -103,7 +103,7 @@ export default {
             
             formData.append('content', this.form.content);
             
-            const attachmentInfo = this.form.attachments.map(({ file, ...rest }) => rest);
+            const attachmentInfo = this.form.attachments.map((item) => ({position: item.position}));
             formData.append('attachmentInfo', JSON.stringify(attachmentInfo));
 
             if (this.form.attachments && this.form.attachments.length > 0) {

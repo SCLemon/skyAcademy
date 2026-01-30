@@ -37,7 +37,10 @@
               <div class="post_text" v-if="obj.content.trim()!='' && !obj.modifying" :key="'view-' + obj.idx" v-html="linkify(obj.content)"></div>
               <div class="post_text post_text_modifying" :ref="`modifyBox-${obj.idx}`" v-else-if="obj.modifying" :key="'edit-' + obj.idx" v-html="saveRender(obj.temp_content)" contenteditable="true"></div>
               <div class="post_text_expand_logo" v-if="checkPostTextOverflow(obj.content) && !obj.modifying" @click="expandPostText($event)">... 顯示更多</div>
-              <carousel :post-img="obj.postImg"></carousel>
+              <template>
+                <carousel :post-img="obj.postImg" v-show="!obj.modifying"></carousel>
+                <upload-picture v-model="obj.temp_img" v-if="obj.modifying"></upload-picture>
+              </template>
               <div class="post_footer">
                 <div class="post_summary" v-if="obj.likeCount || obj.message.length">
                   <div class="post_summary_thumb" v-if="obj.likeCount || obj.isLike">
@@ -123,10 +126,13 @@ import jsCookie from 'js-cookie'
 import AddPost from '../components/AddPost/AddPost.vue';
 import Carousel from '../components/Carousel.vue';
 import DOMPurify from 'dompurify';
+import UploadPicture from '../components/AddPost/components/UploadPicture.vue';
+import { v4 as uuidv4 } from "uuid";
+
 export default {
   name:'PostMain',
   components:{
-    AddPost, Carousel
+    AddPost, Carousel, UploadPicture
   },
   data(){
     return {
@@ -206,6 +212,7 @@ export default {
     saveRender(text){
       return DOMPurify.sanitize(text);
     },
+    
     toggleOption(obj) {
       if (obj.showOption === undefined) {
         this.$set(obj, 'showOption', true);
@@ -213,6 +220,27 @@ export default {
       else {
         obj.showOption = !obj.showOption;
       }
+    },
+    async toggleLikePost(idx,event,obj){
+      const wrapper = event.currentTarget; 
+      const icon = wrapper.querySelector('i');
+      const span = wrapper.querySelector('span')
+      try{
+        const res = await axios.get(`/api/post/toggleLikePost/${idx}`,{
+          headers:{
+            'x-user-token':jsCookie.get('authToken')
+          }
+        })
+        if(res.data.type == 'success'){
+          wrapper.classList.toggle('like')
+          icon.classList.toggle('fa-solid')
+          span.innerText == '按讚'? span.innerText='收回讚':span.innerText='按讚'
+          obj.likeCount = res.data.likeCount;
+          obj.isLike ? obj.isLike = false : obj.isLike = true;
+        }
+        else this.$bus.$emit('handleAlert','貼文按讚通知',res.data.message,res.data.type)
+      }
+      catch(e){}
     },
 
     async getUserInfo(){
@@ -386,7 +414,8 @@ export default {
       }
       catch(e){}
     },
-    // 修改貼文
+
+    // 修改貼文區域開始
     normalizeHTML(html){
       const div = document.createElement('div');
       div.innerHTML = html;
@@ -407,6 +436,14 @@ export default {
       if (!('temp_content' in obj)) this.$set(obj, 'temp_content', obj.content);
       else obj.temp_content = obj.content;
 
+      if (!('temp_img' in obj)) this.$set(obj, 'temp_img', obj.postImg);
+      else obj.temp_img = obj.postImg;
+
+      // UploadPicture.vue 的每一張圖片必須有自己的 id
+      obj.temp_img.forEach((img)=>{
+        img.id = img.id || uuidv4();
+      })
+
       this.$nextTick(()=>{
         let modifyBox = this.$refs[`modifyBox-${obj.idx}`][0];
         if(modifyBox){
@@ -421,26 +458,65 @@ export default {
           selection.addRange(range);
         }
       })
+      
       obj.showOption = false;
     },
     async modifyPost(obj){
       try{
+
         let modifyContent = this.normalizeHTML(this.$refs[`modifyBox-${obj.idx}`][0].innerHTML);
       
-        const res = await axios.post(`/api/post/modifyPost/${obj.idx}`,{content: modifyContent},{
+        const formData = new FormData();
+        formData.append('content', modifyContent);
+        
+        const attachmentInfo = obj.temp_img.map(item => ({position: item.position}));
+        formData.append('attachmentInfo', JSON.stringify(attachmentInfo));
+        
+        // 圖片 File
+        if (obj.temp_img && obj.temp_img.length > 0) {
+          
+          for (const img of obj.temp_img) {
+            let file;
+
+            if (img.file) file = img.file;
+            else {
+              const response = await fetch(img.url);
+              const blob = await response.blob();
+
+              const filename = img.name || 'image.png';
+              file = new File([blob], filename, {
+                type: blob.type
+              });
+            }
+
+            formData.append('attachments', file);
+          }
+        }
+
+        const res = await axios.post(`/api/post/modifyPost/${obj.idx}`,formData,{
           headers:{
             'x-user-token':jsCookie.get('authToken')
           }
         })
         if(res.data.type == 'success'){
-          obj.content = modifyContent;
+          
+          // 賦予新值
+          res.data.post.postImg.forEach((img)=>{
+            img.url += `?${new Date().getTime()}` // 避免 cache
+          })
+          obj.content = res.data.post.content;
+          obj.postImg = res.data.post.postImg;
+
+          // 清除狀態
           obj.temp_content = '';
+          obj.temp_img = [];
           obj.modifying = false;
           this.$bus.$emit('handleAlert','貼文修改通知',res.data.message,res.data.type)
         }
         else this.$bus.$emit('handleAlert','貼文修改通知',res.data.message,res.data.type)
       }
       catch(e){
+        console.log(e)
         this.$bus.$emit('handleAlert','貼文修改通知','修改貼文失敗（參數遺失）','error')
       }
     },
@@ -448,28 +524,8 @@ export default {
       obj.modifying = false;
       obj.temp_content = '';
     },
-    //
-    async toggleLikePost(idx,event,obj){
-      const wrapper = event.currentTarget; 
-      const icon = wrapper.querySelector('i');
-      const span = wrapper.querySelector('span')
-      try{
-        const res = await axios.get(`/api/post/toggleLikePost/${idx}`,{
-          headers:{
-            'x-user-token':jsCookie.get('authToken')
-          }
-        })
-        if(res.data.type == 'success'){
-          wrapper.classList.toggle('like')
-          icon.classList.toggle('fa-solid')
-          span.innerText == '按讚'? span.innerText='收回讚':span.innerText='按讚'
-          obj.likeCount = res.data.likeCount;
-          obj.isLike ? obj.isLike = false : obj.isLike = true;
-        }
-        else this.$bus.$emit('handleAlert','貼文按讚通知',res.data.message,res.data.type)
-      }
-      catch(e){}
-    },
+    // 修改貼文區域結束
+
     // 留言區
     msgScrollToBottom(event){
       this.$nextTick(() => {
