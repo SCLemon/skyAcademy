@@ -5,7 +5,7 @@
                 <i class="el-icon-arrow-left"></i>
             </div>
             <div class="post_img" v-for="(item,id) in postImg" :key="id" @click="showPostImgDetail(item.url)">
-                <img src="img/Loading.gif" :data-src="item.url" v-lazy alt="" @load="transformImg(item, $event)">
+                <img :data-src="item.url" v-lazy alt="" :style="item.style" @load="transformImg(item, $event)">
             </div>
             <div class="next_button button" @click="goNextPostImage(index)" v-if="hasNext">
                 <i class="el-icon-arrow-right"></i>
@@ -48,7 +48,10 @@ export default {
         transformImg(p, e){
             const showWidth = e.target.parentNode.clientWidth;
             const offset = p.position.y * (showWidth / p.position.referWidth);
-            e.target.style.transform = `translateY(-${offset}px) scale(${p.position.scale})`;
+
+            this.$set(p, 'style', {
+                transform: `translateY(-${offset}px) scale(${p.position.scale})`,
+            });
         },
         onScroll(){
             clearTimeout(this.scrollTimer);
@@ -109,6 +112,9 @@ export default {
         margin: 0 auto;
         overflow: hidden;
         position: relative;
+        background-image: url(../../../../public/img/Loading.gif);
+        background-repeat: no-repeat;
+        background-position: center;
     }
     .post_img:hover{
         cursor: pointer;
@@ -116,6 +122,7 @@ export default {
     .post_img img{
        width: 100%;
        display: block;
+       background: black;
     }
     .button{
         position: absolute;

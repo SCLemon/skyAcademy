@@ -11,7 +11,7 @@
         <div class="banner">
           <el-carousel class="carousel" width="100%" height="175px" :autoplay="false">
             <el-carousel-item v-for="item in courses.bannerImg" :key="item.url">
-              <img src="img/Loading.gif" :data-src="item.url" alt="" v-lazy class="bannerImg" loading="lazy">
+              <img :data-src="item.url" alt="" v-lazy class="bannerImg">
             </el-carousel-item>
           </el-carousel>
         </div>
@@ -183,6 +183,9 @@ export default {
     height: 100%;
     object-position: center;
     object-fit: cover;
+    background-image: url(../../../public/img/Loading.gif);
+    background-repeat: no-repeat;
+    background-position: center;
   }
   .classNameBox{
     width: 100%;
