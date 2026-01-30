@@ -38,8 +38,8 @@
               <div class="post_text post_text_modifying" :ref="`modifyBox-${obj.idx}`" v-else-if="obj.modifying" :key="'edit-' + obj.idx" v-html="saveRender(obj.temp_content)" contenteditable="true"></div>
               <div class="post_text_expand_logo" v-if="checkPostTextOverflow(obj.content) && !obj.modifying" @click="expandPostText($event)">... 顯示更多</div>
               <template>
-                <carousel :post-img="obj.postImg" v-if="!obj.modifying"></carousel>
-                <upload-picture v-model="obj.temp_img" v-else></upload-picture>
+                <carousel :post-img="obj.postImg" v-show="!obj.modifying"></carousel>
+                <upload-picture v-model="obj.temp_img" v-if="obj.modifying"></upload-picture>
               </template>
               <div class="post_footer">
                 <div class="post_summary" v-if="obj.likeCount || obj.message.length">
@@ -501,9 +501,6 @@ export default {
         if(res.data.type == 'success'){
           
           // 賦予新值
-          res.data.post.postImg.forEach((img)=>{
-            img.url += `?${new Date().getTime()}` // 避免 cache
-          })
           obj.content = res.data.post.content;
           obj.postImg = res.data.post.postImg;
 
