@@ -12,14 +12,26 @@
                 <img :src="p.url" class="preview_image"/>
             </div>
         </div>
-        <input class="input" ref="input" type="file" accept="image/*" multiple @change="onUpload">
+        <input class="input" ref="input" type="file" accept="image/*" multiple @change="onUpload()">
         <el-dialog title="圖片呈現位置" :visible.sync="isPreviewing" :before-close="saveCrop">
-            <div class="crop_wrapper" ref="cropWrapper">
-                <img class="crop_img" :src="currentPreviewImage.url" ref="crop_img" :style="{ transform: `scale(${cropPosition.scale})` }" @load="calMinScale()">
-                <div class="crop_box" ref="crop_box" :style="{top: cropPosition.y + 'px', aspectRatio }" @mousedown.prevent="startDragY" @pointerdown.prevent="startDragY"></div>
+            <div class="crop_wrapper" ref="cropWrapper" :style="{ aspectRatio }">
+                <img class="crop_img" :src="currentPreviewImage.url" ref="crop_img" :style="cropStyle">
             </div>
               <div class="crop_controls" style="margin-top: 10px;">
-                <el-slider v-model="cropPosition.scale" :min="minScale" :max="3" :step="0.01" :show-tooltip="false"/>
+                <div class="crop_controls_item">
+                    <div class="crop_controls_item_title">水平偏移量（px）： </div>
+                    <div class="crop_controls_item_input"><el-input-number size="medium" v-model="cropPosition.x" :step="1"></el-input-number></div>
+                </div>
+                <div class="crop_controls_item">
+                    <div class="crop_controls_item_title">垂直偏移量（px）： </div>
+                    <div class="crop_controls_item_input"><el-input-number size="medium" v-model="cropPosition.y" :step="1"></el-input-number></div>
+                    
+                </div>
+                <div class="crop_controls_item">
+                    <div class="crop_controls_item_title">放大倍率：</div>
+                    <div class="crop_controls_item_input"><el-slider v-model="cropPosition.scale" :min="0.5" :max="3" :step="0.01" :show-tooltip="true"/></div>
+                    
+                </div >
             </div>
         </el-dialog>
     </div>
@@ -41,7 +53,12 @@ export default {
         uploads:{
             get() { return this.value; },
             set(v) { this.$emit('input', v); }
-        }
+        },
+        cropStyle(){
+            return {
+                transform: `translate(${-this.cropPosition.x}px, ${-this.cropPosition.y}px) scale(${this.cropPosition.scale})`,
+            }
+        },
     },
     data(){
         return {
@@ -53,8 +70,6 @@ export default {
 
             // 裁切框的 y 偏移
             cropPosition: { x: 0, y: 0, referWidth: 0, scale: 1 },
-            draggingY: false,
-            dragOffsetY:0,
 
             // 縮放比例限制
             minScale: 1,
@@ -125,57 +140,20 @@ export default {
             };
             this.cropPosition = this.uploads[index].position
                                     ? { ...this.uploads[index].position } : { x: 0, y: 0, referWidth: 0, scale: 1 };
+
             this.isPreviewing = true;
+
+            this.$nextTick(()=>{ // 校正參數
+                if(this.cropPosition.referWidth != 0){
+                    const wrapper = this.$refs.cropWrapper;
+                    const rect = wrapper.getBoundingClientRect();
+                    const factor = rect.width / this.cropPosition.referWidth;
+                    
+                    this.cropPosition.x = (this.cropPosition.x ?? 0) * factor;
+                    this.cropPosition.y = (this.cropPosition.y ?? 0) * factor;
+                }
+            })
         },
-
-        // 調整 Y offset
-        startDragY(e){
-            this.draggingY = true;
-
-            const box = this.$refs.crop_box;
-            this.dragOffsetY = e.clientY - box.offsetTop;
-
-            window.addEventListener("pointermove", this.onDragMoveY, { passive: false });
-            window.addEventListener("pointerup", this.stopDragY);
-            window.addEventListener("pointercancel", this.stopDragY);
-            
-        },
-
-        onDragMoveY(e){
-            
-            if(!this.draggingY) return;
-            const box = this.$refs.crop_box;
-            const wrapper = this.$refs.cropWrapper;
-
-            const rect = wrapper.getBoundingClientRect();
-            const boxH = box.getBoundingClientRect().height;
-
-            const offset = Math.max(0, Math.min(e.clientY - this.dragOffsetY, rect.height - boxH));
-
-            this.cropPosition.y = offset;
-        },
-
-        stopDragY(){
-            this.draggingY = false;
-
-            window.removeEventListener("pointermove", this.onDragMoveY);
-            window.removeEventListener("pointerup", this.stopDragY);
-            window.removeEventListener("pointercancel", this.stopDragY);
-
-        },
-
-        // 計算縮放限制
-        calMinScale(){
-            const img_crop = this.$refs.crop_img;
-            const crop_box = this.$refs.crop_box;
-            if(!img_crop || !crop_box) return this.minScale = 1;
-
-            const cropImgHeight = img_crop.clientHeight;
-            const cropBoxHeight = crop_box.clientHeight;
-            
-            this.minScale = Math.min(1, cropBoxHeight / cropImgHeight);
-        },
-
         // 儲存裁切位置
         saveCrop(done){
             this.$confirm('確認是否儲存變更?', '提示', {
@@ -203,7 +181,7 @@ export default {
                 next[index] = {
                     ...next[index],
                     position: {
-                        x: 0,
+                        x: this.cropPosition.x,
                         y: this.cropPosition.y,
                         referWidth: rect.width,
                         scale: this.cropPosition.scale,
@@ -310,9 +288,14 @@ export default {
         position: relative;
         width: 100%;
         overflow: hidden;
+        box-sizing: border-box;
+        box-shadow: 0 0 0 9999px rgba(0,0,0,0.35);
+        background: black;
     }
     .crop_img{
         width: 100%;
+        position: absolute;
+        transform-origin: top left;
     }
     .crop_box{
         position: absolute;
@@ -321,7 +304,19 @@ export default {
         box-sizing: border-box;
         cursor: move;
         box-shadow: 0 0 0 9999px rgba(0,0,0,0.35);
-        
+    }
+    .crop_controls_item{
+        margin-top: 10px;
+        height: 40px;
+        display: flex;
+        justify-content: space-evenly;
+    }
+    .crop_controls_item_title{
+        width: 150px;
+        line-height: 40px;
+    }
+    .crop_controls_item_input{
+        width: calc(100% - 150px);
     }
     @media screen and (max-width: 440px) {
         .preview_mask{
@@ -336,6 +331,9 @@ export default {
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+        :deep(.el-input-number--medium){
+            width: 100%;
         }
     }
 </style>

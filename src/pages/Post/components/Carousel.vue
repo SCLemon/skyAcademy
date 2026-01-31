@@ -46,12 +46,25 @@ export default {
     methods:{
         // 圖片偏移量
         transformImg(p, e){
+            
             const showWidth = e.target.parentNode.clientWidth;
-            const offset = p.position.y * (showWidth / p.position.referWidth);
+            const referWidth = p?.position?.referWidth || showWidth;
+
+            const factor = showWidth / referWidth;
+
+            const pos = p.position || {};
+
+            const scale = pos.scale ?? 1;
+            const offsetX = (pos.x ?? 0) * factor;
+            const offsetY = (pos.y ?? 0) * factor;
+
 
             this.$set(p, 'style', {
-                transform: `translateY(-${offset}px) scale(${p.position.scale})`,
+                transform: `translate(${-offsetX}px, ${-offsetY}px) scale(${scale})`,
+                transformOrigin: 'top left',
             });
+            e.target.parentNode.style.backgroundImage = 'none';
+            
         },
         onScroll(){
             clearTimeout(this.scrollTimer);
