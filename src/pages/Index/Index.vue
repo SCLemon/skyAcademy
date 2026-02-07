@@ -80,6 +80,14 @@
         <div class="feedback">
             <div class="feedback_title">技術分享 × 知識傳承 × 實際影響力</div>
             <div class="feedback_subText">我長期致力於將自身所累積的知識與實作經驗系統化並分享給更多人，透過撰寫技術文章、參與開源專案以及教學與指導活動，協助他人在面對複雜技術概念時，能更有效地建立理解脈絡並提升實務能力。在這個過程中，我不僅扮演知識傳遞者的角色，也透過回饋與討論持續檢視並深化自身理解，形成正向的學習循環。 我期望透過持續的知識整理、實踐與傳承，讓技術不只停留在個人層面，而能轉化為可被複製、擴散並長期累積的價值，進而為團隊與社會創造更深遠且實質的影響。</div>
+            <div class="feedback_wrapper">
+                <div class="feedback_box">
+                    <carousel :postImg="feedbackImg"></carousel>
+                </div>
+                <div class="feedback_box feedback_box_2">
+                    <feedback></feedback>
+                </div>
+            </div>
         </div>
         <div class="footer" ref="contact">
             <div class="footer_item">
@@ -92,14 +100,28 @@
 </template>
   
 <script>
+import Carousel from '../Post/components/Carousel.vue';
+import Feedback from './components/Feedback.vue';
 export default {
     name: "Index",
+    components:{
+        Carousel, Feedback
+    },
     data(){
         return {
             banner:['img/banner1.jpg','img/banner2.jpg','img/banner3.jpg'],
             subTextForPC:'Step into Lemon’s Universe — A Journey of Curiosity, Creation, and Endless Discovery.',
             subTextForMobile: 'A Journey of Curiosity, Creation, and Endless Discovery.',
-            subTextEls:[]
+            subTextEls:[],
+            feedbackImg:[{
+                url:'/img/feedback1.jpg',
+            },
+            {
+                url:'/img/feedback2.jpg',
+            },
+            {
+                url:'/img/feedback3.jpg',
+            }],
         }
     },
     mounted(){
@@ -558,6 +580,7 @@ export default {
 
     .feedback{
         width: 100%;
+        margin-bottom: 20px;
     }
     .feedback_title{
         width: 100%;
@@ -572,6 +595,19 @@ export default {
         margin: 0 auto;
         text-align: justify;
         line-height: 1.75;
+    }
+    .feedback_wrapper{
+        width: 95%;
+        margin: 0 auto;
+        margin-top: 20px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .feedback_box{
+        width: 49%;
     }
     .footer{
         width: 100%;
@@ -680,6 +716,12 @@ export default {
         }
         .feedback_subText{
             font-size: 12.5px;
+        }
+        .feedback_box{
+            width: 100%;
+        }
+        .feedback_box_2{
+            margin-top: 20px;
         }
         .footer{
             height: 80px;
