@@ -96,11 +96,16 @@ export default {
                     content:'謝謝你這樣說，這段話對我來說其實很重要。這個帳號一直都不是想變成「標準的讀書帳」，而是想保留一個可以慢慢理解、慢慢喜歡上學習的空間。你說高一時其實不太懂、也沒有參與，但還是願意把內容看完，甚至後來開始對物理、對不同解法產生好奇，這正是我最希望發生的事情——不是馬上會，而是慢慢靠近。至於你提到有人說這個帳號不像讀書帳，其實我都有看到，也想過，但看到你願意因為這份不同而留下來，反而讓我更確定不需要為了迎合而改變。能對你在學習、解題、升學資訊上有所幫助，我真的很開心，也謝謝你願意花時間陪著這個帳號走。放心，我會繼續用我相信的方式走下去，也很謝謝你給我這麼大的支持。',
                     img:'img/author.jpg'
                 },
-
                 {
                     type: 1,
                     username:'SCLemon',
-                    content:'更多的回饋內容可以 <a href="assets/feedback.pdf" style="color: white;" target="_blank">點擊此處</a>',
+                    content:'更多的回饋內容可以 <a href="assets/feedback.pdf" style="color: white;" target="_blank">點擊此處</a> 進行閱覽。',
+                    img:'img/author.jpg'
+                },
+                {
+                    type: 1,
+                    username:'SCLemon',
+                    content:'若想更進一步瞭解檸檬，歡迎 <a href="/#/academic" style="color: white;">進入基地</a> 中一探究竟！',
                     img:'img/author.jpg'
                 },
             ]
@@ -161,6 +166,9 @@ export default {
         border-radius: 50px;
     }
     @media screen and (max-width: 440px){
+        .box_wrapper{
+            aspect-ratio: 1 / 1;
+        }
         .each_info{
             font-size: 12px;
         }

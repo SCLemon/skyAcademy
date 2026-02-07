@@ -79,7 +79,7 @@
         </div>
         <div class="feedback">
             <div class="feedback_title">技術分享 × 知識傳承 × 實際影響力</div>
-            <div class="feedback_subText">我長期致力於將自身所累積的知識與實作經驗系統化並分享給更多人，透過撰寫技術文章、參與開源專案以及教學與指導活動，協助他人在面對複雜技術概念時，能更有效地建立理解脈絡並提升實務能力。在這個過程中，我不僅扮演知識傳遞者的角色，也透過回饋與討論持續檢視並深化自身理解，形成正向的學習循環。 我期望透過持續的知識整理、實踐與傳承，讓技術不只停留在個人層面，而能轉化為可被複製、擴散並長期累積的價值，進而為團隊與社會創造更深遠且實質的影響。</div>
+            <div class="feedback_subText">此外，我也長期致力於將自身所累積的知識與實作經驗系統化並分享給更多人，透過撰寫技術文章、參與開源專案以及教學與指導活動，協助他人在面對複雜技術概念時，能更有效地建立理解脈絡並提升實務能力。在這個過程中，我不僅扮演知識傳遞者的角色，也透過回饋與討論持續檢視並深化自身理解，形成正向的學習循環。 我期望透過持續的知識整理、實踐與傳承，讓技術不只停留在個人層面，而能轉化為可被複製、擴散並長期累積的價值，進而為團隊與社會創造更深遠且實質的影響。</div>
             <div class="feedback_wrapper">
                 <div class="feedback_box">
                     <carousel :postImg="feedbackImg"></carousel>
@@ -92,7 +92,7 @@
         <div class="footer" ref="contact">
             <div class="footer_item">
                 <div>聯絡方式：blc0000421@gmail.com</div>
-                <div>Copyright © 2025 Lemon's Universe All Rights Reserved</div>
+                <div>Copyright © 2026 Lemon's Universe All Rights Reserved</div>
             </div>
         </div>
         <div class="back" @click="scrollToSection('top')"><i class="fa-solid fa-angles-up"></i></div>
@@ -204,7 +204,7 @@ export default {
     .logo_img{
         cursor: pointer;
     }
-    .contact{
+    .contact, .contact_2{
         width: auto;
         height: 40px;
         line-height: 40px;
@@ -628,6 +628,9 @@ export default {
         }
         .contact{
             display: none;
+        }
+        .contact_2{
+            display: flex;
         }
         .top{
         }
