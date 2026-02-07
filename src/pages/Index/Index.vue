@@ -37,13 +37,49 @@
             <div class="developer_content">
                 <div class="developer_img"><img src="img/author.jpg" alt=""></div>
                 <div class="developer_intro_box">
-                    <div class="developer_name">主要作者：林英豪</div>
+                    <div class="developer_name">網站作者：林英豪</div>
                     <div class="developer_detail">
-                  嗨，我是林英豪，也可以叫我 SCLemon。目前就讀於國立清華大學碩士學位，研究領域為「前瞻半導體二維材料元件設計」。同時，我對人工智慧、前端開發與投資研究也充滿熱情。從理論到實作，我喜歡把想法化為具體成果──無論是自行訓練 LSTM 股價預測模型、嘗試大語言模型的本地部署，還是開發 Vue.js 專案與 Chrome 擴充功能，都是我探索的旅程。
-                 <br>在學習與研究的過程中，我不僅追求技術上的突破，也重視創意與應用的延展。對我來說，科技就像「檸檬」──看似平凡，卻能激發無限可能，既能為生活增添風味，也能成為靈感的起點。這裡是我的小小天地，用來分享我的學習、作品與想法。如果你也對人工智慧、程式設計，或是創新投資思維感興趣，歡迎一起交流，探索更廣闊的世界。
+                    嗨，我是林英豪，也可以叫我 SCLemon。 目前就讀於國立清華大學碩士班，研究領域為「前瞻半導體二維材料元件設計」。在研究與實作歷程中，我累積了從光罩圖案設計與下線、材料成長與製程整合，到元件電性量測與參數優化的完整經驗，對半導體元件的設計邏輯與實際製程之間的連結有扎實理解。 
+                    <br> 除了在半導體領域持續深耕，我同時對人工智慧、前端開發與投資研究保有高度熱情。我喜歡將抽象的想法落實為可運作的系統與成果——無論是自行訓練 LSTM 股價預測模型、應用 PINNs 於物理問題建模、進行大語言模型的本地部署與 Fine-tuning，抑或是開發提升日常效率的擴充小工具，都是我探索與實驗的一部分。 
                 </div>
                 </div>
             </div>
+        </div>
+        <div class="transition">
+            <div class="transition_detail">對我而言，科技就像「檸檬（Lemon）」—— 看似平凡，卻能激發無限可能；既能為生活增添風味，也能成為創新的起點。</div>
+        </div>
+        <div class="skill">
+            <div class="skill_title">專業技能</div>
+            <div class="skill_box_wrapper">
+                <div class="skill_box">
+                    <div class="skill_box_title">半導體二維材料研究</div>
+                    <div class="skill_box_subText">具備從光罩設計與下線、材料成長與製程整合，到元件電性量測與參數優化的實作經驗，熟悉研發流程中製程條件—元件結構—電性表現之間的因果關係，能根據量測結果進行問題定位、實驗設計與製程優化，並以良率與重現性思維進行數據導向分析，支援跨模組整合決策，加速研發收斂。</div>
+                    <div class="skill_box_img">
+                        <img src="img/processing.png" alt="">
+                    </div>
+                </div>
+                <div class="skill_box">
+                    <div class="skill_box_title">應用程式設計與實作</div>
+                    <div class="skill_box_subText">具備以 Python 為核心的程式設計能力，能將工程與研究問題轉化為可執行的程式流程，應用於實驗數據分析、自動化處理與模型建構。熟悉機器學習、基礎深度學習訓練流程，並能結合物理知識提升模型可解釋性與穩定性；同時具備前端與工具型程式開發經驗，能有效將想法落實為實際可用的系統。</div>
+                    <div class="skill_box_img">
+                        <img src="img/coding.png" alt="">
+                    </div>
+                </div>
+                <div class="skill_box">
+                    <div class="skill_box_title">自主學習與解決問題的能力</div>
+                    <div class="skill_box_subText">具備高度自主學習與問題導向能力，能在面對不熟悉的技術或研究議題時，快速建立知識脈絡，透過文獻查證、實驗設計與數據驗證釐清關鍵因素，並將新知有效轉化為可落地的實作與流程優化，持續縮短學習曲線並提升研究與工程效率，同時能在有限資源與時程下穩定推進任務完成。</div>
+                    <div class="skill_box_img">
+                        <img src="img/learning.png" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="transition">
+            <div class="transition_detail">也正因具備良好的自律性，以及自主學習與問題解決能力，使我能夠在不依賴他人的情境下，主動規劃方向、整合資源，並以自身能力穩定推進並完成目標。</div>
+        </div>
+        <div class="feedback">
+            <div class="feedback_title">技術分享 × 知識傳承 × 實際影響力</div>
+            <div class="feedback_subText">我長期致力於將自身所累積的知識與實作經驗系統化並分享給更多人，透過撰寫技術文章、參與開源專案以及教學與指導活動，協助他人在面對複雜技術概念時，能更有效地建立理解脈絡並提升實務能力。在這個過程中，我不僅扮演知識傳遞者的角色，也透過回饋與討論持續檢視並深化自身理解，形成正向的學習循環。 我期望透過持續的知識整理、實踐與傳承，讓技術不只停留在個人層面，而能轉化為可被複製、擴散並長期累積的價值，進而為團隊與社會創造更深遠且實質的影響。</div>
         </div>
         <div class="footer" ref="contact">
             <div class="footer_item">
@@ -409,7 +445,6 @@ export default {
     }
     .developer{
         width: 100%;
-        margin-bottom: 25px;
     }
     .developer_content{
         width: 100%;
@@ -417,6 +452,7 @@ export default {
         display: flex;
         justify-content: space-evenly;
         align-items: center;
+        margin-bottom: 15px;
     }
     .developer_title{
         width: 100%;
@@ -449,6 +485,93 @@ export default {
     .developer_detail{
         text-align: justify;
         line-height: 2;
+    }
+
+    .transition{
+        width: 100%;
+        height: 120px;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        background: black;
+    }
+    .transition_detail{
+        color: white;
+        line-height: 1.5;
+        font-size: 16px;
+        width: 90%;
+        text-align: center;
+    }
+    .skill{
+        width: 100%;
+        padding-bottom: 30px;
+    }
+    .skill_title{
+        width: 100%;
+        height: 80px;
+        line-height: 80px;
+        font-size: 28px;
+        text-align: center;
+        font-weight: bolder;
+    }
+    .skill_box_wrapper{
+        width: 100%;
+        height: auto;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+    }
+    .skill_box{
+        width: 30%;
+        background: black;
+        border-radius: 12px;
+        box-sizing: border-box;
+        color: white;
+        padding-bottom: 15px;
+    }
+    .skill_box_title{
+        width: 100%;
+        font-size: 24px;
+        text-align: center;
+        line-height: 80px;
+    }
+    .skill_box_subText{
+        width: 95%;
+        margin: 0 auto;
+        font-size: 14px;
+        text-align: justify;
+        line-height: 1.75;
+        height: auto;
+        max-height: 150px;
+        overflow-y: scroll;
+        margin-bottom: 8px;
+    }
+    .skill_box_img{
+        margin-top: 20px;
+        width: 95%;
+        margin: 0 auto;
+        box-sizing: border-box;
+    }
+    .skill_box_img>img{
+        width: 100%;
+    }
+
+    .feedback{
+        width: 100%;
+    }
+    .feedback_title{
+        width: 100%;
+        height: 80px;
+        line-height: 80px;
+        font-size: 28px;
+        text-align: center;
+        font-weight: bolder;
+    }
+    .feedback_subText{
+        width: 95%;
+        margin: 0 auto;
+        text-align: justify;
+        line-height: 1.75;
     }
     .footer{
         width: 100%;
@@ -526,6 +649,37 @@ export default {
             height: 150px;
             line-height: 1.75;
             overflow-y:scroll;
+        }
+        .transition_detail{
+            line-height: 1.75;
+            font-size: 12.5px;
+            overflow-y:scroll;
+            text-align: justify;
+        }
+        .skill{
+            padding-bottom: 0px;
+        }
+        .skill_title{
+            font-size: 20px;
+        }
+        .skill_box_wrapper{
+            flex-wrap: wrap;
+        }
+        .skill_box{
+            width: 95%;
+            margin-bottom: 20px;
+        }
+        .skill_box_title{
+            font-size: 16px;
+        }
+        .skill_box_subText{
+            font-size: 12.5px;
+        }
+        .feedback_title{
+            font-size: 20px;
+        }
+        .feedback_subText{
+            font-size: 12.5px;
         }
         .footer{
             height: 80px;
