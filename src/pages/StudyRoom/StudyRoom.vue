@@ -3,8 +3,10 @@
     <div class="top">
       <div class="title"><i class="fa-solid fa-book book_icon"></i> 學習紀錄簿 <i class="el-icon-warning-outline alert" @click="showAlert()"></i> </div>
       <input type="file" ref="importFile" class="importFile" @change="importRecord($event)" accept=".json">
-      <el-button class="add" v-if="currentUser && currentUser.typeEng == 'teacher' && !showClock" @click="handleImport()">匯入紀錄</el-button>
-      <el-button class="add" v-if="currentUser && currentUser.typeEng == 'teacher' && !showClock" @click="dialogFormVisible = true">新增計畫</el-button>
+      <div class="add_wrapper">
+        <el-button class="add" v-if="currentUser && currentUser.typeEng == 'teacher' && !showClock" @click="handleImport()">匯入紀錄</el-button>
+        <el-button class="add" v-if="currentUser && currentUser.typeEng == 'teacher' && !showClock" @click="dialogFormVisible = true">新增計畫</el-button>
+      </div>
     </div>
     <div class="showRegion">
       <statistics class="statistics"></statistics>
@@ -513,9 +515,12 @@ export default {
   .export_button{
     margin-left: auto;
   }
-  .add{
+  .add_wrapper{
     margin-left: auto;
+  }
+  .add{
     height: 42px;
+    margin-top: 5px;
   }
   .importFile{
     display: none;

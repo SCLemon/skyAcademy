@@ -82,7 +82,7 @@
 import axios from 'axios';
 import jsCookie from 'js-cookie';
 import pdfViewer from './components/PdfViewer.vue';
-import { nanoid } from 'nanoid';
+import { v4 as uuidv4 } from 'uuid'
 export default {
     name:'Column',
     components:{
@@ -166,7 +166,7 @@ export default {
                 return;
             }
             this.currentChapter = chapter;
-            this.genRefreshPDFNumber = nanoid();
+            this.genRefreshPDFNumber = uuidv4();
             this.pdfUrl = chapter.attachmentUrl;
 
             // 若為移動端，可在此自動隱藏選單：
@@ -317,7 +317,7 @@ export default {
                 if(res.data.type == 'success'){
 
                     if(hasfileUpdated && res.data.material.idx == this.currentChapter.idx){
-                        this.genRefreshPDFNumber = nanoid(); // 避免 url 緩存
+                        this.genRefreshPDFNumber = uuidv4(); // 避免 url 緩存
                     }
                     
                     // 更新該項目

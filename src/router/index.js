@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import jsCookie from 'js-cookie'
+import axios from 'axios'
+
+import Index from '@/pages/Index/Index.vue'
 import Academic from '../pages/Academic/Academic.vue'
 import ColumnList from '../pages/Column/ColumnList.vue'
 import Column from '../pages/Column/Column.vue'
@@ -10,10 +13,9 @@ import Login from '../pages/Login/Login.vue'
 import Admin from '@/pages/InfoPage/Admin.vue'
 import ColumnOverview from '@/pages/InfoPage/pages/ColumnOverview.vue'
 import ClientOverview from '@/pages/InfoPage/pages/ClientOverview.vue'
-import Index from '@/pages/Index/Index.vue'
 import ModifyInfo from '@/pages/InfoPage/ModifyInfo.vue'
 import StudyRoom from '@/pages/StudyRoom/StudyRoom.vue'
-import axios from 'axios'
+
 Vue.use(VueRouter)
 const router = new VueRouter({
     routes:[
@@ -91,7 +93,12 @@ router.beforeEach(async (to, from, next) => {
     
     // 通用驗證
     const allowedPaths = ['/', '/academic/login'];
-    if(!allowedPaths.includes(to.path) && !token) return next('/academic/login')
+    if (allowedPaths.includes(to.path)) {
+        return next()
+    }
+    if (!token) {
+        return next('/academic/login')
+    }
     
     const res = await axios.post('/login/token',{save:false},{
         headers:{
@@ -100,10 +107,10 @@ router.beforeEach(async (to, from, next) => {
         }
     })
 
-    if (!allowedPaths.includes(to.path) && !(res.data.userInfo)){
+    if (!(res.data.userInfo)){
         jsCookie.remove('authToken')
-        next('/academic/login')
-        location.reload()
+        localStorage.removeItem('currentUser');
+        location.reload();
         return;
     }
 
@@ -114,9 +121,9 @@ router.beforeEach(async (to, from, next) => {
 
         if(res.data.userInfo && res.data.userInfo.typeEng =='teacher') return next();
         else{
-            jsCookie.remove('authToken')
-            next('/academic/login')
-            location.reload()
+            jsCookie.remove('authToken');
+            localStorage.removeItem('currentUser');
+            location.reload();
             return
         }
     }

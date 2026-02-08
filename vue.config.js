@@ -1,6 +1,5 @@
 const { defineConfig } = require('@vue/cli-service')
 const WebpackObfuscator = require('webpack-obfuscator');
-const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = defineConfig({
     productionSourceMap: false,
@@ -32,33 +31,35 @@ module.exports = defineConfig({
                 )
             );
 
-            // 壓縮
-            config.optimization.minimizer.push(
-                new TerserPlugin({
-                terserOptions: {
-                    extractComments: false,
-                    compress: {
-                        drop_console: true,
-                        drop_debugger: true
-                    }
-                }
-                })
-            );
-
             // Tree shaking
             config.optimization.usedExports = true;
+            config.optimization.sideEffects = true;
 
             // 拆分代碼
             config.optimization.splitChunks = {
-                chunks: 'all',
-                minSize: 80000,
-                maxSize: 0,
-                minChunks: 2,
-                maxAsyncRequests: 20,
-                maxInitialRequests: 8,
-                enforceSizeThreshold: 150000,
-                automaticNameDelimiter: '~',
-            };
+            chunks: 'all',
+            minSize: 120000,           // 不要太小
+            maxInitialRequests: 5,     // 降低首屏請求數
+            maxAsyncRequests: 8,
+            cacheGroups: {
+                vendors: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'chunk-vendors',
+                    priority: -10,
+                },
+                elementUI: {
+                    test: /[\\/]node_modules[\\/]element-ui[\\/]/,
+                    name: 'chunk-element-ui',
+                    priority: 20,
+                },
+                common: {
+                    name: 'chunk-common',
+                    minChunks: 2,
+                    priority: -20,
+                    reuseExistingChunk: true,
+                },
+            },
+      }
         }
     }
 })

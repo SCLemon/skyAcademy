@@ -5,7 +5,7 @@
                 <i class="el-icon-arrow-left"></i>
             </div>
             <div class="post_img" v-for="(item) in postImg" :key="item.url"  @click="showPostImgDetail(item.url)">
-                <img :data-src="item.url" v-lazy alt="" :style="item.style" @load="transformImg(item, $event)">
+                <img :data-src="item.url" v-lazy decoding="async" alt="" :style="item.style" @load="transformImg(item, $event)">
             </div>
             <div class="next_button button" @click="goNextPostImage(index)" v-if="hasNext">
                 <i class="el-icon-arrow-right"></i>
