@@ -79,5 +79,10 @@ export default {
       width: 85vw !important;
     }
   }
+  @font-face {
+    font-family: "element-icons";
+    src: url("~element-ui/lib/theme-chalk/fonts/element-icons.woff") format("woff");
+    font-display: swap;
+  }
 </style>
 

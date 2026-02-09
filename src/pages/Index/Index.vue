@@ -25,7 +25,7 @@
                     <el-carousel  type="card" :interval="5000">
                         <el-carousel-item v-for="(item,id) in banner" :key="id">
                             <div class="medium">
-                                <img :src="item" decoding="async" alt="">
+                                <img :src="item" decoding="async" fetchpriority="high" alt="">
                             </div>
                         </el-carousel-item>
                     </el-carousel>
