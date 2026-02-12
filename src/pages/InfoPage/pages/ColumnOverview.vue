@@ -372,6 +372,15 @@
             width: 100%;
             height: calc(100vh - 360px);
         }
+        .transfer :deep(.el-transfer-panel__filter){
+            margin-left: 10px;
+            margin-right: 10px;
+            width: calc(100% - 20px);
+        }
+        .transfer :deep(.el-input__inner){
+            padding-left: 35px;
+            box-sizing: border-box;
+        }
         @media screen and (max-width: 440px)  {
             .transfer{
                 display: flex;
