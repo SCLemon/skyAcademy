@@ -18,6 +18,7 @@ export default {
   async mounted(){
     this.$bus.$on('handleAlert',this.handleAlert)
     this.$bus.$on('copyToClipboard',this.copyToClipboard)
+    this.$bus.$on('setAnonymousMode',this.setAnonymousMode)
     await this.setAnonymousMode();
     await this.generateFingerprint();
     registerServiceWorker();
@@ -35,7 +36,7 @@ export default {
       })
       .catch(() => {});
     },
-    async setAnonymousMode(){
+    async setAnonymousMode(triggerAlert){
       const authToken = jsCookie.get('authToken');
       if(!authToken){
         let data;
@@ -52,6 +53,7 @@ export default {
             this.$bus.$emit('setUserInfo')
             this.$router.replace('/academic/post').catch((e)=>{})
           }
+          if(triggerAlert) this.$bus.$emit('handleAlert','訪客模式通知',data.message,data.type)
         }
         catch(e){}
       }

@@ -8,7 +8,10 @@
           <div class="header"><i class="fa-solid fa-id-card card_icon"></i> 一般登入</div>
           <div class="login"><div class="login_text">帳號：</div><el-input placeholder="請輸入帳號" v-model="loginData.account" clearable></el-input></div>
           <div class="login"><div class="login_text">密碼：</div><el-input placeholder="請輸入密碼" v-model="loginData.password" clearable show-password></el-input></div>
-          <div class="btn"><el-button type="primary" @click="login()">會員登入</el-button></div>
+          <div class="btn">
+            <el-button type="warning" @click="loginAsAnonymous()">訪客模式</el-button>
+            <el-button type="primary" @click="login()">會員登入</el-button>
+          </div>
         </div>
         <div class="fast_header"><i class="fa-solid fa-id-card card_icon"></i> 會員卡快速通道</div>
         <div class="fastForm">
@@ -37,6 +40,9 @@ export default {
   mounted(){
   },
   methods:{
+    async loginAsAnonymous(){
+      await this.$bus.$emit('setAnonymousMode', true);
+    },
     async login(){
       let data;
       if(Object.values(this.loginData).some(value => value === null || value === undefined || value.trim() === '')){
