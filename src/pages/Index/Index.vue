@@ -62,14 +62,14 @@
                     <div class="skill_box_title">應用程式設計與實作</div>
                     <div class="skill_box_subText">具備以 Python 為核心的程式設計能力，能將工程與研究問題轉化為可執行的程式流程，應用於實驗數據分析、自動化處理與模型建構。熟悉機器學習、基礎深度學習訓練流程，並能結合物理知識提升模型可解釋性與穩定性；同時具備前端與工具型程式開發經驗，能有效將想法落實為實際可用的系統。</div>
                     <div class="skill_box_img">
-                        <img src="img/coding.webp" decoding="async" alt="">
+                        <img src="img/coding.png" decoding="async" alt="">
                     </div>
                 </div>
                 <div class="skill_box">
                     <div class="skill_box_title">自主學習與解決問題的能力</div>
                     <div class="skill_box_subText">具備高度自主學習與問題導向能力，能在面對不熟悉的技術或研究議題時，快速建立知識脈絡，透過文獻查證、實驗設計與數據驗證釐清關鍵因素，並將新知有效轉化為可落地的實作與流程優化，持續縮短學習曲線並提升研究與工程效率，同時能在有限資源與時程下穩定推進任務完成。</div>
                     <div class="skill_box_img">
-                        <img src="img/learning.webp" decoding="async" alt="">
+                        <img src="img/learning.png" decoding="async" alt="">
                     </div>
                 </div>
             </div>
