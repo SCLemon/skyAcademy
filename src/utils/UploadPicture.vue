@@ -1,12 +1,12 @@
 <template>
     <div>
         <div class="upload_wrapper">
-            <div class="preview_item upload_item" @click="openInput()"><i class="el-icon-plus"></i></div>
-            <div class="preview_item" v-for="p in uploads" :key="p.id">
-                <div class="preview_mask">
+            <div class="preview_item upload_item" @click="openInput()" :style="{ aspectRatio }"><i class="el-icon-plus"></i></div>
+            <div class="preview_item" v-for="p in uploads" :key="p.id" :style="{ aspectRatio }">
+                <div class="preview_mask" :style="{ aspectRatio }">
                     <div class="preview_mask_item" @click="moveUploadUp(p.id)"><i class="el-icon-arrow-up"></i></div>
                     <div class="preview_mask_item" @click="moveUploadDown(p.id)"><i class="el-icon-arrow-down"></i></div>
-                    <div class="preview_mask_item preview-edit" @click="showUploadImage(p.id)"><i class="el-icon-search"></i></div>
+                    <div class="preview_mask_item preview-edit" v-if="cropEnabled" @click="showUploadImage(p.id)"><i class="el-icon-search"></i></div>
                     <div class="preview_mask_item" @click="removeUpload(p.id)"><i class="el-icon-delete"></i></div>
                 </div>
                 <img :src="p.url" class="preview_image"/>
@@ -46,6 +46,10 @@ export default {
         aspectRatio:{
             type: Number,
             default: 16/9
+        },
+        cropEnabled:{
+            type: Boolean,
+            default: true,
         },
         value: { type: Array, default: () => [] }, 
     },
@@ -236,7 +240,6 @@ export default {
     }
     .preview_item{
         width: calc(33% - 6px);
-        aspect-ratio: 1 / 1;
         box-sizing: border-box;
         position: relative;
     }
@@ -258,7 +261,6 @@ export default {
     }
     .preview_mask{
         width: 100%;
-        aspect-ratio: 1 / 1;
         position: absolute;
         left:0;
         background: rgba(0,0,0,0.4);
@@ -319,16 +321,19 @@ export default {
         width: calc(100% - 150px);
     }
     @media screen and (max-width: 440px) {
+        .preview_item{
+            width: calc(50% - 9px);
+        }
         .preview_mask{
             flex-wrap: wrap;
             padding: 10px;
             box-sizing: border-box;
         }
         .preview_mask_item{
-            width: 50%;
-            aspect-ratio: 1 / 1;
+            width: 25%;
             box-sizing: border-box;
             display: flex;
+            aspect-ratio: 1/1;
             justify-content: center;
             align-items: center;
         }

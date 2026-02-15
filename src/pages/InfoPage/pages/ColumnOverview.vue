@@ -40,18 +40,8 @@
                         </el-select>
                     </el-form-item>
                 </el-form>
-                <div class="class_banner_title">專欄封面上傳（最多兩張 Ratio 2/1)</div>
-                <el-upload  action="#" :on-change="handleUpload" list-type="picture-card" :auto-upload="false" :file-list="fileList" :limit="2" :multiple="true" accept="image/*">
-                    <i slot="default" class="el-icon-plus"></i>
-                    <div slot="file" slot-scope="{file}">
-                        <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
-                        <span class="el-upload-list__item-actions">
-                            <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)"><i class="el-icon-zoom-in"></i></span>
-                            <span class="el-upload-list__item-delete" @click="handleRemove(file)"><i class="el-icon-delete"></i></span>
-                        </span>
-                    </div>
-                </el-upload>
-                <el-dialog :visible.sync="dialogVisible"><img width="100%" :src="dialogImageUrl" alt=""></el-dialog>
+                <div class="class_banner_title">專欄封面上傳（ Ratio 2/1 )</div>
+                <upload-picture :aspectRatio="2/1" v-model="fileList" :cropEnabled="false"></upload-picture>
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="dialogFormVisible = false">取消</el-button>
                     <el-button type="primary" @click="create()">創建</el-button>
@@ -87,8 +77,12 @@
     <script>
     import axios from 'axios'
     import jsCookie from 'js-cookie'
+    import UploadPicture from '@/utils/UploadPicture.vue';
     export default {
         name:'CoulmnOverview',
+        components:{
+            UploadPicture
+        },
         data(){
             return{
                 tableData: [],
@@ -108,8 +102,6 @@
                 },
                 // 創建專欄的圖片上傳
                 fileList: [],
-                dialogImageUrl: '',
-                dialogVisible: false,
 
                 // 指派專欄
                 dialogFormVisible2:false, 
@@ -165,7 +157,7 @@
 
                 if (this.fileList && this.fileList.length > 0) {
                     this.fileList.forEach((file, index) => {
-                        formData.append('attachments', file.raw);
+                        formData.append('attachments', file.file);
                     });
                 }
                 const res = await axios.post('/api/infoPage/createCourse',formData,{
@@ -234,18 +226,6 @@
                     else this.$bus.$emit('handleAlert','專欄權限變更通知',res.data.message,res.data.type)
                 }
                 catch(e){}
-            },
-            // 創建專欄的 banner 上傳
-            handleUpload(file){
-                this.fileList.push(file)
-            },
-            handleRemove(file) {
-                const index = this.fileList.indexOf(file);
-                if (index !== -1) this.fileList.splice(index, 1);
-            },
-            handlePictureCardPreview(file) {
-                this.dialogImageUrl = file.url;
-                this.dialogVisible = true;
             },
 
             // 指派專欄
@@ -362,11 +342,6 @@
         }
         ::v-deep .el-transfer-panel__empty{
             display: none;
-        }
-        ::v-deep .el-upload--picture-card, ::v-deep .el-upload-list__item {
-            width: 260px !important;
-            height: 130px !important;
-            line-height: 130px !important; /* 讓圖標垂直置中 */
         }
         :deep(.el-table){
             width: 100%;
