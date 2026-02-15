@@ -5,7 +5,7 @@
         <div class="option" @click="goTo('/academic/post')"><i class="fa-solid fa-house"></i></div>
         <div class="option" @click="goTo('/academic/columnList')"><i class="fa-solid fa-folder-open"></i></div>
         <div class="option" @click="goTo('/academic/studyRoom')"><i class="fa-solid fa-book"></i></div>
-        <div class="option" @click="userInfo && userInfo.account != 'Visitor'? goToProfile():logout()">
+        <div class="option" @click="userInfo && userInfo.account != 'Visitor'? goToProfile():showNotAllowed()">
             <i v-if="!userInfo.userImgUrl ||userInfo.userImgUrl.includes('img/user.png')" class="fa-solid fa-user"></i>
             <img v-else class="userIcon" :src="userInfo.userImgUrl" alt="">
         </div>
@@ -58,6 +58,9 @@ export default {
 
             if(currentUser.typeEng === 'teacher') this.goTo(`/academic/admin`)
             else if(currentUser.typeEng === 'student') this.goTo(`/academic/modifyInfo?idx=${currentUser.idx}`)
+        },
+        showNotAllowed(){
+            this.$bus.$emit('handleAlert','訪客模式限制','訪客模式無法進入個人頁面。','warning')
         },
         logout(){
             this.$confirm('確認是否登出系統?', '提示', {
