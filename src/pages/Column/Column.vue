@@ -81,7 +81,7 @@
 <script>
 import axios from 'axios';
 import jsCookie from 'js-cookie';
-import pdfViewer from './components/PdfViewer.vue';
+import pdfViewer from '../../utils/PdfViewer.vue';
 import { v4 as uuidv4 } from 'uuid'
 export default {
     name:'Column',

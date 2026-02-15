@@ -125,7 +125,7 @@ export default {
         margin: 0 auto;
         overflow: hidden;
         position: relative;
-        background-image: url(../../../../public/img/Loading.gif);
+        background-image: url(../../public/img/Loading.gif);
         background-repeat: no-repeat;
         background-position: center;
     }

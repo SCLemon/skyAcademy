@@ -124,9 +124,9 @@
 import axios from 'axios'
 import jsCookie from 'js-cookie'
 import AddPost from '../components/AddPost/AddPost.vue';
-import Carousel from '../components/Carousel.vue';
 import DOMPurify from 'dompurify';
-import UploadPicture from '../components/AddPost/components/UploadPicture.vue';
+import Carousel from '../../../utils/Carousel.vue';
+import UploadPicture from '../../../utils/UploadPicture.vue';
 import { v4 as uuidv4 } from "uuid";
 
 export default {

@@ -5,7 +5,7 @@
         <div class="option" @click="goTo('/academic/post')"><i class="fa-solid fa-house"></i></div>
         <div class="option" @click="goTo('/academic/columnList')"><i class="fa-solid fa-folder-open"></i></div>
         <div class="option" @click="goTo('/academic/studyRoom')"><i class="fa-solid fa-book"></i></div>
-        <div class="option" @click="goToProfile()">
+        <div class="option" @click="userInfo && userInfo.account != 'Visitor'? goToProfile():logout()">
             <i v-if="!userInfo.userImgUrl ||userInfo.userImgUrl.includes('img/user.png')" class="fa-solid fa-user"></i>
             <img v-else class="userIcon" :src="userInfo.userImgUrl" alt="">
         </div>

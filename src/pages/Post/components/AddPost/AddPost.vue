@@ -36,7 +36,7 @@
 import axios from 'axios';
 import { format } from 'date-fns';
 import jsCookie from 'js-cookie';
-import UploadPicture from './components/UploadPicture.vue';
+import UploadPicture from '../../../../utils/UploadPicture.vue';
 export default {
     name: "AddPost",
     components:{

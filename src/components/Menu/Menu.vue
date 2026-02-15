@@ -17,7 +17,7 @@
         學習紀錄
     </div>
     <div class="version_info">
-        <div>General EX II v1.5.3.0</div>
+        <div>General EX II v1.5.4.0 PRE</div>
     </div>
     <div class="memoryUsageBlock_wrapper">
         <div class="memoryUsageBlock">
@@ -42,7 +42,7 @@
         <div v-if="isLogin" class="menu_more">
             <transition name="fade">
                 <div class="menu_more_block" v-show="showOption">
-                    <div class="menu_more_block_item" @click="handleMore('setting')"><i class="fa-solid fa-gear menu_more_block_item_icon"></i> 設定</div>
+                    <div class="menu_more_block_item" v-if="userInfo && userInfo.account != 'Visitor'" @click="userInfo.account == 'Visitor'?handleMore('logout'):handleMore('setting')"><i class="fa-solid fa-gear menu_more_block_item_icon"></i> 設定</div>
                     <div class="menu_more_block_item" @click="handleMore('logout')"><i class="fa-solid fa-right-to-bracket menu_more_block_item_icon_2"></i>登出</div>
                 </div>
             </transition>

@@ -2,8 +2,10 @@
   <div>
     <div class="header">
         <span class="header_text">使用者資料維護</span>
-        <subscribe class="btn" v-if="isOwnData"></subscribe>
-        <el-button type="primary" class="btn" :loading="loading" icon="el-icon-refresh" @click="modifyData()">更新資料</el-button>
+        <div class="header_btn_wrapper">
+            <subscribe class="btn" v-if="isOwnData"></subscribe>
+            <el-button type="primary" class="btn" :loading="loading" icon="el-icon-refresh" @click="modifyData()">更新資料</el-button>
+        </div>
     </div>
     <div class="box">
         <div class="mobile_show_changeUserIcon">
@@ -332,10 +334,12 @@ export default {
         display: flex;
         align-items: center;
     }
+    .header_btn_wrapper{
+        margin-left: auto;
+    }
     .btn{
         height: 40px;
-        margin-left: auto;
-        margin-right: 5px;
+        margin-left: 8px;
     }
     .box{
         width: 95%;
@@ -636,6 +640,9 @@ export default {
         }
         .header{
             border-bottom: 0;
+        }
+        .header_btn_wrapper{
+            margin-right: 10px;
         }
         .header_text{
             display: none;

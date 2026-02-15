@@ -100,7 +100,7 @@
 </template>
   
 <script>
-import Carousel from '../Post/components/Carousel.vue';
+import Carousel from '../../utils/Carousel.vue';
 import Feedback from './components/Feedback.vue';
 export default {
     name: "Index",
