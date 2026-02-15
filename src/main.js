@@ -9,7 +9,7 @@ Vue.config.productionTip = false
 // Vue.use(ElementUI);
 
 import {
-  Icon, Empty, Dialog, Upload, Input, InputNumber, Button, Carousel, CarouselItem, 
+  Icon, Empty, Dialog, Input, InputNumber, Button, Carousel, CarouselItem, 
   Table, TableColumn, Form, FormItem, Transfer, Select, Option, DatePicker, Slider,
   Notification, MessageBox
 } from 'element-ui'
@@ -22,7 +22,6 @@ Vue.prototype.$prompt = MessageBox.prompt
 Vue.use(Icon)
 Vue.use(Empty)
 Vue.use(Dialog)
-Vue.use(Upload)
 Vue.use(Input)
 Vue.use(InputNumber)
 Vue.use(Button)

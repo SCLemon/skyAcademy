@@ -57,21 +57,13 @@
     <el-dialog title="上傳文件" :visible.sync="dialogTableVisible">
         創建章節：<el-input class="form_input" v-model="form.title" placeholder="請輸入章節名稱"></el-input>
         文件上傳：
-        <el-upload class="upload-demo" drag action="#" :auto-upload="false" :limit="1" accept=".pdf" :on-change="handleUpload" :on-remove="handleRemove" :file-list="form.fileList">
-            <i class="el-icon-upload"></i>
-            <div class="el-upload__text">將文件拖到此處，或<em>點擊上傳</em></div>
-            <div class="el-upload__tip" slot="tip">只能上傳 PDF 文件</div>
-        </el-upload>
+        <div class="uploadFile"><upload-file v-model="form.fileList" :aspectRatio="3/1"></upload-file></div>
         <el-button type="primary" class="sendBtn" :loading="isSending" :disabled="(form.title =='' || form.fileList.length == 0)" @click="(form.title =='' || form.fileList.length == 0)?'':create()">{{ isSending? `${uploadPercent}%`:'確認上傳' }}</el-button>
     </el-dialog>
     <el-dialog title="更新文件" :visible.sync="dialogTableVisible2">
         更新章節：<el-input class="form_input" v-model="update.title" placeholder="請輸入章節名稱"></el-input>
         文件上傳：
-        <el-upload class="upload-demo" drag action="#" :auto-upload="false" :limit="1" accept=".pdf" :on-change="handleUpload2" :on-remove="handleRemove2" :file-list="update.fileList">
-            <i class="el-icon-upload"></i>
-            <div class="el-upload__text">將文件拖到此處，或<em>點擊上傳</em></div>
-            <div class="el-upload__tip" slot="tip">只能上傳 PDF 文件</div>
-        </el-upload>
+        <div class="uploadFile"><upload-file v-model="update.fileList" :aspectRatio="3/1"></upload-file></div>
         <el-button type="primary" class="sendBtn" :loading="isSending2" :disabled="(update.title =='' || (isSending2 || isSending3))" @click="(update.title =='')?'':updateChapter()">{{isSending2? `${updatePercent}%`:'確認更新' }}</el-button>
         <el-button type="danger" class="sendBtn" :loading="isSending3" :disabled="isSending2 || isSending3" @click="removeChapter()">確認刪除</el-button>
     </el-dialog>
@@ -82,11 +74,12 @@
 import axios from 'axios';
 import jsCookie from 'js-cookie';
 import pdfViewer from '../../utils/PdfViewer.vue';
+import UploadFile from '@/utils/UploadFile.vue';
 import { v4 as uuidv4 } from 'uuid'
 export default {
     name:'Column',
     components:{
-        pdfViewer
+        pdfViewer, UploadFile
     },
     data(){
         return {
@@ -227,12 +220,6 @@ export default {
         openUpload(){
             this.dialogTableVisible = true;
         },
-        handleUpload(file,fileList){
-            this.form.fileList = fileList
-        },
-        handleRemove(file, fileList) {
-            this.form.fileList = fileList
-        },
         async create(){
             try{
                 
@@ -245,7 +232,7 @@ export default {
                 formData.append('title', this.form.title);
                 if (this.form.fileList && this.form.fileList.length > 0) {
                     this.form.fileList.forEach((file, index) => {
-                        formData.append('attachments', file.raw);
+                        formData.append('attachments', file.file);
                     });
                 
                 }
@@ -280,12 +267,7 @@ export default {
             this.update.materialIdx = chapter.idx;
             this.dialogTableVisible2 = true;
         },
-        handleUpload2(file,fileList){
-            this.update.fileList = fileList
-        },
-        handleRemove2(file, fileList) {
-            this.update.fileList = fileList
-        },
+        
         async updateChapter(){
             try{
 
@@ -301,7 +283,7 @@ export default {
                 let hasfileUpdated = false;
                 if (this.update.fileList && this.update.fileList.length > 0) {
                     this.update.fileList.forEach((file, index) => {
-                        formData.append('attachments', file.raw);
+                        formData.append('attachments', file.file);
                     });
                     hasfileUpdated = true;
                 }
@@ -526,7 +508,7 @@ export default {
         margin-top: 15px;
         margin-bottom: 15px;
     }
-    .upload-demo{
+    .uploadFile{
         margin-top: 15px;
     }
     .sendBtn{

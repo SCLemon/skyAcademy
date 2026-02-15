@@ -242,6 +242,7 @@ export default {
         width: calc(33% - 6px);
         box-sizing: border-box;
         position: relative;
+        overflow: hidden;
     }
     .upload_item{
         color: gray;
@@ -255,8 +256,6 @@ export default {
     }
     .preview_image{
         width: 100%;
-        height: 100%;
-        object-fit: cover;
         display: block;
     }
     .preview_mask{
