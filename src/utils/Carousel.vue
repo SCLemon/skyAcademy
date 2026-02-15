@@ -1,13 +1,13 @@
 <template>
     <div class="post_img_box_wrapper">
-        <div class="post_img_box" v-if="postImg.length" ref="post_img_box" @scroll="onScroll()">
-            <div class="previous_button button" @click="goPreviousPostImage(index)" v-if="hasPrevious">
+        <div class="post_img_box" v-if="postImg.length" :style="{ aspectRatio }" ref="post_img_box" @scroll="onScroll()">
+            <div class="previous_button button" @click.stop="goPreviousPostImage(index)" v-if="hasPrevious">
                 <i class="el-icon-arrow-left"></i>
             </div>
-            <div class="post_img" v-for="(item) in postImg" :key="item.url"  @click="showPostImgDetail(item.url)">
+            <div class="post_img" v-for="(item) in postImg" :key="item.url"  @click="clickToShowImgDetail ? showPostImgDetail(item.url) : null">
                 <img :data-src="item.url" v-lazy decoding="async" alt="" :style="item.style" @load="transformImg(item, $event)">
             </div>
-            <div class="next_button button" @click="goNextPostImage(index)" v-if="hasNext">
+            <div class="next_button button" @click.stop="goNextPostImage(index)" v-if="hasNext">
                 <i class="el-icon-arrow-right"></i>
             </div>
         </div>
@@ -28,6 +28,14 @@ export default {
                 return []
             }
         },
+        aspectRatio:{
+            type: Number,
+            default: 16/9
+        },
+        clickToShowImgDetail:{
+            type: Boolean,
+            default: true
+        }
     },
     data(){
         return{
@@ -107,7 +115,7 @@ export default {
     }
     .post_img_box{
         height: auto;
-        aspect-ratio: 16 / 9;
+        /* aspect-ratio: 16 / 9; */
         display: grid;
         grid-auto-flow: column;
         grid-auto-columns: 100%;

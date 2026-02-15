@@ -9,11 +9,7 @@
     <div class="classList" v-if="searchCourse.length">
       <div class="classItem" v-for="(courses,id) in searchCourse" :key="id" @click="courses.idx?goToColumn(courses.idx):handleLockMsg('若要開啟此專欄，請逕行向版主申請。')">
         <div class="banner">
-          <el-carousel class="carousel" width="100%" height="175px" :autoplay="false">
-            <el-carousel-item v-for="item in courses.bannerImg" :key="item.url">
-              <img :data-src="item.url" alt="" v-lazy class="bannerImg">
-            </el-carousel-item>
-          </el-carousel>
+          <carousel :post-img="courses.bannerImg" :aspectRatio="2/1" :clickToShowImgDetail="false"></carousel>
         </div>
         <div class="classNameBox"><div class="className">{{ courses.courseName }}</div><i v-if="courses.lock" class="fa-solid fa-lock course_lock"></i></div>
         <div class="classNum">{{courses.courseId}}</div>
@@ -29,8 +25,12 @@
 <script>
 import axios from 'axios';
 import jsCookie from 'js-cookie';
+import Carousel from '@/utils/Carousel.vue';
 export default {
   name:'ColumnList',
+  components:{
+    Carousel
+  },
   data(){
     return {
       search:'',
@@ -238,9 +238,6 @@ export default {
     overflow: hidden;
     box-sizing: border-box;
     text-align: right;
-  }
-  ::v-deep .el-carousel__indicator{
-    display: none;
   }
 
   @media screen and (max-width: 440px) {
