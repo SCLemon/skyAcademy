@@ -111,7 +111,7 @@ export default {
         return {
             banner:['img/banner1.webp','img/banner2.webp','img/banner3.webp'],
             subTextForPC:'Step into Lemon’s Universe — A Journey of Curiosity, Creation, and Endless Discovery.',
-            subTextForMobile: 'A Journey of Curiosity, Creation, and Endless Discovery.',
+            subTextForMobile: 'A Journey of Curiosity, Creation, and Discovery.',
             subTextEls:[],
             feedbackImg:[{
                 url:'/img/feedback1.webp',
