@@ -3,9 +3,15 @@
         <div class="header">
             <div class="logo"><img class="logo_img" src="img/horizontal_logo_white.png" alt="" @click="goTo('/')"></div>
             <div class="contact">
-                <div class="contact_item" @click="scrollToSection('top')">前往探索</div>
-                <div class="contact_item" @click="scrollToSection('developer')">版主介紹</div>
-                <div class="contact_item" @click="scrollToSection('contact')">聯絡我們</div>
+                <div class="contact_item" @click="scrollToSection('top', 0)">前往探索</div>
+                <div class="contact_item" @click="scrollToSection('developer', 1)">版主介紹</div>
+                <div class="contact_item" @click="scrollToSection('contact', 2)">聯絡我們</div>
+            </div>
+            <div :class="{contact_mobile: true, openMobileList: showOption}" @click="showOption = !showOption"><i class="fa-solid fa-bars menu_more_block_bars"></i></div>
+            <div class="contact_mobile_list" v-if="showOption">
+                <div :class="{contact_mobile_item: true, currentSection: currentSection === 0}" @click="scrollToSection('top', 0)">前往探索</div>
+                <div :class="{contact_mobile_item: true, currentSection: currentSection === 1}" @click="scrollToSection('developer', 1)">版主介紹</div>
+                <div :class="{contact_mobile_item: true, currentSection: currentSection === 2}" @click="scrollToSection('contact', 2)">聯絡我們</div>
             </div>
         </div>
         <div class="top" ref="top">
@@ -37,7 +43,15 @@
             <div class="developer_content">
                 <div class="developer_img"><img src="img/author.jpg" alt=""></div>
                 <div class="developer_intro_box">
-                    <div class="developer_name">網站作者：林英豪</div>
+                    <div class="developer_name">
+                        網站作者：林英豪 
+                        <div class="developer_other_link">
+                            <div class="developer_other_link_item" title="Gmail" @click="copy('Gmail 信箱地址複製通知','blc0000421@gmail.com')"><i class="fa-solid fa-envelope"></i></div>
+                            <div class="developer_other_link_item" title="Resume" @click="openLink('https://www.cake.me/blc0000421')"><i class="fa-solid fa-file-lines"></i></div>
+                            <div class="developer_other_link_item" title="GitHub" @click="openLink('https://github.com/SCLemon')"><i class="fa-brands fa-github"></i></div>
+                            <div class="developer_other_link_item" title="LinkedIn" @click="openLink('https://www.linkedin.com/in/sclemon1013/')"><i class="fa-brands fa-linkedin"></i></div>
+                        </div>
+                    </div>
                     <div class="developer_detail">
                     嗨，我是林英豪，也可以叫我 SCLemon。 目前就讀於國立清華大學碩士班，研究領域為「前瞻半導體二維材料元件設計」。在研究與實作歷程中，我累積了從光罩圖案設計與下線、材料成長與製程整合，到元件電性量測與參數優化的完整經驗，對半導體元件的設計邏輯與實際製程之間的連結有扎實理解。 
                     <br> 除了在半導體領域持續深耕，我同時對人工智慧、前端開發與投資研究保有高度熱情。我喜歡將抽象的想法落實為可運作的系統與成果——無論是自行訓練 LSTM 股價預測模型、應用 PINNs 於物理問題建模、進行大語言模型的本地部署與 Fine-tuning，抑或是開發提升日常效率的擴充小工具，都是我探索與實驗的一部分。 
@@ -122,6 +136,8 @@ export default {
             {
                 url:'/img/feedback3.webp',
             }],
+            showOption: false,
+            currentSection:0,
         }
     },
     mounted(){
@@ -142,8 +158,11 @@ export default {
         goTo(path){
             this.$router.push(path).catch((e)=>{})
         },
-        scrollToSection(refName) {
+        scrollToSection(refName, sectionId) {
             const element = this.$refs[refName];
+            
+            if(sectionId === this.currentSection) return;
+
             if (element) {
                 const offset = 120;
                 const top = element.getBoundingClientRect().top + window.pageYOffset - offset;
@@ -152,6 +171,20 @@ export default {
                     top,
                     behavior: 'smooth'
                 });
+                this.currentSection = sectionId;
+                this.showOption = false;
+            }
+        },
+        openLink(url){
+            window.open(url, '_blank');
+        },
+        copy(title, url){
+            try{
+                navigator.clipboard.writeText(url);
+                this.$bus.$emit('handleAlert',title,'已複製至剪貼簿','success')
+            }
+            catch(e){
+                this.$bus.$emit('handleAlert',title,`複製失敗，請手動複製網址 ${url}`,'error')
             }
         }
     },
@@ -204,7 +237,9 @@ export default {
     .logo_img{
         cursor: pointer;
     }
-    .contact, .contact_2{
+
+    /* contact for pc */
+    .contact, .contact_mobile{
         width: auto;
         height: 40px;
         line-height: 40px;
@@ -217,13 +252,47 @@ export default {
         margin-right: 10px;
         transition: all 0.25s;
     }
+    .contact_item{
+        width: 100px;
+    }
     .contact_item:hover{
         cursor: pointer;
         color: white;
     }
-    .contact_item{
-        width: 100px;
+
+    /* contact for mobile */
+    .contact_mobile{
+        display: none;
+        font-size: 22px;
+        margin-right: 0;
+        width: 90px;
+        height: 90px;
+        transition: none;
     }
+    .contact_mobile_list{
+        display: none;
+        position: absolute;
+        top: 90px;
+        left: 0;
+        background: black;
+    }
+    .contact_mobile_item{
+        width: 100vw;
+        height: 60px;
+        line-height: 60px;
+        text-align: center;
+        background: black;
+        color: #EAEAEA;
+    }
+    .contact_mobile_item:hover{
+        cursor: pointer;
+        background: rgba(255,255,255,0.1);
+        color: white;
+    }
+    .currentSection, .openMobileList{
+        background: rgba(255,255,255,0.1);
+    }
+    /*  */
     .top {
         width: 100vw;
         height: 100vh;
@@ -503,6 +572,24 @@ export default {
         font-size: 24px;
         font-weight: bolder;
         line-height: 65px;
+        display: flex;
+        align-items: center;
+    }
+    .developer_other_link{
+        height: 65px;
+        margin-left: auto;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+    }
+    .developer_other_link_item{
+        font-size: 18px;
+        width: 35px;
+        text-align: center;
+    }
+    .developer_other_link_item:hover{
+        cursor: pointer;
+        background-color: #f0f0f0;
     }
     .developer_detail{
         text-align: justify;
@@ -629,8 +716,11 @@ export default {
         .contact{
             display: none;
         }
-        .contact_2{
+        .contact_mobile{
             display: flex;
+        }
+        .contact_mobile_list{
+            display: block;
         }
         .top{
         }
@@ -682,6 +772,10 @@ export default {
         }
         .developer_name{
             font-size: 16px;
+        }
+        .developer_other_link_item{
+            font-size: 12px;
+            width: 22px;
         }
         .developer_detail{
             font-size: 12.5px;

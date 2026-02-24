@@ -68,7 +68,7 @@
                     <div class="id_card_declaration">5. 若會員有不當使用或違反規定，本網站得取消其會員資格與相關權益。</div>
                     <div class="id_card_declaration">6. 任何爭議依中華民國法律處理，並以本網站所在地法院為第一審管轄法院。</div>
                 </div>
-                <div class="id_card_issuer">Copyright © 2025 Lemon's Universe All Rights Reserved</div>
+                <div class="id_card_issuer">Copyright © 2026 Lemon's Universe All Rights Reserved</div>
             </div>
             <div class="id_card_download">
                 <div class="level" v-if="enableModifyLevel()">

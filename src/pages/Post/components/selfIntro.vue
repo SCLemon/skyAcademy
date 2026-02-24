@@ -6,6 +6,14 @@
         <div class="name_chinese">林英豪</div>
         <div class="name_Englist">YING-HAO, LIN</div>
     </div>
+    <div class="contact">
+        <div class="contact_item" title="Gmail" @click="copy('Gmail 信箱地址複製通知','blc0000421@gmail.com')"><i class="fa-solid fa-envelope"></i></div>
+        <div class="contact_item" title="Resume" @click="openLink('https://www.cake.me/blc0000421')"><i class="fa-solid fa-file-lines"></i></div>
+        <div class="contact_item" title="GitHub" @click="openLink('https://github.com/SCLemon')"><i class="fa-brands fa-github"></i></div>
+        <!-- https://sclemon1013.com/ -->
+        <div class="contact_item" title="LinkedIn" @click="openLink('https://www.linkedin.com/in/sclemon1013/')"><i class="fa-brands fa-linkedin"></i></div>
+        <div class="contact_item" title="個人網站" @click="copy('個人網站網址複製通知','https://sclemon1013.com/')"><i class="fa-solid fa-earth-americas"></i></div>
+    </div>
    <div class="detail">
         <div class="part">
             <div class="part_title">學歷</div>
@@ -33,7 +41,21 @@
 
 <script>
 export default {
-    name:'SelfIntro'
+    name:'SelfIntro',
+    methods:{
+        openLink(url){
+            window.open(url, '_blank');
+        },
+        copy(title, url){
+            try{
+                navigator.clipboard.writeText(url);
+                this.$bus.$emit('handleAlert',title,'已複製至剪貼簿','success')
+            }
+            catch(e){
+                this.$bus.$emit('handleAlert',title,`複製失敗，請手動複製網址 ${url}`,'error')
+            }
+        }
+    }
 }
 </script>
 
@@ -47,6 +69,7 @@ export default {
         box-sizing: border-box;
         padding-top: 20px;
         padding-bottom: 15px;
+        overflow: hidden;
     }
     .box:hover{
         cursor: pointer;
@@ -66,14 +89,37 @@ export default {
         background-size: contain;
         background-repeat: no-repeat;
     }
+    .contact{
+        width: 100%;
+        height: 45px;
+        margin-top: 5px;
+        margin-bottom: 5px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .contact_item{
+        width: 45px;
+        height: 45px;
+        line-height: 45px;
+        text-align: center;
+        font-size: 18px;
+        margin-right: 5px;
+    }
+    .contact_item:hover{
+        cursor: pointer;
+        background-color: #f0f0f0;
+    }
     .detail{
         width: 100%;
-        min-height: 395px;
-        height: calc(100vh - 390px);
+        min-height: 360px;
+        height: calc(100vh - 420px);
         box-sizing: border-box;
         overflow-y: scroll;
-        padding-bottom: 20px;
+        padding-bottom: 10px;
     }
+    
     .name{
         width: 100%;
         text-align: center;
@@ -119,4 +165,5 @@ export default {
         line-height: 1.5;
         font-size: 14px;
     }
+
 </style>
