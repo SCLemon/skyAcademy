@@ -152,17 +152,7 @@ export default {
         this.pdf = await loadingTask.promise;
 
         // 進行結構渲染 --> 利用 div 先替代 canvas 避免內存爆滿。
-        for (let pageNum = 1; pageNum <= this.pdf.numPages; pageNum++) {
-          const canvasWrapper = document.createElement('div');
-          canvasWrapper.dataset.pageNum = pageNum;
-          canvasWrapper.style.display = 'block';
-          canvasWrapper.style.marginTop = '5px';
-          canvasWrapper.style.marginBottom = '5px';
-          canvasWrapper.style.width = '100%'
-          canvasWrapper.style.aspectRatio = '1 / 1.414';
-          container.appendChild(canvasWrapper);
-          this.pageCanvases.push({ pageNum, canvasWrapper, renderTask: null });
-        }
+        await this.buildPageWrappers();
 
         // 提前渲染
         for (let i = 1; i <= this.preloadCount; i++) {
@@ -182,6 +172,57 @@ export default {
         this.$bus.$emit('toggleEnableToReadNextPDF',true);
       } 
       catch (err) {}
+    },
+    async buildPageWrappers() {
+
+      const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
+
+      let batchSize;
+      if (isMobile) batchSize = 4;  // 穩定優先
+      else batchSize = navigator.hardwareConcurrency > 8 ? 10 : 8;
+
+      const container = this.$refs.pdfContainer;
+      const total = this.pdf.numPages;
+
+      for (let i = 1; i <= total; i += batchSize) {
+
+        const batch = [];
+
+        for (let j = i; j < i + batchSize && j <= total; j++) {
+          batch.push(this.pdf.getPage(j));
+        }
+
+        const pages = await Promise.all(batch);
+
+        // 依照個別頁面的比例建置對應的容器
+        pages.forEach((page, index) => {
+          const pageNum = i + index;
+
+          const viewport = page.getViewport({ scale: 1 });
+          const ratio = viewport.height / viewport.width;
+
+          const canvasWrapper = document.createElement('div');
+          canvasWrapper.dataset.pageNum = pageNum;
+          canvasWrapper.style.display = 'block';
+          canvasWrapper.style.marginTop = '5px';
+          canvasWrapper.style.marginBottom = '5px';
+          canvasWrapper.style.width = '100%';
+          canvasWrapper.style.aspectRatio = `1 / ${ratio}`;
+
+          container.appendChild(canvasWrapper);
+
+          this.pageCanvases.push({
+            pageNum,
+            canvasWrapper,
+            renderTask: null
+          });
+
+          page.cleanup();
+        });
+
+        // 小延遲等下一個 event loop tick 再繼續 --> 讓瀏覽器有機會 repaint
+        await new Promise(r => setTimeout(r, 0));
+      }
     },
     async initObserver() {
       if (this.observer) this.observer.disconnect();
