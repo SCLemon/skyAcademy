@@ -3,15 +3,15 @@
         <div class="header">
             <div class="logo"><img class="logo_img" src="img/horizontal_logo_white.png" alt="" @click="goTo('/')"></div>
             <div class="contact">
-                <div class="contact_item" @click="scrollToSection('top', 0)">前往探索</div>
-                <div class="contact_item" @click="scrollToSection('developer', 1)">版主介紹</div>
-                <div class="contact_item" @click="scrollToSection('contact', 2)">聯絡我們</div>
+                <div class="contact_item" @click="scrollToSection('top', 0)">前往探索<div class="currentSection" v-if="currentSection === 0"></div></div>
+                <div class="contact_item" @click="scrollToSection('developer', 1)">版主介紹<div class="currentSection" v-if="currentSection === 1"></div></div>
+                <div class="contact_item" @click="scrollToSection('contact', 2)">聯絡我們<div class="currentSection" v-if="currentSection === 2"></div></div>
             </div>
             <div :class="{contact_mobile: true, openMobileList: showOption}" @click="showOption = !showOption"><i class="fa-solid fa-bars menu_more_block_bars"></i></div>
             <div class="contact_mobile_list" v-if="showOption">
-                <div :class="{contact_mobile_item: true, currentSection: currentSection === 0}" @click="scrollToSection('top', 0)">前往探索</div>
-                <div :class="{contact_mobile_item: true, currentSection: currentSection === 1}" @click="scrollToSection('developer', 1)">版主介紹</div>
-                <div :class="{contact_mobile_item: true, currentSection: currentSection === 2}" @click="scrollToSection('contact', 2)">聯絡我們</div>
+                <div :class="{contact_mobile_item: true, currentSection_mobile: currentSection === 0}" @click="scrollToSection('top', 0)">前往探索</div>
+                <div :class="{contact_mobile_item: true, currentSection_mobile: currentSection === 1}" @click="scrollToSection('developer', 1)">版主介紹</div>
+                <div :class="{contact_mobile_item: true, currentSection_mobile: currentSection === 2}" @click="scrollToSection('contact', 2)">聯絡我們</div>
             </div>
         </div>
         <div class="top" ref="top">
@@ -136,8 +136,16 @@ export default {
             {
                 url:'/img/feedback3.webp',
             }],
+            
+            // section part
             showOption: false,
             currentSection:0,
+            sections:[
+                { ref: 'top', id: 0 },
+                { ref: 'developer', id: 1 },
+                { ref: 'contact', id: 2 }
+            ],
+            scrollTimer: null,
         }
     },
     mounted(){
@@ -145,6 +153,7 @@ export default {
         this.subTextEls.forEach(el => {
             el.addEventListener('animationend', this.onTypingEnd)
         })
+        window.addEventListener('scroll', this.handleScroll);
     },
     methods: {
         async delay(ms){
@@ -157,6 +166,39 @@ export default {
         },
         goTo(path){
             this.$router.push(path).catch((e)=>{})
+        },
+        handleScroll() {
+
+            if (this.scrollTimer) {
+                clearTimeout(this.scrollTimer);
+            }
+            
+            this.scrollTimer = setTimeout(() => {
+                
+                // +200 為 header offset + buffer
+                const scrollPosition = window.scrollY + 200; 
+                
+                let activeId = 0;
+
+                this.sections.forEach(section => {
+                    const el = this.$refs[section.ref];
+                    if (!el) return;
+
+                    const offsetTop = el.offsetTop;
+
+                    if (scrollPosition >= offsetTop) {
+                        activeId = section.id;
+                    }
+                });
+
+                // 如果滑到最底
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 2) {
+                    activeId = this.sections[this.sections.length - 1].id;
+                }
+
+                this.currentSection = activeId;
+
+            }, 40);
         },
         scrollToSection(refName, sectionId) {
             const element = this.$refs[refName];
@@ -192,7 +234,8 @@ export default {
         if (!this.subTextEls) return
         this.subTextEls.forEach(el => {
             el.removeEventListener('animationend', this.onTypingEnd)
-        })  
+        })
+        window.removeEventListener('scroll', this.handleScroll);
     }
 };
 </script>
@@ -249,22 +292,30 @@ export default {
         justify-content: space-evenly;
         align-items: center;
         margin-left: auto;
-        margin-right: 10px;
         transition: all 0.25s;
     }
     .contact_item{
-        width: 100px;
+        width: 130px;
+        height: 90px;
+        line-height: 90px;
+        text-align: center;
+        position: relative;
     }
     .contact_item:hover{
         cursor: pointer;
         color: white;
     }
-
+    .currentSection{
+        border-bottom: 4px solid white;
+        position: absolute;
+        width: 100%;
+        left: 0;
+        bottom: 0;
+    }
     /* contact for mobile */
     .contact_mobile{
         display: none;
         font-size: 22px;
-        margin-right: 0;
         width: 90px;
         height: 90px;
         transition: none;
@@ -289,7 +340,7 @@ export default {
         background: rgba(255,255,255,0.1);
         color: white;
     }
-    .currentSection, .openMobileList{
+    .currentSection_mobile, .openMobileList{
         background: rgba(255,255,255,0.1);
     }
     /*  */

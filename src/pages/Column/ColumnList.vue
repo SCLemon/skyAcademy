@@ -6,7 +6,7 @@
         <i class="fa-solid fa-magnifying-glass search_icon"></i><input type="text" class="search" placeholder="關鍵字查詢（主題, 代號, 作者名,...）" v-model="search">
       </div>
     </div>
-    <div class="classList" v-if="searchCourse.length">
+    <div class="classList" id="classList" v-if="searchCourse.length">
       <div class="classItem" v-for="(courses,id) in searchCourse" :key="id" @click="courses.idx?goToColumn(courses.idx):handleLockMsg('若要開啟此專欄，請逕行向版主申請。')">
         <div class="banner">
           <carousel :post-img="courses.bannerImg" :aspectRatio="2/1" :clickToShowImgDetail="false"></carousel>

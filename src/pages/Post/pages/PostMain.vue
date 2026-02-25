@@ -6,7 +6,7 @@
           <div class="search_input_div"><input type="search" class="search_input" v-model="q" placeholder="搜尋 Lemon's Universe 的貼文"></div>
           <div class="search_icon_div" @click="searchPost()"><i class="fa-solid fa-magnifying-glass"></i></div>
         </div>
-        <div class="postAll_wrapper" ref="postAll_wrapper" @scroll="postDivScroll()">
+        <div class="postAll_wrapper" ref="postAll_wrapper" id="postAll_wrapper" @scroll="postDivScroll()">
           <add-post v-if="!hideCreatePostBox && currentUser && currentUser.typeEng == 'teacher'" :currentUser="currentUser"></add-post>
           <div class="postAll" ref="postAll" v-if="posts.length">
             <div class="post" v-for="(obj,id) in posts" :key="id">

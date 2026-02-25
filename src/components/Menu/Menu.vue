@@ -17,7 +17,7 @@
         學習紀錄
     </div>
     <div class="version_info">
-        <div>General EX II v1.5.4.0</div>
+        <div>General EX II v1.5.4.1 PRE</div>
     </div>
     <div class="memoryUsageBlock_wrapper">
         <div class="memoryUsageBlock">
@@ -149,6 +149,20 @@ export default {
             this.showOption = false;
         },
         goTo(path){
+            if(path == '/academic/post' && this.$route.path.includes('/post')){
+                const el = document.getElementById('postAll_wrapper')
+                if (el) {
+                    el.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+                return;
+            }
+            else if(path == '/academic/columnList' && this.$route.path.includes('/columnList')){
+                const el = document.getElementById('columnList_wrapper')
+                if (el) {
+                    el.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+                return;
+            }
             this.$router.push(path).catch((e)=>{}).finally(()=>{
                 this.showOption = false;
             })

@@ -50,6 +50,20 @@ export default {
     },
     methods:{
         goTo(path){
+            if(path == '/academic/post' && this.$route.path.includes('/post')){
+                const el = document.getElementById('postAll_wrapper')
+                if (el) {
+                    el.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+                return;
+            }
+            else if(path == '/academic/columnList' && this.$route.path.includes('/columnList')){
+                const el = document.getElementById('classList')
+                if (el) {
+                    el.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+                return;
+            }
             this.$router.push(path).catch((e)=>{})
         },
         goToProfile(){
