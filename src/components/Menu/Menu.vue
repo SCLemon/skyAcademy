@@ -17,7 +17,7 @@
         學習紀錄
     </div>
     <div class="version_info">
-        <div @click="goToOutlink('https://github.com/SCLemon/skyAcademy/releases')">General EX II v1.5.4.1 PRE</div>
+        <div @click="goToOutlink('https://github.com/SCLemon/skyAcademy/releases')">General EX II v1.5.4.1</div>
     </div>
     <div class="memoryUsageBlock_wrapper">
         <div class="memoryUsageBlock">
