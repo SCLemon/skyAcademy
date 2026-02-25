@@ -175,8 +175,8 @@ export default {
             
             this.scrollTimer = setTimeout(() => {
                 
-                // +200 為 header offset + buffer
-                const scrollPosition = window.scrollY + 200; 
+                //  header offset + buffer
+                const scrollPosition = window.scrollY + 350; 
                 
                 let activeId = 0;
 
@@ -306,7 +306,7 @@ export default {
         color: white;
     }
     .currentSection{
-        border-bottom: 4px solid white;
+        border-bottom: 3.5px solid rgba(255,255,255,0.3);
         position: absolute;
         width: 100%;
         left: 0;
