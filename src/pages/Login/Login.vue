@@ -41,7 +41,7 @@ export default {
   },
   methods:{
     async loginAsAnonymous(){
-      await this.$bus.$emit('setAnonymousMode', true);
+      this.$bus.$emit('setAnonymousMode',true,true, true);
     },
     async login(){
       let data;

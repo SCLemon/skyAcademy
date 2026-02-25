@@ -19,7 +19,7 @@ export default {
     this.$bus.$on('handleAlert',this.handleAlert)
     this.$bus.$on('copyToClipboard',this.copyToClipboard)
     this.$bus.$on('setAnonymousMode',this.setAnonymousMode)
-    await this.setAnonymousMode();
+    await this.setAnonymousMode(false, false, false);
     await this.generateFingerprint();
     registerServiceWorker();
   },
@@ -36,9 +36,9 @@ export default {
       })
       .catch(() => {});
     },
-    async setAnonymousMode(triggerAlert){
+    async setAnonymousMode(isManual, triggerAlert, autoRedirect){
       const authToken = jsCookie.get('authToken');
-      if(!authToken){
+      if(isManual || !authToken){
         let data;
         try{
           const res = await axios.post('/login/anonymous',null,
@@ -51,7 +51,7 @@ export default {
           if(data.type == 'success'){
             localStorage.setItem('currentUser', JSON.stringify(res.data.userInfo))
             this.$bus.$emit('setUserInfo')
-            this.$router.replace('/academic/post').catch((e)=>{})
+            if(autoRedirect) this.$router.replace('/academic/post').catch((e)=>{})
           }
           if(triggerAlert) this.$bus.$emit('handleAlert','訪客模式通知',data.message,data.type)
         }

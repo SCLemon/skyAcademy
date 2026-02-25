@@ -10,7 +10,6 @@
         <div class="contact_item" title="Gmail" @click="copy('Gmail 信箱地址複製通知','blc0000421@gmail.com')"><i class="fa-solid fa-envelope"></i></div>
         <div class="contact_item" title="Resume" @click="openLink('https://www.cake.me/blc0000421')"><i class="fa-solid fa-file-lines"></i></div>
         <div class="contact_item" title="GitHub" @click="openLink('https://github.com/SCLemon')"><i class="fa-brands fa-github"></i></div>
-        <!-- https://sclemon1013.com/ -->
         <div class="contact_item" title="LinkedIn" @click="openLink('https://www.linkedin.com/in/sclemon1013/')"><i class="fa-brands fa-linkedin"></i></div>
         <div class="contact_item" title="個人網站" @click="copy('個人網站網址複製通知','https://sclemon1013.com/')"><i class="fa-solid fa-earth-americas"></i></div>
     </div>
