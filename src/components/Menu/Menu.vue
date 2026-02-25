@@ -17,7 +17,7 @@
         學習紀錄
     </div>
     <div class="version_info">
-        <div>General EX II v1.5.4.1 PRE</div>
+        <div @click="goToOutlink('https://github.com/SCLemon/skyAcademy/releases')">General EX II v1.5.4.1 PRE</div>
     </div>
     <div class="memoryUsageBlock_wrapper">
         <div class="memoryUsageBlock">
@@ -148,6 +148,9 @@ export default {
             }
             this.showOption = false;
         },
+        goToOutlink(path){
+            window.open(path, '_blank');
+        },
         goTo(path){
             if(path == '/academic/post' && this.$route.path.includes('/post')){
                 const el = document.getElementById('postAll_wrapper')
@@ -248,6 +251,11 @@ export default {
         text-align: center;
         font-size: 12px;
         margin-top: 40px;
+    }
+    .version_info:hover{
+        cursor: pointer;
+        color: white;
+        transition: color 0.5s ease;
     }
 
     .memoryUsageBlock_wrapper{

@@ -1,6 +1,10 @@
 <!-- 發文帖子 -->
 <template>
   <div>
+    <div class="mobile_top_logo_wrapper">
+      <img @click="goTo('/')" src="img/mobile_post_logo.png" alt="">
+      <div class="mobile_version" @click="goToOutlink('https://github.com/SCLemon/skyAcademy/releases')">Version 1.5.4.1 PRE</div>
+    </div>
     <div class="posterBox">
         <div class="searchBox">
           <div class="search_input_div"><input type="search" class="search_input" v-model="q" placeholder="搜尋 Lemon's Universe 的貼文"></div>
@@ -172,6 +176,12 @@ export default {
     }
   },
   methods:{
+    goTo(path){
+      this.$router.push(path).catch((e)=>{})
+    },
+    goToOutlink(path){
+      window.open(path, '_blank');
+    },
     // 處理 AddPost.vue 邏輯
     async handleAddPost(){
       this.q = '';
@@ -616,7 +626,21 @@ export default {
 </script>
 
 <style scoped>
-
+  .mobile_top_logo_wrapper{
+    display: none;
+    align-items: center;
+    margin-bottom: 11px;
+  }
+  .mobile_top_logo_wrapper>img{
+    width: 130px;
+    margin-left: 10px;
+  }
+  .mobile_version{
+    margin-left: auto;
+    margin-right: 10px;
+    font-size: 12px;
+    color: rgba(0,0,0,0.3);
+  }
   .fade-enter-active,.fade-leave-active {
     transition: opacity 0.25s ease;
   }
@@ -716,7 +740,7 @@ export default {
     width: 100%;
   }
   .postAll_wrapper{
-    height: calc(100vh - 95px);
+    height: calc(100vh - 142.6px);
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
@@ -1114,6 +1138,9 @@ export default {
     box-shadow: 0px 1px 3px gray;
   }
   @media screen and (max-width: 440px) {
+    .mobile_top_logo_wrapper{
+      display: flex;
+    }
     .search_input_div{
       width: 82.5%;
     }
