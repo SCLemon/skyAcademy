@@ -745,7 +745,7 @@ export default {
     width: 100%;
   }
   .postAll_wrapper{
-    height: calc(100vh - 142.6px);
+    height: calc(100vh - 95px);
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
@@ -1154,6 +1154,7 @@ export default {
     }
     .postAll_wrapper{
       padding-bottom: 95px;
+      height: calc(100vh - 142.6px);
     }
   }
 </style>
