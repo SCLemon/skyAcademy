@@ -3,7 +3,7 @@
   <div>
     <div class="mobile_top_logo_wrapper">
       <img @click="goTo('/')" src="img/sclemon/sclemon_2.png" alt="">
-      <div class="mobile_version" @click="goToOutlink('https://github.com/SCLemon/skyAcademy/releases')">General EX II v1.5.4.1</div>
+      <div class="mobile_version" @click="goToOutlink('https://github.com/SCLemon/skyAcademy/releases')">Version 1.5.4.2</div>
     </div>
     <div class="posterBox">
         <div class="searchBox">
@@ -629,10 +629,10 @@ export default {
   .mobile_top_logo_wrapper{
     display: none;
     align-items: center;
-    margin-bottom: 11px;
+    margin-bottom: 15px;
   }
   .mobile_top_logo_wrapper>img{
-    width: 130px;
+    width: 140px;
     margin-left: 10px;
   }
   .mobile_version{
@@ -641,10 +641,6 @@ export default {
     font-size: 12px;
     color: rgba(0,0,0,0.3);
     transition: color 0.5s ease;
-  }
-  .mobile_version:hover{
-    cursor: pointer;
-    color: black;
   }
   .fade-enter-active,.fade-leave-active {
     transition: opacity 0.25s ease;
@@ -1154,7 +1150,7 @@ export default {
     }
     .postAll_wrapper{
       padding-bottom: 95px;
-      height: calc(100vh - 142.6px);
+      height: calc(100vh - 157px);
     }
   }
 </style>

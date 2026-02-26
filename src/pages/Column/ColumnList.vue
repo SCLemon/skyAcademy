@@ -277,7 +277,7 @@ export default {
     .classList{
       margin: 0 auto;
       width: 100%;
-      height: calc(100vh - 80px);
+      height: calc(100vh - 93px);
       justify-content: center;
       padding-bottom: 120px;
       padding-left: 0;

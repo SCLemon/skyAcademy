@@ -3,9 +3,9 @@
         <div class="header">
             <div class="logo"><img class="logo_img" src="img/horizontal_logo_white.png" alt="" @click="goTo('/')"></div>
             <div class="contact">
-                <div class="contact_item" @click="scrollToSection('top', 0)">前往探索<div class="currentSection" v-if="currentSection === 0"></div></div>
-                <div class="contact_item" @click="scrollToSection('developer', 1)">版主介紹<div class="currentSection" v-if="currentSection === 1"></div></div>
-                <div class="contact_item" @click="scrollToSection('contact', 2)">聯絡我們<div class="currentSection" v-if="currentSection === 2"></div></div>
+                <div :class="{contact_item: true, contact_item_selected: currentSection === 0}" @click="scrollToSection('top', 0)">前往探索<div class="currentSection" :class="{currentSection_selected: currentSection === 0}"></div></div>
+                <div :class="{contact_item: true, contact_item_selected: currentSection === 1}" @click="scrollToSection('developer', 1)">版主介紹<div class="currentSection" :class="{currentSection_selected: currentSection === 1}"></div></div>
+                <div :class="{contact_item: true, contact_item_selected: currentSection === 2}" @click="scrollToSection('contact', 2)">聯絡我們<div class="currentSection" :class="{currentSection_selected: currentSection === 2}"></div></div>
             </div>
             <div :class="{contact_mobile: true, openMobileList: showOption}" @click="showOption = !showOption"><i class="fa-solid fa-bars menu_more_block_bars"></i></div>
             <div class="contact_mobile_list" v-if="showOption">
@@ -305,13 +305,27 @@ export default {
         cursor: pointer;
         color: white;
     }
+    .contact_item_selected{
+        color: white;
+        background: linear-gradient(to top, rgba(255,255,255,0.25) 0%,rgba(0,0,0,1) 100%);
+    }
+
     .currentSection{
-        border-bottom: 3.5px solid rgba(255,255,255,0.3);
+        border-bottom: 4px solid white;
+        box-sizing: border-box;
         position: absolute;
-        width: 100%;
+        width: 0;
         left: 0;
         bottom: 0;
+        transition: width 0.25s ease;
     }
+    .contact_item:hover .currentSection{
+        width: 100%;
+    }
+    .currentSection_selected{
+        width: 100%;
+    }
+
     /* contact for mobile */
     .contact_mobile{
         display: none;

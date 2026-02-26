@@ -95,13 +95,21 @@ export default {
 </script>
 
 <style scoped>
-    .select_wrapper{
+    .select_wrapper {
         width: 100%;
-        height: auto;
-        background: rgba(0,0,0,0.3);
-        backdrop-filter: blur(1.5px);
+        padding: 4px;
+        border-radius: 65px;
+
+        background: rgba(0,0,0, 0.3);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+
+        border: 1px solid rgba(255,255,255,0.15);
+        box-shadow: 
+            0 8px 25px rgba(0,0,0,0.15),
+            inset 0 1px 0 rgba(255,255,255,0.25);
+
         box-sizing: border-box;
-        border-radius: 30px;
     }
     .select{
         width: calc(100% - 15px);
