@@ -142,7 +142,6 @@ export default {
         this.idx = idx;
         await this.getData();
         this.isOwnData = JSON.parse(localStorage.getItem('currentUser')).idx == this.idx;
-        console.log(this.isOwnData)
     },
     methods:{
         async getData(){

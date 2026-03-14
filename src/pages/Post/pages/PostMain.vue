@@ -498,7 +498,6 @@ export default {
           const files = await Promise.all(
             obj.temp_img.map(async (img) => {
 
-              if (img.file) return img.file;
               const response = await fetch(img.url);
               const blob = await response.blob();
 
