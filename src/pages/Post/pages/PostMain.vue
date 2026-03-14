@@ -16,8 +16,9 @@
             <div class="post" v-for="(obj,id) in posts" :key="id">
               <div class="post_more" v-if="showPermission">
                 <template v-if="obj.modifying">
-                  <button class="modifying_button" type="primary" @click="modifyPost(obj, $event)">儲存</button>
-                  <button class="modifying_button" @click="cancelModifyPost(obj)">取消</button>
+                  <span class="modifying_upload_percent" v-if="obj.uploadStatus">{{ obj.uploadStatus }}</span>
+                  <button class="modifying_button" type="primary" @click="obj.startUpload ? null : modifyPost(obj)">儲存</button>
+                  <button class="modifying_button" @click="obj.startUpload ? null : cancelModifyPost(obj)">取消</button>
                 </template>
                 <div class="post_more_option_wrapper" v-else-if="!obj.modifying">
                   <i class="el-icon-more icon_more" @click.stop="toggleOption(obj)"></i>
@@ -443,6 +444,12 @@ export default {
       if (!('modifying' in obj)) this.$set(obj, 'modifying', true)
       else obj.modifying = true;
 
+      if (!('uploadStatus' in obj)) this.$set(obj, 'uploadStatus', '')
+      else obj.uploadStatus = ''; // 上傳狀態
+
+      if (!('startUpload' in obj)) this.$set(obj, 'startUpload', false)
+      else obj.startUpload = false; // 防呆
+
       if (!('temp_content' in obj)) this.$set(obj, 'temp_content', obj.content);
       else obj.temp_content = obj.content;
 
@@ -472,6 +479,9 @@ export default {
       obj.showOption = false;
     },
     async modifyPost(obj){
+
+      obj.startUpload = true;
+
       try{
 
         let modifyContent = this.normalizeHTML(this.$refs[`modifyBox-${obj.idx}`][0].innerHTML);
@@ -484,7 +494,7 @@ export default {
         
         // 圖片 File
         if (obj.temp_img && obj.temp_img.length > 0) {
-          
+          obj.uploadStatus = '圖片處理中 ...';
           for (const img of obj.temp_img) {
             let file;
 
@@ -502,11 +512,15 @@ export default {
             formData.append('attachments', file);
           }
         }
-
+        obj.uploadStatus = '準備上傳 ...';
         const res = await axios.post(`/api/post/modifyPost/${obj.idx}`,formData,{
           headers:{
             'x-user-token':jsCookie.get('authToken')
-          }
+          },
+          onUploadProgress:(progressEvent) => {
+            const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            obj.uploadStatus = percent + '%';
+          },
         })
         if(res.data.type == 'success'){
           
@@ -525,6 +539,9 @@ export default {
       catch(e){
         console.log(e)
         this.$bus.$emit('handleAlert','貼文修改通知','修改貼文失敗（參數遺失）','error')
+      }
+      finally{
+        obj.startUpload = false;
       }
     },
     cancelModifyPost(obj){
@@ -896,6 +913,10 @@ export default {
   .modifying_button:hover{
     cursor: pointer;
     box-shadow: 0px 0.5px 1px rgba(0,0,0,0.3);
+  }
+  .modifying_upload_percent{
+    font-size: 10px;
+    line-height: 18px;
   }
 
   ::v-deep .el-upload-list__item img {
