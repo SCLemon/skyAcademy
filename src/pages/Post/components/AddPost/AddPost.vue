@@ -26,7 +26,7 @@
             </div>
         </div>
         <div class="real_input" ref="input" contenteditable="true"></div>
-        <upload-picture v-model="form.attachments"></upload-picture>
+        <upload-picture v-model="form.attachments" :maxSize="1440"></upload-picture>
         <el-button type="primary" class="button" @click="create()" :loading="isSending" >建立貼文</el-button>
     </div>
   </div>

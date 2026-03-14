@@ -52,6 +52,10 @@ export default {
             type: Boolean,
             default: true,
         },
+        maxSize:{
+            type: Number,
+            default: 1440,
+        },
         value: { type: Array, default: () => [] }, 
     },
     computed:{
@@ -104,7 +108,7 @@ export default {
 
                 // 壓縮圖片
                 try{
-                    const compressedFile = await compressImage(file.file);
+                    const compressedFile = await compressImage(file.file, this.maxSize);
                     file.file = compressedFile;
 
                     const compressedSize = compressedFile.size
