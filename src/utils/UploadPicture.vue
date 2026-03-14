@@ -40,6 +40,7 @@
 
 <script>
 import { v4 as uuidv4 } from "uuid";
+import { compressImage } from "./js/compressor";
 export default {
     name:'UploadPicture',
     props:{
@@ -84,7 +85,7 @@ export default {
         openInput(){
             this.$refs.input.click();
         },
-        onUpload(){
+        async onUpload(){
             const files = this.$refs.input.files;
             if(!files) return;
 
@@ -94,8 +95,25 @@ export default {
                 url: URL.createObjectURL(file),
                 position:{
                     x:0, y:0, referWidth: 0, scale: 1,
-                }
+                },
             }));
+
+            for(const file of fileArr){
+                
+                const originalSize = file.file.size;
+
+                // 壓縮圖片
+                try{
+                    const compressedFile = await compressImage(file.file);
+                    file.file = compressedFile;
+
+                    const compressedSize = compressedFile.size
+                    console.log(`原始: ${(originalSize / 1024).toFixed(1)} KB → 壓縮後: ${(compressedSize / 1024).toFixed(1)} KB`)
+                }
+                catch{
+                    console.log(file.file, '壓縮失敗');
+                }
+            }
 
             this.uploads = [...this.uploads, ...fileArr];
             this.$refs.input.value = "";
@@ -191,9 +209,7 @@ export default {
                         scale: this.cropPosition.scale,
                     }
                 };
-
                 this.uploads = next;
-
                 // 清除狀態
                 this.currentPreviewImage = {
                     id: null, url: ''
