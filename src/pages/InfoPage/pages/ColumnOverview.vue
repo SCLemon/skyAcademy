@@ -41,7 +41,7 @@
                     </el-form-item>
                 </el-form>
                 <div class="class_banner_title">專欄封面上傳（ Ratio 2/1 )</div>
-                <upload-picture :aspectRatio="2/1" v-model="fileList" :cropEnabled="false"></upload-picture>
+                <upload-picture :aspectRatio="2/1" v-model="fileList" :cropEnabled="false" :maxSize="720"></upload-picture>
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="dialogFormVisible = false">取消</el-button>
                     <el-button type="primary" @click="create()">創建</el-button>

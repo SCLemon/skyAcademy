@@ -1,24 +1,19 @@
 <template>
-  <el-button v-if="!isSubscribed" type="warning" :loading="isloading" icon="el-icon-message-solid" @click="requestSubscribe()">裝置訂閱</el-button>
+  <el-button type="warning" :loading="isloading" icon="el-icon-message-solid" @click="requestSubscribe()">裝置訂閱</el-button>
 </template>
 
 <script>
-import { checkSubscribed, subscribe } from '@/service-worker/main';
+import { subscribe } from '@/service-worker/main';
 export default {
     name:'Subscribe',
     data(){
         return{
             isloading: false,
-            isSubscribed: true,
         }
     },
     mounted(){
-        this.checkIfSubscribed();
     },
     methods:{
-        async checkIfSubscribed(){
-            this.isSubscribed = await checkSubscribed();
-        },
         async requestSubscribe(){
             try{
                 this.isloading = true;
@@ -32,7 +27,6 @@ export default {
 
             }
             finally{
-                await this.checkIfSubscribed();
                 this.isloading = false;
             }
         }

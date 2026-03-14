@@ -19,7 +19,7 @@ export default {
     this.$bus.$on('handleAlert',this.handleAlert)
     this.$bus.$on('copyToClipboard',this.copyToClipboard)
     this.$bus.$on('setAnonymousMode',this.setAnonymousMode)
-    await this.setAnonymousMode(false, false, false);
+
     await this.generateFingerprint();
     registerServiceWorker();
   },

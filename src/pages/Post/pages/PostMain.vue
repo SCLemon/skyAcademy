@@ -3,7 +3,7 @@
   <div>
     <div class="mobile_top_logo_wrapper">
       <img @click="goTo('/')" src="img/sclemon/sclemon_2.png" alt="">
-      <div class="mobile_version" @click="goToOutlink('https://github.com/SCLemon/skyAcademy/releases')">Version 1.5.4.2</div>
+      <div class="mobile_version" @click="goToOutlink('https://github.com/SCLemon/skyAcademy/releases')">Version 1.5.5.0</div>
     </div>
     <div class="posterBox">
         <div class="searchBox">
@@ -16,7 +16,7 @@
             <div class="post" v-for="(obj,id) in posts" :key="id">
               <div class="post_more" v-if="showPermission">
                 <template v-if="obj.modifying">
-                  <span class="modifying_upload_percent" v-if="obj.uploadStatus">{{ obj.uploadStatus }}</span>
+                  <span class="modifying_upload_status" v-if="obj.uploadStatus">{{ obj.uploadStatus }}</span>
                   <button class="modifying_button" type="primary" @click="obj.startUpload ? null : modifyPost(obj)">儲存</button>
                   <button class="modifying_button" @click="obj.startUpload ? null : cancelModifyPost(obj)">取消</button>
                 </template>
@@ -483,7 +483,7 @@ export default {
       obj.startUpload = true;
 
       try{
-
+        
         let modifyContent = this.normalizeHTML(this.$refs[`modifyBox-${obj.idx}`][0].innerHTML);
       
         const formData = new FormData();
@@ -495,23 +495,24 @@ export default {
         // 圖片 File
         if (obj.temp_img && obj.temp_img.length > 0) {
           obj.uploadStatus = '圖片處理中 ...';
-          for (const img of obj.temp_img) {
-            let file;
+          const files = await Promise.all(
+            obj.temp_img.map(async (img) => {
 
-            if (img.file) file = img.file;
-            else {
+              if (img.file) return img.file;
               const response = await fetch(img.url);
               const blob = await response.blob();
 
               const filename = img.name || 'image.png';
-              file = new File([blob], filename, {
+
+              return new File([blob], filename, {
                 type: blob.type
               });
-            }
+            })
+          );
 
-            formData.append('attachments', file);
-          }
+          for (const file of files) formData.append('attachments', file);
         }
+
         obj.uploadStatus = '準備上傳 ...';
         const res = await axios.post(`/api/post/modifyPost/${obj.idx}`,formData,{
           headers:{
@@ -538,6 +539,7 @@ export default {
       }
       catch(e){
         console.log(e)
+        obj.uploadStatus = '上傳失敗'
         this.$bus.$emit('handleAlert','貼文修改通知','修改貼文失敗（參數遺失）','error')
       }
       finally{
@@ -914,9 +916,10 @@ export default {
     cursor: pointer;
     box-shadow: 0px 0.5px 1px rgba(0,0,0,0.3);
   }
-  .modifying_upload_percent{
+  .modifying_upload_status{
     font-size: 10px;
     line-height: 18px;
+    margin-right: 5px;
   }
 
   ::v-deep .el-upload-list__item img {

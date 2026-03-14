@@ -498,7 +498,7 @@ router.get('/api/post/notify/:idx', authMiddleware, async (req, res) => {
             try{
 
                 const targetPost = await postModel.findOne({ idx:idx, group: req.user.group, status: true });
-                if(!targetPost) return res.send({ type:'error',message:`貼文推播失敗（貼文不存在）。`});
+                if(!targetPost) return res.send({ type:'error',message:`貼文推播失敗（貼文隱藏或不存在）。`});
 
                 // 推播貼文
                 pushNotification("檸檬小天地", "檸檬推播了一則有趣的貼文！", "./#/academic/post/" + targetPost.idx);
