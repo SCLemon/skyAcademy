@@ -139,7 +139,7 @@ export default {
     width: 95%;
     margin: 0 auto;
     margin-left: 20px;
-    height: calc(100vh - 120px);
+    height: calc(100vh - 93px);
     overflow-x: hidden;
     overflow-y: scroll;
     padding-left: 10px;
@@ -158,7 +158,8 @@ export default {
   }
   .classList_empty{
     width: 100%;
-    height: calc(100vh - 81px);
+    height: calc(100vh - 80px);
+    box-sizing: border-box;
     display: flex;
     justify-content: center;
     align-items: center;
