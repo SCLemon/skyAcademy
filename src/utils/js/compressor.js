@@ -1,63 +1,35 @@
-// 前端圖片壓縮代碼
-async function compressImage(file, maxSize = 1440, quality = 0.8) {
-  return new Promise((resolve, reject) => {
+import imageCompression from 'browser-image-compression';
 
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
+async function compressImage(file, maxWidthOrHeight = 1440, maxSizeKB = 200, quality = 0.9) {
 
-    reader.onload = (e) => {
-      const img = new Image()
-      img.src = e.target.result
+  if (file.size / 1024 <= maxSizeKB && file.type === 'image/webp') {
+    return file;
+  }
 
-      img.onload = () => {
+  const options = {
+    maxSizeMB: maxSizeKB / 1024,
+    maxWidthOrHeight: maxWidthOrHeight,
+    useWebWorker: true,
+    fileType: 'image/webp',
+    initialQuality: quality,
+  };
 
-        let width = img.width
-        let height = img.height
-
-        const maxEdge = Math.max(width, height)
-
-        // 如果超過 maxSize 才 resize
-        if (maxEdge > maxSize) {
-          const scale = maxSize / maxEdge
-          width = Math.round(width * scale)
-          height = Math.round(height * scale)
-        }
-
-        const canvas = document.createElement("canvas")
-        const ctx = canvas.getContext("2d")
-
-        canvas.width = width
-        canvas.height = height
-
-        ctx.drawImage(img, 0, 0, width, height)
-
-        canvas.toBlob(
-          (blob) => {
-
-            // 如果壓縮後沒有變小就回傳原圖
-            if (!blob || blob.size >= file.size) {
-              resolve(file)
-              return
-            }
-
-            const compressedFile = new File([blob], file.name, {
-              type: file.type
-            })
-
-            resolve(compressedFile)
-          },
-          file.type,
-          quality
-        )
-      }
-
-      img.onerror = reject
-    }
-
-    reader.onerror = reject
-  })
+  try {
+    const compressedBlob = await imageCompression(file, options);
+    
+    // 處理副檔名：移除舊副檔名，統一加上 .webp
+    const newFileName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+    
+    return new File([compressedBlob], `${newFileName}.webp`, {
+      type: 'image/webp',
+      lastModified: Date.now(),
+    });
+  } catch (error) {
+    console.error("圖片壓縮出錯，回傳原始檔案:", error);
+    return file; 
+  }
 }
 
 export { 
-    compressImage 
-}
+  compressImage 
+};
