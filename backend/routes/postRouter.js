@@ -56,24 +56,28 @@ router.post('/api/post/create',authMiddleware,upload.fields([{ name: 'attachment
                 });
                 await newPost.save()
 
-                // 再創建並寫入資料夾中
-                if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath, { recursive: true });
+                await fs.promises.mkdir(folderPath, { recursive: true });
 
                 const attachmentInfo = JSON.parse(req.body.attachmentInfo);
-                let availableAttachmentInfo = [];
 
-                attachments.forEach((file,idx) => {
+                const attachmentTasks = attachments.map(async (file, i) => {
+
                     const newId = uuidv4();
-                    const filePath = `${folderPath}/${newId}${path.extname(file.originalname)}`
-                    fs.renameSync(file.path, filePath);
+                    const ext = path.extname(file.originalname);
+                    const filename = `${newId}${ext}`;
+                    const filePath = `${folderPath}/${filename}`;
 
-                    availableAttachmentInfo.push({
-                        filename: `${newId}${path.extname(file.originalname)}`,
+                    await fs.promises.rename(file.path, filePath);
+
+                    return {
+                        filename: filename,
                         id: newId,
-                        position: attachmentInfo[idx].position
-                    });
-
+                        position: attachmentInfo[i].position
+                    };
                 });
+
+                const availableAttachmentInfo = await Promise.all(attachmentTasks);
+
                 newPost.attachmentInfo = availableAttachmentInfo;
                 await newPost.save();
 
@@ -82,7 +86,7 @@ router.post('/api/post/create',authMiddleware,upload.fields([{ name: 'attachment
             }
             catch(e){
                 console.log(e)
-                return res.send({ type:'error', message:'貼文創建失敗。'});
+                return res.send({ type:'error', message:'貼文創建失敗（資料可能遺失）。'});
             }
         } 
         else {
@@ -93,6 +97,83 @@ router.post('/api/post/create',authMiddleware,upload.fields([{ name: 'attachment
         return res.send({ type: 'error', message: '伺服器錯誤，請洽客服人員協助。'});
     }
 });
+// 修改貼文內容
+router.post('/api/post/modifyPost/:idx',authMiddleware, upload.fields([{ name: 'attachments'}]),autoCleanupTmp,checkUsageMemory,async(req,res)=>{
+
+    try {
+        if (req.user.type === 'teacher') {
+
+            const idx = req.params.idx;
+            
+            let attachments = req.files['attachments']?req.files['attachments']:[]
+            
+            if (!idx || typeof idx !== 'string' || idx.length !== 36) return res.send({ type: 'error', message: '貼文修改失敗！'});
+
+            const post = await postModel.findOne({idx:idx, 'creator.idx':req.user.idx, group:req.user.group});
+
+            if(!post) return res.send({ type: 'error',  message: `貼文修改失敗 (貼文不存在)`});
+            
+            post.content = req.body.content;
+            await post.save();
+        
+            try{
+
+                // 貼文專屬資料夾
+                const folderPath = `${post.databaseUrl}`
+
+                // 刪除舊資料夾
+                await fs.promises.rm(folderPath, { recursive: true, force: true });
+
+                // 重新建立
+                await fs.promises.mkdir(folderPath, { recursive: true });
+
+                const attachmentInfo = JSON.parse(req.body.attachmentInfo);
+
+                const attachmentTasks = attachments.map(async (file, i) => {
+
+                    const newId = uuidv4();
+                    const ext = path.extname(file.originalname);
+                    const filename = `${newId}${ext}`;
+                    const filePath = `${folderPath}/${filename}`;
+
+                    await fs.promises.rename(file.path, filePath);
+
+                    return {
+                        filename: filename,
+                        id: newId,
+                        position: attachmentInfo[i].position
+                    };
+
+                });
+
+                const availableAttachmentInfo = await Promise.all(attachmentTasks);
+                post.attachmentInfo = availableAttachmentInfo;
+                await post.save();
+
+                const postResponse = await getPostResponse([post], req.user);
+
+                return res.send({ type:'success', message:'貼文修改成功。', post: postResponse[0]});
+
+            }
+            catch(e){
+                console.log(e)
+                return res.send({ type:'error', message:'貼文修改失敗。'});
+            }
+        } 
+        else {
+            return res.send({
+                type: 'error',
+                message: '您沒有權限修改貼文資料。',
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
+    }
+})
 
 // 刪除貼文
 router.delete('/api/post/deletePost/:idx',authMiddleware,async(req,res)=>{
@@ -154,78 +235,7 @@ router.delete('/api/post/deletePost/:idx',authMiddleware,async(req,res)=>{
     }
 })
 
-// 修改貼文內容
-router.post('/api/post/modifyPost/:idx',authMiddleware, upload.fields([{ name: 'attachments'}]),async(req,res)=>{
 
-    try {
-        if (req.user.type === 'teacher') {
-
-            const idx = req.params.idx;
-            
-            let attachments = req.files['attachments']?req.files['attachments']:[]
-            
-            if (!idx || typeof idx !== 'string' || idx.length !== 36) return res.send({ type: 'error', message: '貼文修改失敗！'});
-
-            const post = await postModel.findOne({idx:idx, 'creator.idx':req.user.idx, group:req.user.group});
-
-            if(!post) return res.send({ type: 'error',  message: `貼文修改失敗 (貼文不存在)`});
-            
-            post.content = req.body.content;
-            await post.save();
-        
-            try{
-
-                // 貼文專屬資料夾
-                const folderPath = `${post.databaseUrl}`
-
-                // 重新創建並寫入資料夾中
-                if (fs.existsSync(folderPath)) fs.rmdirSync(folderPath, { recursive: true }); 
-                fs.mkdirSync(folderPath, { recursive: true });
-
-                // 寫入圖片
-                const attachmentInfo = JSON.parse(req.body.attachmentInfo);
-                let availableAttachmentInfo = [];
-
-                attachments.forEach((file,idx) => {
-
-                    const newId = uuidv4();
-                    const filePath = `${folderPath}/${newId}${path.extname(file.originalname)}`
-                    fs.renameSync(file.path, filePath);
-
-                    availableAttachmentInfo.push({
-                        filename: `${newId}${path.extname(file.originalname)}`,
-                        id: newId,
-                        position: attachmentInfo[idx].position
-                    });
-
-                });
-                post.attachmentInfo = availableAttachmentInfo;
-                await post.save();
-
-                const postResponse = await getPostResponse([post], req.user);
-
-                return res.send({ type:'success', message:'貼文修改成功。', post: postResponse[0]});
-
-            }
-            catch(e){
-                console.log(e)
-                return res.send({ type:'error', message:'貼文修改失敗。'});
-            }
-        } 
-        else {
-            return res.send({
-                type: 'error',
-                message: '您沒有權限修改貼文資料。',
-            });
-        }
-    } catch (e) {
-        console.log(e);
-        return res.send({
-            type: 'error',
-            message: '伺服器錯誤，請洽客服人員協助。',
-        });
-    }
-})
 
 // 獲取貼文資料
 router.get('/api/post/getPost', authMiddleware, async (req, res) => {

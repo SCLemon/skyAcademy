@@ -4,20 +4,16 @@ const fs = require('fs');
 
 
 // 跨平台基準路徑
-let tmpDir;
-if (process.platform === 'win32') {
-    tmpDir = 'D:/sky_database/sky_tmp';
-} 
-else if (process.platform === 'darwin') {
-    tmpDir = '/Volumes/sky_database/sky_tmp';
-} 
-else {
-    tmpDir = '/mnt/sky_database/sky_tmp';
-}
+const tmpDirMap = {
+  win32: 'D:/sky_database/sky_tmp',
+  darwin: '/Volumes/sky_database/sky_tmp'
+};
 
-if (!fs.existsSync(tmpDir)) {
-  fs.mkdirSync(tmpDir, { recursive: true });
-}
+const tmpDir = tmpDirMap[process.platform] || '/mnt/sky_database/sky_tmp';
+
+// 建立 tmp dir
+fs.mkdirSync(tmpDir, { recursive: true });
+
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -29,26 +25,46 @@ const storage = multer.diskStorage({
   }
 });
 
+
 const upload = multer({
   storage,
 });
 
 
 function autoCleanupTmp(req, res, next) {
-  const cleanup = () => {
 
-    const removeFile = (file) => {
-      if (!file?.destination || !file?.filename) return;
+  let cleaned = false;
 
-      const realPath = path.join(file.destination, file.filename);
+  const removeFile = async (file) => {
+    if (!file?.destination || !file?.filename) return;
 
-      if (fs.existsSync(realPath)) {
-        fs.unlinkSync(realPath);
+    const realPath = path.join(file.destination, file.filename);
+
+    try {
+      await fs.promises.unlink(realPath);
+    } 
+    catch {}
+
+  };
+
+  const cleanup = async () => {
+
+    if (cleaned) return;
+    cleaned = true;
+
+    if (req.file) await removeFile(req.file);
+
+    if (req.files) {
+      const tasks = [];
+
+      for (const files of Object.values(req.files)) {
+        for (const file of files) {
+          tasks.push(removeFile(file));
+        }
       }
-    };
 
-    if (req.file) removeFile(req.file);
-    if (req.files) Object.values(req.files).flat().forEach(removeFile);
+      await Promise.all(tasks);
+    }
 
   };
 
@@ -57,6 +73,7 @@ function autoCleanupTmp(req, res, next) {
 
   next();
 }
+
 
 module.exports = {
   upload,
