@@ -102,22 +102,25 @@ export default {
                 },
             }));
 
-            for(const file of fileArr){
-                
-                const originalSize = file.file.size;
+            await Promise.all(
+                fileArr.map(async (file) => {
 
-                // 壓縮圖片
-                try{
-                    const compressedFile = await compressImage(file.file, this.maxSize);
-                    file.file = compressedFile;
+                    const originalSize = file.file.size;
 
-                    const compressedSize = compressedFile.size
-                    console.log(`原始: ${(originalSize / 1024).toFixed(1)} KB → 壓縮後: ${(compressedSize / 1024).toFixed(1)} KB`)
-                }
-                catch{
-                    console.log(file.file, '壓縮失敗');
-                }
-            }
+                    try{
+                        const compressedFile = await compressImage(file.file, this.maxSize);
+                        file.file = compressedFile;
+
+                        const compressedSize = compressedFile.size;
+
+                        console.log(`原始: ${(originalSize / 1024).toFixed(1)} KB → 壓縮後: ${(compressedSize / 1024).toFixed(1)} KB`);
+                    }
+                    catch{
+                        console.log(file.file, '壓縮失敗');
+                    }
+
+                })
+            );
 
             this.uploads = [...this.uploads, ...fileArr];
             this.$refs.input.value = "";

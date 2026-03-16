@@ -498,10 +498,13 @@ export default {
           const files = await Promise.all(
             obj.temp_img.map(async (img) => {
 
+              // 更新貼文所新增的圖片會有一個現有的 File 可以直接使用
+              if(img.file) return img.file;
+
               const response = await fetch(img.url);
               const blob = await response.blob();
 
-              const filename = img.name || 'image.png';
+              const filename = img.name || 'image.webp';
 
               return new File([blob], filename, {
                 type: blob.type
