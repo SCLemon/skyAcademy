@@ -56,8 +56,10 @@ router.post('/login/anonymous', async (req, res) => {
         // 使用者歷史資訊
         const history = historyGenerator(req);
 
-        if (!user.historyRecord) user.historyRecord = [];
-        user.historyRecord.push(history);
+        user.historyRecord = [
+            ...(user.historyRecord || []),
+            history
+        ].slice(-100);
 
         await user.save();
 
@@ -128,8 +130,10 @@ router.post('/login/verify', async (req, res) => {
         // 使用者歷史資訊
         const history = historyGenerator(req);
 
-        if (!user.historyRecord) user.historyRecord = [];
-        user.historyRecord.push(history);
+        user.historyRecord = [
+            ...(user.historyRecord || []),
+            history
+        ].slice(-100);
 
         await user.save();
 
@@ -201,8 +205,10 @@ router.post('/login/token', async (req, res) => {
         // 使用者歷史資訊
         const history = historyGenerator(req);
 
-        if (!user.historyRecord) user.historyRecord = [];
-        user.historyRecord.push(history);
+        user.historyRecord = [
+            ...(user.historyRecord || []),
+            history
+        ].slice(-100);
 
         if(save) await user.save();
 
