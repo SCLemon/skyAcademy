@@ -203,6 +203,7 @@ router.put('/api/studyRecord/update/:idx',authMiddleware, async (req, res) => {
                 {
                     $set: {
                         'detail.$[elem].date': date,
+                        'detail.$[elem].expectTime': req.body.expectTime || 90,
                         'detail.$[elem].content': req.body.content || '-',
                         'detail.$[elem].projectType': req.body.projectType || '其他',
                     }

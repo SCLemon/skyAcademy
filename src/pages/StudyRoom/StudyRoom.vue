@@ -81,6 +81,9 @@
         <el-form-item label="學習計畫概要">
           <el-input v-model="updateForm.content" autocomplete="off" clearable></el-input>
         </el-form-item>
+        <el-form-item label="預計所需時間 (分鐘)：">
+          <el-input-number v-model="updateForm.expectTime" :min="15"></el-input-number>
+        </el-form-item>
         <el-form-item label="計畫類別：">
           <el-select v-model="updateForm.projectType" placeholder="請選擇類別">
             <el-option v-for="item in projectTypeOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
@@ -91,10 +94,10 @@
     </el-dialog>
     <el-dialog title="計畫執行紀錄" :visible.sync="dialogFormVisible3" custom-class="PWACSS_MessageBox">
       <el-table :data="showRecordData" stripe height="auto" style="max-height: 400px; overflow: scroll;" :empty-text="'暫無數據'">
-        <el-table-column prop="idx" label="輪次"></el-table-column>
-        <el-table-column prop="start" label="起始時間" width="220px"></el-table-column>
-        <el-table-column prop="end" label="截止時間" width="220px"></el-table-column>
-        <el-table-column prop="diff" label="持續時間" width="100px"></el-table-column>
+        <el-table-column prop="idx" label="輪次" min-width="50px"></el-table-column>
+        <el-table-column prop="start" label="起始時間" min-width="200px"></el-table-column>
+        <el-table-column prop="end" label="截止時間" min-width="200px"></el-table-column>
+        <el-table-column prop="diff" label="持續時間" min-width="100px"></el-table-column>
       </el-table>
       <div class="export_button_wrapper" v-if="currentUser && currentUser.typeEng == 'teacher'"><el-button class="export_button" @click="exportRecord(showRecordIdx)">匯出紀錄</el-button></div>
     </el-dialog>
@@ -148,6 +151,7 @@ export default {
         updateForm:{
           date:'',
           content:'',
+          expectTime: 90,
           projectType:'',
         },
         pickerOptions2: {
@@ -258,6 +262,7 @@ export default {
         this.updateForm.date = new Date(obj.date);
         this.updateForm.content = obj.content;
         this.updateForm.projectType = obj.projectType;
+        this.updateForm.expectTime = obj.expectTime;
         this.dialogFormVisible2 = true;
       },
       async update(){
@@ -274,6 +279,7 @@ export default {
           this.updateForm.date = '';
           this.updateForm.content = '';
           this.updateForm.projectType = '';
+          this.updateForm.expectTime = 90;
           this.dialogFormVisible2 = false;
           
           this.$bus.$emit('handleAlert','變更計畫通知',res.data.message, res.data.type)
