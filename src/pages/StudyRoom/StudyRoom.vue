@@ -90,11 +90,11 @@
       <el-button type="primary" class="create" :disabled="(!updateForm.date ||updateForm.content.trim()=='')" @click="(!updateForm.date ||updateForm.content.trim()=='')?'':update()">修改計畫</el-button>
     </el-dialog>
     <el-dialog title="計畫執行紀錄" :visible.sync="dialogFormVisible3" custom-class="PWACSS_MessageBox">
-      <el-table :data="showRecordData" stripe height="auto" style="width: 100%; max-height: 400px; overflow-y: scroll;" :empty-text="'暫無數據'">
-        <el-table-column prop="idx" label="輪次" width="50px"></el-table-column>
-        <el-table-column prop="start" label="起始時間"></el-table-column>
-        <el-table-column prop="end" label="截止時間"></el-table-column>
-        <el-table-column prop="diff" label="持續時間"></el-table-column>
+      <el-table :data="showRecordData" stripe height="auto" style="max-height: 400px; overflow: scroll;" :empty-text="'暫無數據'">
+        <el-table-column prop="idx" label="輪次"></el-table-column>
+        <el-table-column prop="start" label="起始時間" width="220px"></el-table-column>
+        <el-table-column prop="end" label="截止時間" width="220px"></el-table-column>
+        <el-table-column prop="diff" label="持續時間" width="100px"></el-table-column>
       </el-table>
       <div class="export_button_wrapper" v-if="currentUser && currentUser.typeEng == 'teacher'"><el-button class="export_button" @click="exportRecord(showRecordIdx)">匯出紀錄</el-button></div>
     </el-dialog>
