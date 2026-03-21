@@ -10,6 +10,20 @@ const levelTitle = [
     '新手會員','普通會員','進階會員','高級會員','鉑金會員',
     '鑽石會員','星耀會員','頂級會員','特權貴賓','頂級版主'
 ]
+
+function historyGenerator(req){
+    return {
+        recordingTime: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+        fingerprint: req.headers['x-user-fingerprint'],
+        ip: req.headers['cf-connecting-ip'],
+        country: req.headers['cf-ipcountry'],
+        city: req.headers['cf-ipcity'],
+        latitude: req.headers['cf-iplatitude'],
+        longitude: req.headers['cf-iplongitude'],
+        timezone: req.headers['cf-timezone']
+    };
+}
+
 // anonymous mode
 router.post('/login/anonymous', async (req, res) => {
     const account = 'Visitor';
@@ -38,6 +52,13 @@ router.post('/login/anonymous', async (req, res) => {
         const loginTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss')
         user.lastOnline = loginTime;
         user.fingerprint = fingerprint;
+
+        // 使用者歷史資訊
+        const history = historyGenerator(req);
+
+        if (!user.historyRecord) user.historyRecord = [];
+        user.historyRecord.push(history);
+
         await user.save();
 
         res.cookie('authToken',user.token,{
@@ -94,13 +115,22 @@ router.post('/login/verify', async (req, res) => {
                 message:'帳號已被凍結，請洽詢客服人員協助。'
             });
         }
+
         const fingerprint = req.headers['x-user-fingerprint'];
         if (!fingerprint || !/^[a-f0-9]{64}$/.test(fingerprint)) {
             return res.send({ type: 'error',message: '驗證失敗（參數異常錯誤）'});
         }
+
         const loginTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss')
         user.lastOnline = loginTime;
         user.fingerprint = fingerprint;
+
+        // 使用者歷史資訊
+        const history = historyGenerator(req);
+
+        if (!user.historyRecord) user.historyRecord = [];
+        user.historyRecord.push(history);
+
         await user.save();
 
         res.cookie('authToken',user.token,{
@@ -163,9 +193,17 @@ router.post('/login/token', async (req, res) => {
             return res.send({ type: 'error',message: '驗證失敗（參數異常錯誤）'});
         }
 
+        
         const loginTime = format(new Date(), 'yyyy-MM-dd HH:mm:ss')
         user.lastOnline = loginTime;
         user.fingerprint = fingerprint;
+
+        // 使用者歷史資訊
+        const history = historyGenerator(req);
+
+        if (!user.historyRecord) user.historyRecord = [];
+        user.historyRecord.push(history);
+
         if(save) await user.save();
 
         return res.send({

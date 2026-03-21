@@ -41,15 +41,10 @@ async function generateFingerprint() {
 
   try {
     // 嘗試使用 crypto.subtle
-    if (window.crypto && crypto.subtle) {
-        const buffer = new TextEncoder().encode(rawString);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    } else {
-        // fallback 使用 js-sha256
-        hashHex = sha256(rawString);
-    }
+    const buffer = new TextEncoder().encode(rawString);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   } 
   catch (e) {
     console.warn('Fingerprint SHA-256 error, fallback to js-sha256', e);

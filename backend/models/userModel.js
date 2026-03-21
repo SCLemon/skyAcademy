@@ -71,6 +71,10 @@ const userSchema = new mongoose.Schema({
         type:String,
         default:''
     },
+    historyRecord:{
+        type: Array,
+        default: []
+    },
     detail:{
         photoStickers:{  // 4.5x3.5
             url: { 
