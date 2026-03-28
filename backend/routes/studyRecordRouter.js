@@ -179,58 +179,66 @@ router.delete('/api/studyRecord/delete/:idx',authMiddleware, async (req, res) =>
     }
 });
 
+
 // 修改計畫
-router.put('/api/studyRecord/update/:idx',authMiddleware, async (req, res) => {
-    if(req.user.type == 'teacher'){
-        
-        if(!req.body.date || req.body.content.trim() ==''){
-            return res.send({ type: 'error',message: '資料格式錯誤。'});
-        }
-        
-        // 檢查日期格式以及自動轉換
-        let date;
-        try{
-            date = format(req.body.date, 'yyyy-MM-dd')
-        }
-        catch{
-            return res.send({ type: 'error', message: '資料格式錯誤。'});
-        }
+router.put('/api/studyRecord/update/:idx', authMiddleware, async (req, res) => {
+    
+    if (req.user.type !== 'teacher') return res.send({ type: 'error', message: '您沒有權限變更計畫。'});
 
-        try {
-
-            const record = await studyRecordModel.updateOne(
-                { group: req.user.group, creator: req.user.token, detail: {$elemMatch: { idx: req.params.idx, status: { $nin: ["進行中"] } } }}, // 進行中的計畫不可以修改計畫。
-                {
-                    $set: {
-                        'detail.$[elem].date': date,
-                        'detail.$[elem].expectTime': req.body.expectTime || 90,
-                        'detail.$[elem].content': req.body.content || '-',
-                        'detail.$[elem].projectType': req.body.projectType || '其他',
-                    }
-                },
-                {
-                    arrayFilters: [{"elem.idx": req.params.idx, "elem.status": { $nin: ["進行中"] }}]
-                }
-            );
-
-            if (record.matchedCount === 0) {
-                return res.send({ type: 'error', message: '計畫變更失敗。'});
-            }
-
-            return res.send({ type: 'success', message: '計畫變更成功。'});
-        } catch (e) {
-            console.log(e);
-            return res.send({
-                type: 'error',
-                message: '伺服器錯誤，請洽客服人員協助。',
-            });
-        }
+    // 基本驗證
+    if (!req.body.date || !req.body.content || req.body.content.trim() === '') {
+        return res.send({ type: 'error', message: '資料格式錯誤。' });
     }
-    else{
-        res.send({
-            type:'error',
-            message:'您沒有權限變更計畫。'
-        })
+
+    // 日期格式驗證
+    let date;
+    try {
+        date = format(new Date(req.body.date), 'yyyy-MM-dd');
+    } 
+    catch {
+        return res.send({ type: 'error', message: '資料格式錯誤。' });
+    }
+
+    try {
+
+        const doc = await studyRecordModel.findOne({ group: req.user.group, creator: req.user.token });
+
+        if (!doc) return res.send({ type: 'error', message: '找不到資料。' });
+
+        // 找到對應的 detail
+        const detail = doc.detail.find(d => d.idx === req.params.idx);
+        if (!detail) return res.send({ type: 'error', message: '找不到該計畫。' });
+
+        // 進行中不可修改
+        if (detail.status === '進行中') return res.send({ type: 'error', message: '進行中的計畫不可修改。' });
+
+        // 更新資料
+        detail.date = date;
+        detail.expectTime = req.body.expectTime || 90;
+        detail.content = req.body.content || '-';
+        detail.projectType = req.body.projectType || '其他';
+
+        // 若已完成，重新計算 status
+        if (!['進行中', '尚未完成'].includes(detail.status)) {
+
+            const totalHour = detail.statistics.total / 60;
+
+            const newStatus = totalHour > detail.expectTime + 30 ? '延遲完成' : 
+                                totalHour < detail.expectTime - 30 ? '提前完成': '已完成';
+            detail.status = newStatus;
+        }
+
+        // 儲存
+        await doc.save();
+
+        return res.send({ type: 'success', message: '計畫變更成功。' });
+
+    } catch (e) {
+        console.log(e);
+        return res.send({
+            type: 'error',
+            message: '伺服器錯誤，請洽客服人員協助。',
+        });
     }
 });
 
