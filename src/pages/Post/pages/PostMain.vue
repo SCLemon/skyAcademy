@@ -40,7 +40,7 @@
                 </div>
               </div>
               <div class="post_text" v-if="obj.content.trim()!='' && !obj.modifying" :key="'view-' + obj.idx" v-html="linkify(obj.content)"></div>
-              <div class="post_text post_text_modifying" :ref="`modifyBox-${obj.idx}`" v-else-if="obj.modifying" :key="'edit-' + obj.idx" v-html="saveRender(obj.temp_content)" contenteditable="true"></div>
+              <div class="post_text post_text_modifying" :ref="`modifyBox-${obj.idx}`" v-else-if="obj.modifying" :key="'edit-' + obj.idx" v-html="safeRender(obj.temp_content)" contenteditable="true"></div>
               <div class="post_text_expand_logo" v-if="checkPostTextOverflow(obj.content) && !obj.modifying" @click="expandPostText($event)">... 顯示更多</div>
               <template>
                 <carousel :post-img="obj.postImg" v-show="!obj.modifying"></carousel>
@@ -217,10 +217,10 @@ export default {
       }
 
       result += remaining;
-      return this.saveRender(result);
+      return this.safeRender(result);
     },
     // 避免 XSS
-    saveRender(text){
+    safeRender(text){
       return DOMPurify.sanitize(text);
     },
 
