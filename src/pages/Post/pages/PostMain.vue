@@ -3,7 +3,7 @@
   <div>
     <div class="mobile_top_logo_wrapper">
       <img @click="goTo('/')" src="img/sclemon/sclemon_2.png" alt="">
-      <div class="mobile_version" @click="goToOutlink('https://github.com/SCLemon/skyAcademy/releases')">Version 1.5.6.0 PRE</div>
+      <div class="mobile_version" @click="goToOutlink('https://github.com/SCLemon/skyAcademy/releases')">Version 1.5.6.0</div>
     </div>
     <div class="posterBox">
         <div class="searchBox">
