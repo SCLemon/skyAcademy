@@ -121,6 +121,17 @@ export default {
             isOpenMobileList: false,
         }
     },
+    watch: {
+        // 文件上傳時，自動填入標題
+        'form.fileList'(newVal) {
+            if (newVal && newVal.length > 0) {
+                const file = newVal[0];
+
+                const fileName = file.file.name;
+                if(this.form.title ==='' && fileName) this.form.title = fileName.replace(/\.[^/.]+$/, "");
+            }
+        }
+    },
     async mounted(){
 
         // 禁止在前一頁面渲染時跳頁
