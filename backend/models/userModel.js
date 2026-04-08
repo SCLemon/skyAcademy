@@ -103,6 +103,9 @@ const userSchema = new mongoose.Schema({
     }
 });
 
+// 給 auth.middleware 使用
+userSchema.index({ token: 1, status: 1 });
+
 const userModel = mongoose.model('User', userSchema);
 
 module.exports = userModel;
