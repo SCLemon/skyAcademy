@@ -3,6 +3,9 @@ const fs = require('fs');
 const path = require('path')
 
 function getFolderSize(folderPath) {
+
+    if(!fs.existsSync(folderPath)) return 0;
+
     let totalSize = 0;
     const files = fs.readdirSync(folderPath);
     files.forEach((file) => {
@@ -12,8 +15,9 @@ function getFolderSize(folderPath) {
       else totalSize += stat.size;
     });
   
-    return totalSize;
+    return totalSize; // Bytes
 }
+
 const checkUsageMemory = async(req,res,next)=>{
     try{
         const group = await groupModel.findOne({group: req.user.group})
