@@ -32,7 +32,7 @@
             <pdf-viewer :pdfUrl="`${pdfUrl}?${genRefreshPDFNumber}`" 
                         :httpHeaders="{'x-user-token': getToken()}"
                         :preloadCount="2"
-                        :fakeLoadingProgress="true"
+                        :fakeLoadingProgress="fakeLoadingProgress"
                         :contextLayer="showContextLayer"
             ></pdf-viewer>
         </div>
@@ -128,6 +128,10 @@ export default {
             const isMobile =(/iPhone|iPad|Android/i).test(navigator.userAgent);
             console.log(isMobile)
             return !isMobile;
+        },
+        fakeLoadingProgress(){ // 只在 safari 上回傳 false
+            const isSafari = (/^((?!chrome|android).)*safari/i).test(navigator.userAgent);
+            return !isSafari;
         }
     },
     watch: {

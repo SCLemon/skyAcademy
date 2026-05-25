@@ -299,74 +299,7 @@ export default {
 
       pageObj.canvasWrapper.dataset.rendered = false;
     },
-    
-    // 進行頁面渲染 v1
-    // async safeRenderPage(pageNum, canvasWrapper) {
-      
-    //   const pageObj = this.pageCanvases.find(p => p.pageNum === pageNum);
-    //   if (!pageObj || !this.pdf || canvasWrapper.dataset.rendered === 'true') return
 
-    //   // cache 緩存頁面
-    //   let page = this.pageCache.get(pageNum);
-    //   if (!page) {
-    //     page = await this.pdf.getPage(pageNum);
-    //     this.pageCache.set(pageNum, page);
-        
-    //     // 清除舊頁面資料
-    //     if (this.pageCache.size > 20) {
-    //         const oldest = this.pageCache.keys().next().value;
-    //         const oldPage = this.pageCache.get(oldest);
-    //         if (!pageObj.renderTask && oldPage?.cleanup) {
-    //           await oldPage.cleanup();
-    //         } 
-    //         this.pageCache.delete(oldest);
-    //     }
-    //   }
-      
-    //   // 建立 canvas 並插入到 canvasWrapper
-    //   const canvas = document.createElement('canvas');
-    //   canvas.style.display = 'block';
-    //   canvas.style.marginTop = '5px';
-    //   canvas.style.marginBottom = '5px';
-    //   canvas.dataset.pageNum = pageNum;
-    
-    //   // 開始繪圖
-    //   const containerWidth = this.$refs.pdfContainer.clientWidth;
-    //   const dpr = window.devicePixelRatio || 1;
-    //   const qualityFactor = 1.75;
-    //   const viewport = page.getViewport({ scale: 1 });
-    //   const scale = (containerWidth / viewport.width) * dpr * qualityFactor;
-    //   const scaledViewport = page.getViewport({ scale });
-
-    //   canvas.width = scaledViewport.width;
-    //   canvas.height = scaledViewport.height;
-    //   canvas.style.width = `${containerWidth}px`;
-    //   canvas.style.height = `${(scaledViewport.height / scaledViewport.width) * containerWidth}px`;
-    //   canvas.style.border = '0.5px solid rgba(0,0,0,0.15)';
-    //   canvas.style.boxSizing = 'border-box';
-
-    //   const ctx = canvas.getContext('2d');
-    //   ctx.imageSmoothingEnabled = true;
-    //   ctx.imageSmoothingQuality = 'high';
-
-    //   // 建立 renderTask 並保存
-    //   pageObj.renderTask = page.render({ canvasContext: ctx, viewport: scaledViewport });
-
-    //   try {
-    //     await pageObj.renderTask.promise;
-        
-    //     canvasWrapper.innerHTML = '';
-    //     canvasWrapper.appendChild(canvas);
-    //     canvasWrapper.dataset.rendered = true;
-    //     pageObj.canvasWrapper = canvasWrapper;
-    //   } 
-    //   catch (e) {
-    //     console.log(e)
-    //   } 
-    //   finally {
-    //     pageObj.renderTask = null; // render 完成後清除
-    //   }
-    // },
 
     // 進行頁面渲染 v2 (with text Layer)
     async safeRenderPage(pageNum, canvasWrapper) {
