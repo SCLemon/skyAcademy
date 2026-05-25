@@ -32,6 +32,10 @@ export default {
       type: Number,
       default: 1
     },
+    contextLayer:{
+      type: Boolean,
+      default: true,
+    },
     fakeLoadingProgress:{ // 避免 chrome 的渲染機制問題
       type: Boolean,
       default: false,
@@ -295,8 +299,8 @@ export default {
 
       pageObj.canvasWrapper.dataset.rendered = false;
     },
+    
     // 進行頁面渲染 v1
-
     // async safeRenderPage(pageNum, canvasWrapper) {
       
     //   const pageObj = this.pageCanvases.find(p => p.pageNum === pageNum);
@@ -367,6 +371,9 @@ export default {
     // 進行頁面渲染 v2 (with text Layer)
     async safeRenderPage(pageNum, canvasWrapper) {
 
+      const dpr = window.devicePixelRatio || 1;
+      const qualityFactor = 1.75;
+
       const pageObj = this.pageCanvases.find(p => p.pageNum === pageNum);
       if (!pageObj || !this.pdf || canvasWrapper.dataset.rendered === 'true') return;
 
@@ -396,13 +403,7 @@ export default {
       canvas.style.marginBottom = '5px';
       canvas.dataset.pageNum = pageNum;
 
-      const textLayer = document.createElement('div');
-      textLayer.className = 'textLayer';
-
       const containerWidth = this.$refs.pdfContainer.clientWidth;
-      const dpr = window.devicePixelRatio || 1;
-      const qualityFactor = 1.75;
-
       const viewport = page.getViewport({ scale: 1 });
 
       const renderViewport = page.getViewport({
@@ -422,14 +423,19 @@ export default {
       canvas.style.border = '0.5px solid rgba(0,0,0,.15)';
       canvas.style.boxSizing = 'border-box';
 
-      textLayer.style.width = `${textViewport.width}px`;
-      textLayer.style.height = `${textViewport.height}px`;
-      textLayer.style.position = 'absolute';
-      textLayer.style.top = '0';
-      textLayer.style.left = '0';
+      let textLayer = null;
+
+      if (this.contextLayer) {
+        textLayer = document.createElement('div');
+        textLayer.className = 'textLayer';
+        textLayer.style.width = `${textViewport.width}px`;
+        textLayer.style.height = `${textViewport.height}px`;
+        textLayer.style.position = 'absolute';
+        textLayer.style.top = '0';
+        textLayer.style.left = '0';
+      }
 
       const ctx = canvas.getContext('2d');
-
       ctx.scale(dpr, dpr);
       ctx.imageSmoothingEnabled = false;
 
@@ -442,18 +448,23 @@ export default {
 
         await pageObj.renderTask.promise;
 
-        const textContent = await page.getTextContent();
+        if (this.contextLayer && textLayer) {
+          const textContent = await page.getTextContent();
 
-        await pdfjsLib.renderTextLayer({
-          textContent,
-          container: textLayer,
-          viewport: textViewport
-        });
+          await pdfjsLib.renderTextLayer({
+            textContent,
+            container: textLayer,
+            viewport: textViewport
+          });
+        }
 
         canvasWrapper.innerHTML = '';
 
         canvasWrapper.appendChild(canvas);
-        canvasWrapper.appendChild(textLayer);
+
+        if (this.contextLayer && textLayer) {
+          canvasWrapper.appendChild(textLayer);
+        }
 
         canvasWrapper.dataset.rendered = true;
         pageObj.canvasWrapper = canvasWrapper;
@@ -465,6 +476,7 @@ export default {
       finally {
         pageObj.renderTask = null;
       }
+
     },
 
     async handleResize() {

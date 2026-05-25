@@ -31,8 +31,9 @@
         <div class="pdf" v-else>
             <pdf-viewer :pdfUrl="`${pdfUrl}?${genRefreshPDFNumber}`" 
                         :httpHeaders="{'x-user-token': getToken()}"
-                        :preloadCount="2",
+                        :preloadCount="2"
                         :fakeLoadingProgress="true"
+                        :contextLayer="showContextLayer"
             ></pdf-viewer>
         </div>
         <div class="column">
@@ -120,6 +121,13 @@ export default {
             isSending3:false,
             // 以下為移動端參數
             isOpenMobileList: false,
+        }
+    },
+    computed:{
+        showContextLayer() { // 只在電腦端渲染
+            const isMobile =(/iPhone|iPad|Android/i).test(navigator.userAgent);
+            console.log(isMobile)
+            return !isMobile;
         }
     },
     watch: {
