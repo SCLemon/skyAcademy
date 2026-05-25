@@ -31,12 +31,17 @@ export default {
     preloadCount:{
       type: Number,
       default: 1
+    },
+    fakeLoadingProgress:{ // 避免 chrome 的渲染機制問題
+      type: Boolean,
+      default: false,
     }
   },
   data() {
     return {
       isLoading: true,
       loadProgress:0,
+      loadTimer: null,
       pdf: null,
       pageCache: new Map(),
       pageCanvases: [],
@@ -141,13 +146,23 @@ export default {
           httpHeaders: this.httpHeaders,
           verbosity: pdfjsLib.VerbosityLevel.ERRORS,
 
-        });
+        },);
 
-        // 下載進度條
+        // 下載進度條(偽進度條)
+        if(this.fakeLoadingProgress){
+          this.loadTimer = setInterval(() => {
+            if(this.loadProgress < 90){
+              const step = Math.random() * 5;
+              this.loadProgress += Math.min(Math.floor(step),90);
+            }
+          }, 75);
+        }
+
         loadingTask.onProgress = (progressData) => {
           const { loaded, total } = progressData;
           const percent = Math.min(Math.round((loaded / total) * 100), 100);
           this.loadProgress = percent;
+          clearInterval(this.loadTimer)
         };
 
         this.pdf = await loadingTask.promise;
@@ -351,17 +366,16 @@ export default {
 
     // 進行頁面渲染 v2 (with text Layer)
     async safeRenderPage(pageNum, canvasWrapper) {
-      
+
       const pageObj = this.pageCanvases.find(p => p.pageNum === pageNum);
       if (!pageObj || !this.pdf || canvasWrapper.dataset.rendered === 'true') return;
 
-      // cache 緩存頁面
       let page = this.pageCache.get(pageNum);
+
       if (!page) {
         page = await this.pdf.getPage(pageNum);
         this.pageCache.set(pageNum, page);
 
-        // 清除舊頁面資料
         if (this.pageCache.size > 20) {
           const oldest = this.pageCache.keys().next().value;
           const oldPage = this.pageCache.get(oldest);
@@ -376,65 +390,64 @@ export default {
 
       canvasWrapper.style.position = 'relative';
 
-      // 建立 canvas
       const canvas = document.createElement('canvas');
       canvas.style.display = 'block';
       canvas.style.marginTop = '5px';
       canvas.style.marginBottom = '5px';
       canvas.dataset.pageNum = pageNum;
 
-      // 建立 text layer
       const textLayer = document.createElement('div');
       textLayer.className = 'textLayer';
 
-      // viewport
       const containerWidth = this.$refs.pdfContainer.clientWidth;
       const dpr = window.devicePixelRatio || 1;
+      const qualityFactor = 1.75;
 
       const viewport = page.getViewport({ scale: 1 });
-      const scale = containerWidth / viewport.width;
-      const scaledViewport = page.getViewport({ scale });
 
-      // canvas 尺寸
-      canvas.width = scaledViewport.width * dpr;
-      canvas.height = scaledViewport.height * dpr;
+      const renderViewport = page.getViewport({
+        scale: (containerWidth / viewport.width) * qualityFactor
+      });
 
-      canvas.style.width = `${scaledViewport.width}px`;
-      canvas.style.height = `${scaledViewport.height}px`;
+      const textViewport = page.getViewport({
+        scale: containerWidth / viewport.width
+      });
 
-      canvas.style.border = '0.5px solid rgba(0,0,0,0.15)';
+      canvas.width = renderViewport.width * dpr;
+      canvas.height = renderViewport.height * dpr;
+
+      canvas.style.width = `${textViewport.width}px`;
+      canvas.style.height = `${textViewport.height}px`;
+
+      canvas.style.border = '0.5px solid rgba(0,0,0,.15)';
       canvas.style.boxSizing = 'border-box';
 
-      // text layer 尺寸
-      textLayer.style.width = `${scaledViewport.width}px`;
-      textLayer.style.height = `${scaledViewport.height}px`;
+      textLayer.style.width = `${textViewport.width}px`;
+      textLayer.style.height = `${textViewport.height}px`;
       textLayer.style.position = 'absolute';
       textLayer.style.top = '0';
       textLayer.style.left = '0';
 
       const ctx = canvas.getContext('2d');
+
       ctx.scale(dpr, dpr);
+      ctx.imageSmoothingEnabled = false;
 
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-
-      // render pdf
       pageObj.renderTask = page.render({
         canvasContext: ctx,
-        viewport: scaledViewport
+        viewport: renderViewport
       });
 
       try {
 
         await pageObj.renderTask.promise;
 
-        // render text layer
         const textContent = await page.getTextContent();
 
         await pdfjsLib.renderTextLayer({
-          textContent: textContent,
+          textContent,
           container: textLayer,
-          viewport: scaledViewport
+          viewport: textViewport
         });
 
         canvasWrapper.innerHTML = '';
